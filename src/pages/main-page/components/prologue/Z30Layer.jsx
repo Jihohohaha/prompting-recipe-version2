@@ -2,12 +2,16 @@ import React from 'react';
 
 const Z30_IMAGE_URL = '/images/main-page/Z30Folders.png';
 
-const Z30Layer = ({ onWheel }) => {
+
+const Z30Layer = ({ onWheel, onMouseMove, onMouseEnter, onMouseLeave, maskStyle = {} }) => {
   return (
     <div
       className="absolute top-0 left-0 w-screen h-screen z-30 pointer-events-auto flex select-none"
       onWheel={onWheel}
-      style={{ userSelect: 'none' }}
+      onMouseMove={onMouseMove}
+      onMouseEnter={onMouseEnter}
+      onMouseLeave={onMouseLeave}
+      style={{ userSelect: 'none', ...maskStyle }}
     >
       {/* 왼쪽 검정 영역 */}
       <div className="flex-1 bg-black h-full" />

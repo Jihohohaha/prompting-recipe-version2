@@ -1,25 +1,16 @@
 // src/pages/main-page/effects/HandLight.jsx
-import { useState } from 'react';
-
-const HandLight = () => {
-  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
-
-  const handleMouseMove = (e) => {
-    setMousePos({ x: e.clientX, y: e.clientY });
+// HandLight: 마우스 위치를 받아 마스크 스타일을 반환하는 함수형 컴포넌트
+const HandLight = ({ mousePos, radius = 230 }) => {
+  if (!mousePos) return {};
+  const { x, y } = mousePos;
+  const mask = `radial-gradient(circle ${radius}px at ${x}px ${y}px, transparent 0%, transparent 60%, black 61%, black 100%)`;
+  return {
+    WebkitMaskImage: mask,
+    maskImage: mask,
+    WebkitMaskRepeat: 'no-repeat',
+    maskRepeat: 'no-repeat',
+    transition: 'mask-position 0.1s, -webkit-mask-position 0.1s',
   };
-
-  return (
-    <div
-      className="fixed inset-0 z-20 pointer-events-none"
-      onMouseMove={handleMouseMove}
-      style={{
-        maskImage: `radial-gradient(ellipse 256.5px 231px at ${mousePos.x}px ${mousePos.y}px, rgba(0,0,0,1) 0%, rgba(0,0,0,0.8) 40%, rgba(0,0,0,0) 100%)`,
-        WebkitMaskImage: `radial-gradient(ellipse 256.5px 231px at ${mousePos.x}px ${mousePos.y}px, rgba(0,0,0,1) 0%, rgba(0,0,0,0.8) 40%, rgba(0,0,0,0) 100%)`,
-      }}
-    >
-      <div className="w-full h-full bg-black" />
-    </div>
-  );
 };
 
 export default HandLight;

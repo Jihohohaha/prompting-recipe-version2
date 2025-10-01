@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 
 // Z-0 레이어 (가장 아래)
 import Z0Layer from './Z0Layer'; 
@@ -15,8 +15,9 @@ import Z30Layer from './Z30Layer';
 import HandLight from '../../effects/HandLight';
 
 const Prologue = () => {
-  // SnapScroll에 연결할 ref 생성
   const snapScrollRef = useRef();
+  const [mousePos, setMousePos] = useState(null);
+  const [isHover, setIsHover] = useState(false);
 
   // wheel 이벤트를 SnapScroll로 전달
   const handleWheel = (e) => {
@@ -28,18 +29,31 @@ const Prologue = () => {
     }
   };
 
+  // 마우스 위치 추적 및 hover 상태 관리
+  const handleMouseMove = (e) => {
+    setMousePos({ x: e.clientX, y: e.clientY });
+  };
+  const handleMouseEnter = () => setIsHover(true);
+  const handleMouseLeave = () => setIsHover(false);
+
+  // HandLight로부터 마스크 스타일 생성
+  const maskStyle = isHover && mousePos ? HandLight({ mousePos, radius: 230 }) : {};
+
   return (
-    <div 
-      className="relative mx-auto overflow-hidden" 
+    <div
+      className="relative mx-auto overflow-hidden"
       style={{ width: '1920px', height: '1080px' }}
     >
       <Z0Layer />
-      {/* SnapScroll의 ref를 Z10Layer로 전달 */}
       <Z10Layer snapScrollRef={snapScrollRef} />
       <Z20Layer />
-      {/* wheel 이벤트 핸들러를 Z30Layer로 전달 */}
-      <Z30Layer onWheel={handleWheel} />
-      {/* <HandLight /> */}
+      <Z30Layer
+        onWheel={handleWheel}
+        onMouseMove={handleMouseMove}
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
+        maskStyle={maskStyle}
+      />
     </div>
   );
 };

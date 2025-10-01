@@ -3,6 +3,7 @@ import React from 'react';
 
 const Z20_BACKGROUND_URL = '/images/main-page/Z20Background.png'; 
 
+
 const Z20Layer = () => {
   return (
     <div 
