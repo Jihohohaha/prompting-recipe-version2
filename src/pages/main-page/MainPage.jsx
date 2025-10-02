@@ -23,28 +23,6 @@ const MainPage = () => {
   return (
     <div className="w-full h-screen overflow-hidden">
       {renderPage()}
-      
-      {/* 디버그용 페이지 전환 버튼 */}
-      <div className="fixed bottom-4 right-4 z-50 flex gap-2">
-        <button
-          onClick={() => setCurrentPage('prologue')}
-          className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
-        >
-          Prologue
-        </button>
-        <button
-          onClick={() => setCurrentPage('closue')}
-          className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 transition-colors"
-        >
-          Closue
-        </button>
-        <button
-          onClick={() => setCurrentPage('select')}
-          className="px-4 py-2 bg-purple-500 text-white rounded hover:bg-purple-600 transition-colors"
-        >
-          Select
-        </button>
-      </div>
     </div>
   );
 };

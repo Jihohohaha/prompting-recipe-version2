@@ -1,5 +1,5 @@
 import React from 'react';
-import SnapScroll from '../../effects/SnapScroll';
+import FadeScroll from '../../effects/FadeScroll';
 
 const Z10Layer = ({ snapScrollRef }) => {
   const snapTexts = [
@@ -40,17 +40,16 @@ const Z10Layer = ({ snapScrollRef }) => {
           z-20
         "
       />
-      {/* SnapScroll은 마스킹 영향 밖에서 렌더링 */}
+      {/* FadeScroll은 마스킹 영향 밖에서 렌더링 */}
       <div 
         className="
           absolute
-          flex items-center justify-center
           w-[500px] h-[80px] top-[100px]
           left-1/2 -translate-x-1/2
           rounded-lg z-30
         "
       >
-        <SnapScroll ref={snapScrollRef} snaps={snapTexts} />
+        <FadeScroll ref={snapScrollRef} snaps={snapTexts} />
       </div>
     </div>
   );
