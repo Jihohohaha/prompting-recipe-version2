@@ -1,10 +1,12 @@
 // src/pages/main-page/MainPage.jsx
+
 import { useState } from 'react';
 import Prologue from './components/prologue/Prologue';
 import Closue from './components/closue/Closue';
 import ClosueStatueSelect from './components/closue-statue-select/ClosueStatueSelect';
 
 const MainPage = () => {
+
   const [currentPage, setCurrentPage] = useState('prologue'); // 'prologue', 'closure', 'select'
 
   const renderPage = () => {
