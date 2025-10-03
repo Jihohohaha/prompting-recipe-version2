@@ -26,7 +26,7 @@ const StartVideo = ({ onFinish }) => {
     const t6 = setTimeout(() => setShake(false), 3000); // 6초 후 세 번째 흔들림 끝
     const t7 = setTimeout(() => setShowAssets(true), 3500); // 6초 후 자산 등장 시작
     // 8.5초 후 애니메이션 종료
-    const t8 = setTimeout(() => setFinished(true), 8500);
+    const t8 = setTimeout(() => setFinished(true), 9000);
     return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3); clearTimeout(t4); clearTimeout(t5); clearTimeout(t6); clearTimeout(t7); clearTimeout(t8); };
   }, []);
 
@@ -42,7 +42,7 @@ const StartVideo = ({ onFinish }) => {
 
   return (
     <div
-      className="absolute\n      top-0 left-0 w-screen h-screen\n      z-20 bg-transparent"
+      className="absolute top-0 left-0 w-screen h-screen z-20 bg-transparent"
       style={{ overflow: 'hidden' }}
     >
       {/* 아래 레이어: F5F5F5 배경 + 중앙 이미지 */}
@@ -59,7 +59,6 @@ const StartVideo = ({ onFinish }) => {
             top: vh(centerImage.y),
             width: vw(centerImage.width),
             height: vh(centerImage.height),
-            pointerEvents: 'none',
             userSelect: 'none',
             transform: shake
               ? 'translateX(-20px) rotate(-3deg)'
@@ -92,14 +91,13 @@ const StartVideo = ({ onFinish }) => {
         className="absolute top-0 left-0 w-full h-full z-20"
         style={{
           background: '#000',
-          pointerEvents: 'none',
-          ...getHandLightMask(centerX, centerY, 300),
+          ...getHandLightMask(centerX*(9/10), centerY*(11/10), 230),
         }}
       />
 
       {/* 폴더/글씨 튀어나오는 애니메이션 (z-30으로 올림) */}
       {showAssets && (
-        <div className="absolute top-0 left-0 w-full h-full z-30 pointer-events-none">
+        <div className="absolute top-0 left-0 w-full h-full z-30">
           {folders.map((f, i) => (
             <FlyingAsset
               key={`folder-${i}`}

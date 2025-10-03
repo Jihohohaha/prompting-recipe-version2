@@ -1,22 +1,15 @@
-// src/pages/main-page/effects/HandLight.jsx
-// HandLight: 마우스 위치를 받아 마스크 스타일을 반환하는 함수형 컴포넌트
+// 성능 최적화된 HandLight
 const HandLight = ({ mousePos, radius = 230 }) => {
-  if (!mousePos) return {};
-  const { x, y } = mousePos;
-  // fade, soft edge, gradient 효과를 위한 마스크
-  const mask = `radial-gradient(circle ${radius}px at ${x}px ${y}px,
-    transparent 0%,
-    rgba(0,0,0,0.05) 60%,
-    rgba(0,0,0,0.15) 70%,
-    rgba(0,0,0,0.4) 80%,
-    rgba(0,0,0,0.7) 90%,
-    black 100%)`;
+  // CSS 변수 사용으로 리플로우 최소화
   return {
-    WebkitMaskImage: mask,
-    maskImage: mask,
+    '--mouse-x': `${mousePos.x}px`,
+    '--mouse-y': `${mousePos.y}px`,
+    '--radius': `${radius}px`,
+    WebkitMaskImage: `radial-gradient(circle var(--radius) at var(--mouse-x) var(--mouse-y), transparent 0%, rgba(0,0,0,0.05) 60%, rgba(0,0,0,0.15) 70%, rgba(0,0,0,0.4) 80%, rgba(0,0,0,0.7) 90%, black 100%)`,
+    maskImage: `radial-gradient(circle var(--radius) at var(--mouse-x) var(--mouse-y), transparent 0%, rgba(0,0,0,0.05) 60%, rgba(0,0,0,0.15) 70%, rgba(0,0,0,0.4) 80%, rgba(0,0,0,0.7) 90%, black 100%)`,
     WebkitMaskRepeat: 'no-repeat',
     maskRepeat: 'no-repeat',
-    transition: 'mask-position 0.1s, -webkit-mask-position 0.1s',
+    willChange: 'mask-position, -webkit-mask-position',
   };
 };
 

@@ -170,21 +170,27 @@ const Z30Layer = ({
   onMouseMove,
   onMouseEnter,
   onMouseLeave,
+  onClick, // 클릭 이벤트 추가
   maskStyle = {},
+  isClickable = false, // 클릭 가능 상태 추가
 }) => {
   return (
     <div
-      className="absolute top-0 left-0 w-screen h-screen z-30 pointer-events-auto flex select-none"
+      className={`absolute top-0 left-0 w-screen h-screen z-30 pointer-events-auto flex select-none ${
+        isClickable ? 'cursor-pointer' : 'cursor-default'
+      }`}
       onWheel={onWheel}
       onMouseMove={onMouseMove}
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
+      onClick={onClick}
       style={{
         userSelect: 'none',
         backgroundImage: `url(${Z30_BACKGROUND_URL})`,
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         backgroundRepeat: 'no-repeat',
+        cursor: isClickable ? 'pointer' : 'default',
         ...maskStyle,
       }}
     >
