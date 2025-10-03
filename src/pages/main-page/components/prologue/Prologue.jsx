@@ -41,40 +41,32 @@ const Prologue = () => {
   // HandLight로부터 마스크 스타일 생성
   const maskStyle = isHover && mousePos ? HandLight({ mousePos, radius: 230 }) : {};
 
-  // StartVideo 종료 후 Prologue 본문 표시
+  // StartVideo → Prologue 전환 (콜백 기반)
   const [showPrologue, setShowPrologue] = useState(false);
-  // StartVideo 총 길이(6초 흔들림+애니메이션+여유)
-  React.useEffect(() => {
-    if (!showPrologue) {
-      const t = setTimeout(() => setShowPrologue(true), 9000);
-      return () => clearTimeout(t);
-    }
-  }, [showPrologue]);
 
   return (
     <div
       className="relative mx-auto overflow-hidden"
       style={{ width: '1920px', height: '1080px' }}
     >
-      {/* StartVideo가 끝나면 사라지고 Prologue 본문이 나타남 */}
+      {/* Prologue 본문은 항상 렌더, StartVideo만 위에 덮음 */}
+      <Z0Layer />
+      <Z10Layer snapScrollRef={snapScrollRef} />
+      <Z20Layer />
+      <Z30Layer
+        onWheel={handleWheel}
+        onMouseMove={handleMouseMove}
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
+        maskStyle={maskStyle}
+      />
       {!showPrologue && (
-        <div className="absolute inset-0 z-50 bg-white transition-opacity duration-700" style={{ opacity: showPrologue ? 0 : 1 }}>
-          <StartVideo />
+        <div
+          className="absolute inset-0 z-50 bg-white transition-opacity duration-700"
+          style={{ pointerEvents: 'none' }}
+        >
+          <StartVideo onFinish={() => setShowPrologue(true)} />
         </div>
-      )}
-      {showPrologue && (
-        <>
-          <Z0Layer />
-          <Z10Layer snapScrollRef={snapScrollRef} />
-          <Z20Layer />
-          <Z30Layer
-            onWheel={handleWheel}
-            onMouseMove={handleMouseMove}
-            onMouseEnter={handleMouseEnter}
-            onMouseLeave={handleMouseLeave}
-            maskStyle={maskStyle}
-          />
-        </>
       )}
     </div>
   );

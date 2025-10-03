@@ -74,7 +74,7 @@ const letters = [
 const centerImage = {
   src: '/images/main-page/CreateYourOwnIdea.png',
   width: 689, height: 577,
-  x: convertX(615), y: convertY(279), opacity: 1,
+  x: convertX(645), y: convertY(279), opacity: 1,
 };
 
 const fontUrl = '/fonts/116watermelon.ttf';
