@@ -98,7 +98,6 @@ const FlyingAsset = ({ asset, type, delay, duration, from, to, style, children }
         height: vh(asset.height),
         opacity,
         transform: `rotate(${asset.rotate || 0}deg)` + (style?.transform ? ' ' + style.transform : ''),
-        pointerEvents: 'none',
         userSelect: 'none',
         transition: 'opacity 0.2s',
         ...style,
@@ -118,7 +117,6 @@ const FlyingAsset = ({ asset, type, delay, duration, from, to, style, children }
         lineHeight: 1,
         transform: `rotate(${asset.rotate || 0}deg)` + (style?.transform ? ' ' + style.transform : ''),
         color: '#222',
-        pointerEvents: 'none',
         userSelect: 'none',
         display: 'flex',
         alignItems: 'center',
@@ -161,7 +159,7 @@ const StartVideo = () => {
 
   return (
     <div
-      className="absolute\n      top-0 left-0 w-screen h-screen\n      z-20 bg-transparent"
+      className="absolute top-0 left-0 w-screen h-screen z-20 bg-transparent"
       style={{ overflow: 'hidden' }}
     >
       {/* 아래 레이어: F5F5F5 배경 + 중앙 이미지 */}
@@ -178,7 +176,6 @@ const StartVideo = () => {
             top: vh(centerImage.y),
             width: vw(centerImage.width),
             height: vh(centerImage.height),
-            pointerEvents: 'none',
             userSelect: 'none',
             transform: shake
               ? 'translateX(-20px) rotate(-3deg)'
@@ -211,14 +208,13 @@ const StartVideo = () => {
         className="absolute top-0 left-0 w-full h-full z-20"
         style={{
           background: '#000',
-          pointerEvents: 'none',
           ...getHandLightMask(centerX, centerY, 300),
         }}
       />
 
       {/* 폴더/글씨 튀어나오는 애니메이션 (z-30으로 올림) */}
       {showAssets && (
-        <div className="absolute top-0 left-0 w-full h-full z-30 pointer-events-none">
+        <div className="absolute top-0 left-0 w-full h-full z-30">
           {folders.map((f, i) => (
             <FlyingAsset
               key={`folder-${i}`}

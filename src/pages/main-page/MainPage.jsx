@@ -12,13 +12,13 @@ const MainPage = () => {
   const renderPage = () => {
     switch (currentPage) {
       case 'prologue':
-        return <Prologue />;
+        return <Prologue onComplete={() => setCurrentPage('closure')} />;
       case 'closure':
-        return <Closue />;
+        return <Closue onComplete={() => setCurrentPage('select')} />;
       case 'select':
         return <ClosueStatueSelect />;
       default:
-        return <Prologue />;
+        return <Prologue onComplete={() => setCurrentPage('closure')} />;
     }
   };
 

@@ -1,8 +1,9 @@
 // FadeScroll.jsx
 import React, { forwardRef, useState, useEffect, useRef } from 'react';
 
-const FadeScroll = forwardRef(({ snaps }, ref) => {
+const FadeScroll = forwardRef(({ snaps, onScrollComplete }, ref) => {
   const [scrollProgress, setScrollProgress] = useState(0);
+  const [hasCompletedOnce, setHasCompletedOnce] = useState(false);
   const containerRef = useRef(null);
 
   useEffect(() => {
@@ -14,6 +15,14 @@ const FadeScroll = forwardRef(({ snaps }, ref) => {
       const scrollHeight = container.scrollHeight - container.clientHeight;
       const progress = scrollTop / scrollHeight;
       setScrollProgress(progress);
+      
+      // 스크롤이 90% 이상 완료되면 처음으로 완료된 것으로 간주
+      if (progress >= 0.9 && !hasCompletedOnce) {
+        setHasCompletedOnce(true);
+        if (onScrollComplete) {
+          onScrollComplete();
+        }
+      }
     };
 
     container.addEventListener('scroll', handleScroll);
