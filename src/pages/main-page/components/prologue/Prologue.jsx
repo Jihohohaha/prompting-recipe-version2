@@ -1,4 +1,4 @@
-import React, { useRef, useState, useCallback, useEffect } from 'react';
+import React, { useRef, useState, useCallback, useEffect, useMemo } from 'react';
 
 import Z0Layer from './Z0Layer'; 
 import Z10Layer from './Z10Layer'; 
@@ -27,22 +27,21 @@ const Prologue = ({ onComplete }) => {
   // throttle 간격 조절 (밀리초 단위)
   const THROTTLE_MS = 150; // 16ms = 60fps, 33ms = 30fps, 50ms = 20fps 값 올리면 렉 주는 대신, Light가 끊기면서 이동
 
-  // 더 강한 throttle 적용
+  // 최적화된 마우스 이벤트 - RAF만 사용하고 시간 기반 throttling 제거
   const handleMouseMove = useCallback((e) => {
     if (rafRef.current) return;
     
     rafRef.current = requestAnimationFrame(() => {
-      const now = Date.now();
-      if (now - lastUpdateRef.current >= THROTTLE_MS) {
-        setMousePos({ x: e.clientX, y: e.clientY });
-        lastUpdateRef.current = now;
-      }
+      setMousePos({ x: e.clientX, y: e.clientY });
       rafRef.current = null;
     });
   }, []);
 
   const handleMouseEnter = useCallback(() => setIsHover(true), []);
-  const handleMouseLeave = useCallback(() => setIsHover(false), []);
+  const handleMouseLeave = useCallback(() => {
+    setIsHover(false);
+    setMousePos(null); // 마우스가 벗어나면 null로 설정
+  }, []);
 
   const [videoEnded, setVideoEnded] = useState(false);
   const [isScrollCompleted, setIsScrollCompleted] = useState(false);
@@ -57,8 +56,11 @@ const Prologue = ({ onComplete }) => {
     }
   }, [videoEnded, isScrollCompleted, onComplete]);
 
-  // HandLight로부터 마스크 스타일 생성 (과거 방식)
-  const maskStyle = isHover && mousePos ? HandLight({ mousePos, radius: 230 }) : {};
+  // HandLight 마스크 스타일을 메모이제이션으로 최적화
+  const maskStyle = useMemo(() => {
+    if (!isHover || !mousePos) return {};
+    return HandLight({ mousePos, radius: 230 });
+  }, [isHover, mousePos]);
   
   useEffect(() => {
     const t = setTimeout(() => setVideoEnded(true), 9000);
@@ -97,14 +99,14 @@ const Prologue = ({ onComplete }) => {
       )}
       
       {videoEnded && (
-        <div className="absolute bottom-10 left-1/2 transform -translate-x-1/2 z-40 text-white text-center">
+        <div className="absolute bottom-20 left-1/2 transform -translate-x-1/2 z-[100] text-center">
           {!isScrollCompleted ? (
-            <p className="text-lg opacity-70">
+            <p className="text-xl font-bold px-6 py-3 bg-black text-white rounded-lg shadow-xl border-2 border-white">
               스크롤하여 모든 문장을 확인하세요
             </p>
           ) : (
-            <p className="text-lg opacity-90 animate-pulse cursor-pointer">
-              클릭하세요
+            <p className="text-xl font-bold px-6 py-3 bg-blue-600 text-white rounded-full animate-pulse shadow-xl border-2 border-white">
+              클릭하세요!
             </p>
           )}
         </div>

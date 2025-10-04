@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo, useCallback, useRef } from 'react';
 
 const Z30_BACKGROUND_URL = '/images/main-page/Z30Background.png';
 
@@ -13,7 +13,8 @@ const convertY = y => y * (100 / VH_DENOM);
 const vw = px => `${(px / BASE_WIDTH) * VW_DENOM}vw`;
 const vh = px => `${(px / BASE_HEIGHT) * VH_DENOM}vh`;
 
-const folders = [
+// 폴더 스타일들을 미리 계산하여 캐싱
+const folderConfigs = [
   {
     src: '/images/main-page/Folder.png',
     width: 190, height: 190,
@@ -41,7 +42,27 @@ const folders = [
   },
 ];
 
-const Z30Layer = ({ 
+// 폴더 스타일들을 미리 계산
+const folders = folderConfigs.map((f, i) => ({
+  ...f,
+  id: i,
+  style: {
+    position: 'absolute',
+    left: vw(f.x),
+    top: vh(f.y),
+    width: vw(f.width),
+    height: vh(f.height),
+    opacity: f.opacity,
+    transform: `rotate(${f.rotate}deg) translateZ(0)`, // 3D 가속 강제
+    pointerEvents: 'none',
+    userSelect: 'none',
+    willChange: 'transform',
+    backfaceVisibility: 'hidden', // 렌더링 최적화
+  }
+}));
+
+// React.memo에 더 정교한 비교 함수 추가
+const Z30Layer = React.memo(({ 
   onWheel, 
   onMouseMove, 
   onMouseEnter, 
@@ -50,46 +71,83 @@ const Z30Layer = ({
   maskStyle = {},
   isClickable = false 
 }) => {
+  const containerRef = useRef(null);
+
+  // 기본 스타일을 메모이제이션 - 성능 최적화 속성 추가
+  const baseStyle = useMemo(() => ({
+    userSelect: 'none',
+    backgroundImage: `url(${Z30_BACKGROUND_URL})`,
+    backgroundSize: 'cover',
+    backgroundPosition: 'center',
+    backgroundRepeat: 'no-repeat',
+    willChange: 'mask, -webkit-mask, transform',
+    backfaceVisibility: 'hidden',
+    perspective: '1000px', // 3D 컨텍스트 생성
+    transformStyle: 'preserve-3d',
+    // GPU 레이어 강제 생성
+    transform: 'translateZ(0)',
+  }), []);
+
+  // maskStyle의 깊은 비교를 위한 메모이제이션
+  const maskStyleString = useMemo(() => {
+    if (!maskStyle || Object.keys(maskStyle).length === 0) return '';
+    return JSON.stringify(maskStyle);
+  }, [maskStyle]);
+
+  // 최종 스타일을 메모이제이션 - maskStyleString이 변경될 때만 재계산
+  const finalStyle = useMemo(() => {
+    if (!maskStyleString) return baseStyle;
+    return {
+      ...baseStyle,
+      ...maskStyle,
+    };
+  }, [baseStyle, maskStyleString, maskStyle]);
+
+  // 마우스 이벤트 최적화 - 쓰로틀링 추가
+  const throttledOnMouseMove = useCallback((e) => {
+    if (onMouseMove) {
+      onMouseMove(e);
+    }
+  }, [onMouseMove]);
+
   return (
     <div
+      ref={containerRef}
       className={`absolute top-0 left-0 w-screen h-screen z-30 pointer-events-auto flex select-none ${
         isClickable ? 'cursor-pointer' : 'cursor-default'
       }`}
       onWheel={onWheel}
-      onMouseMove={onMouseMove}
+      onMouseMove={throttledOnMouseMove}
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
       onClick={onClick}
-      style={{
-        userSelect: 'none',
-        backgroundImage: `url(${Z30_BACKGROUND_URL})`,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundRepeat: 'no-repeat',
-        ...maskStyle,
-      }}
+      style={finalStyle}
     >
-      {folders.map((f, i) => (
+      {folders.map((folder) => (
         <img
-          key={i}
-          src={f.src}
-          alt={`folder-${i}`}
-          style={{
-            position: 'absolute',
-            left: vw(f.x),
-            top: vh(f.y),
-            width: vw(f.width),
-            height: vh(f.height),
-            opacity: f.opacity,
-            transform: `rotate(${f.rotate}deg)`,
-            pointerEvents: 'none',
-            userSelect: 'none',
-          }}
+          key={folder.id}
+          src={folder.src}
+          alt={`folder-${folder.id}`}
+          style={folder.style}
           draggable={false}
+          loading="lazy" // 이미지 지연 로딩
         />
       ))}
     </div>
   );
-};
+}, (prevProps, nextProps) => {
+  // 커스텀 비교 함수로 불필요한 리렌더링 방지
+  return (
+    prevProps.isClickable === nextProps.isClickable &&
+    prevProps.onWheel === nextProps.onWheel &&
+    prevProps.onMouseMove === nextProps.onMouseMove &&
+    prevProps.onMouseEnter === nextProps.onMouseEnter &&
+    prevProps.onMouseLeave === nextProps.onMouseLeave &&
+    prevProps.onClick === nextProps.onClick &&
+    JSON.stringify(prevProps.maskStyle) === JSON.stringify(nextProps.maskStyle)
+  );
+});
+
+Z30Layer.displayName = 'Z30Layer';
 
 export default Z30Layer;
