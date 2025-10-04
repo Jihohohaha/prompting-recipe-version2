@@ -25,7 +25,7 @@ const Prologue = ({ onComplete }) => {
   }, []);
 
   // throttle 간격 조절 (밀리초 단위)
-  const THROTTLE_MS = 200; // 16ms = 60fps, 33ms = 30fps, 50ms = 20fps 값 올리면 렉 주는 대신, Light가 끊기면서 이동
+  const THROTTLE_MS = 150; // 16ms = 60fps, 33ms = 30fps, 50ms = 20fps 값 올리면 렉 주는 대신, Light가 끊기면서 이동
 
   // 더 강한 throttle 적용
   const handleMouseMove = useCallback((e) => {
