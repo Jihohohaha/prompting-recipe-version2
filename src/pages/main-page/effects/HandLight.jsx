@@ -1,15 +1,21 @@
-// 성능 최적화된 HandLight
+// 극한 성능 최적화된 HandLight
 const HandLight = ({ mousePos, radius = 230 }) => {
-  // CSS 변수 사용으로 리플로우 최소화
+  if (!mousePos) return {};
+  
+  // 간소화된 그라디언트 - 적은 색상 단계로 렌더링 부하 감소
+  const maskValue = `radial-gradient(circle ${radius}px at ${mousePos.x}px ${mousePos.y}px, transparent 0%, rgba(0,0,0,0.1) 70%, rgba(0,0,0,0.6) 85%, black 100%)`;
+  
   return {
-    '--mouse-x': `${mousePos.x}px`,
-    '--mouse-y': `${mousePos.y}px`,
-    '--radius': `${radius}px`,
-    WebkitMaskImage: `radial-gradient(circle var(--radius) at var(--mouse-x) var(--mouse-y), transparent 0%, rgba(0,0,0,0.05) 60%, rgba(0,0,0,0.15) 70%, rgba(0,0,0,0.4) 80%, rgba(0,0,0,0.7) 90%, black 100%)`,
-    maskImage: `radial-gradient(circle var(--radius) at var(--mouse-x) var(--mouse-y), transparent 0%, rgba(0,0,0,0.05) 60%, rgba(0,0,0,0.15) 70%, rgba(0,0,0,0.4) 80%, rgba(0,0,0,0.7) 90%, black 100%)`,
+    WebkitMaskImage: maskValue,
+    maskImage: maskValue,
     WebkitMaskRepeat: 'no-repeat',
     maskRepeat: 'no-repeat',
+    // GPU 가속 강제 적용
     willChange: 'mask-position, -webkit-mask-position',
+    backfaceVisibility: 'hidden',
+    transform: 'translateZ(0)', // GPU 레이어 강제 생성
+    // 렌더링 힌트
+    imageRendering: 'optimizeSpeed',
   };
 };
 
