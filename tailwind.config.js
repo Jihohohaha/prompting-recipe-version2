@@ -14,6 +14,13 @@ export default {
         koolegant: ['Koolegant', 'sans-serif'],
         watermelon: ['116Watermelon', 'sans-serif'],
       },
+      zIndex: {
+        60: '60',
+        70: '70',
+        80: '80',
+        90: '90',
+        100: '100',
+      },
     },
   },
   plugins: [],
