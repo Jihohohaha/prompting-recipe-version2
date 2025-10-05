@@ -40,8 +40,9 @@ const FirstOpeningClosue = ({ onFinish }) => {
             y: 100,
           }}
           animate={isOpen ? {
-            rotate: -60,
-            y: 20,
+            rotate: -20,
+            y: -70,
+            x: 80,
           } : {}}
           transition={{ duration: 1, ease: "easeOut" }}
           style={{ 

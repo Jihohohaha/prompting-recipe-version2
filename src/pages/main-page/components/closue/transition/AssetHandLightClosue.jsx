@@ -1,17 +1,20 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { folders, letters, centerImage, vw, vh, fontUrl } from '../../start-video/assetData';
+// 원본 px 좌표/크기용 centerImageRaw를 assetData.js에서 export한다고 가정
+import { centerImageRaw } from '../../start-video/assetData.js';
 import AppearanceClosue from '../animation/AppearanceClosue';
 import FirstOpeningClosue from '../animation/FirstOpeningClosue';
 import AssetConverge from '../animation/AssetConverge';
 import SecondOpeningClosue from '../animation/SecondOpeningClosue';
+import HandLight from '../../../effects/HandLight';
 
 const AssetsHandLightClosue = ({ mousePos, onAnimationComplete }) => {
   const urlParams = new URLSearchParams(window.location.search);
   const debugStep = parseInt(urlParams.get('step')) || 0;
   
   const [step, setStep] = useState(debugStep);
-  const [isPaused, setIsPaused] = useState(false); // 일시정지 상태
+  const [isPaused, setIsPaused] = useState(false);
   const isDebugMode = urlParams.has('step');
 
   useEffect(() => {
@@ -35,13 +38,14 @@ const AssetsHandLightClosue = ({ mousePos, onAnimationComplete }) => {
     }
   }, [step, onAnimationComplete, isPaused]);
 
-  // HandLight mask 스타일
-  const centerX = centerImage.x * (90 / 100) + (centerImage.width * 90 / 100) / 2;
-  const centerY = centerImage.y * (110 / 100) + (centerImage.height * 110 / 100) / 2;
-  const radius = 300;
+  // ✅ StartVideo/Prologue와 동일하게 원본 px 좌표로 중앙 계산
+  const centerX = centerImageRaw.x + centerImageRaw.width / 2;
+  const centerY = centerImageRaw.y + centerImageRaw.height / 2;
+  const radius = 500; // ⬅️ 크기 수정은 여기서 하세요!
 
-  const finalX = mousePos?.x || (typeof window !== 'undefined' ? centerX * window.innerWidth / 100 : centerX);
-  const finalY = mousePos?.y || (typeof window !== 'undefined' ? centerY * window.innerHeight / 100 : centerY);
+  // 고정 위치 계산 (픽셀 단위, 변환 없이 그대로 사용)
+  const finalX = centerX;
+  const finalY = centerY;
 
   const showAssets = step < 4;
 
@@ -97,6 +101,11 @@ const AssetsHandLightClosue = ({ mousePos, onAnimationComplete }) => {
           <div className="mt-2 pt-2 border-t border-gray-300 text-xs text-blue-600">
             💡 URL에 ?step=3 추가해서 바로 이동 가능
           </div>
+          <div className="mt-2 pt-2 border-t border-green-600 text-xs text-green-600 font-bold">
+            🔒 HandLight 고정 위치: ({Math.round(finalX)}, {Math.round(finalY)})
+            <br />
+            📏 Radius: {radius}px
+          </div>
         </div>
       )}
 
@@ -104,15 +113,15 @@ const AssetsHandLightClosue = ({ mousePos, onAnimationComplete }) => {
       <div className="absolute inset-0 z-10 bg-[#F5F5F5]">
         {showAssets && (
           <>
-            {/* 중앙 이미지 */}
+            {/* ✅ CreateYourOwnIdea.png 중앙 이미지 추가 */}
             <motion.img
               key={`center-${step}`}
               src={centerImage.src}
               alt="center"
               initial={step === 3 ? { x: 0, y: 0, scale: 1, opacity: 1 } : {}}
               animate={step === 3 && !isPaused ? {
-                x: 'calc(30vw - 50%)',
-                y: 'calc(80vh - 50%)',
+                x: `calc(50vw - ${vw(centerImage.x)} - ${vw(centerImage.width / 2)})`,
+                y: `calc(70vh - ${vh(centerImage.y)} - ${vh(centerImage.height / 2)})`,
                 scale: 0,
                 opacity: 0,
               } : {}}
@@ -136,7 +145,7 @@ const AssetsHandLightClosue = ({ mousePos, onAnimationComplete }) => {
                 initial={step === 3 ? { x: 0, y: 0, scale: 1, opacity: f.opacity } : {}}
                 animate={step === 3 && !isPaused ? {
                   x: `calc(50vw - ${vw(f.x)} - 50%)`,
-                  y: `calc(50vh - ${vh(f.y)} - 50%)`,
+                  y: `calc(70vh - ${vh(f.y)} - 50%)`,
                   scale: 0,
                   opacity: 0,
                 } : {}}
@@ -168,7 +177,7 @@ const AssetsHandLightClosue = ({ mousePos, onAnimationComplete }) => {
                 initial={step === 3 ? { x: 0, y: 0, scale: 1, opacity: 1 } : {}}
                 animate={step === 3 && !isPaused ? {
                   x: `calc(50vw - ${vw(l.x)} - 50%)`,
-                  y: `calc(50vh - ${vh(l.y)} - 50%)`,
+                  y: `calc(70vh - ${vh(l.y)} - 50%)`,
                   scale: 0,
                   opacity: 0,
                 } : {}}
@@ -196,14 +205,19 @@ const AssetsHandLightClosue = ({ mousePos, onAnimationComplete }) => {
         )}
       </div>
 
-      {/* Z-20: HandLight 마스킹 효과 */}
-      <div 
-        className="absolute inset-0 z-20 bg-black pointer-events-none"
-        style={{
-          maskImage: `radial-gradient(circle ${radius}px at ${finalX}px ${finalY}px, transparent 0%, black 100%)`,
-          WebkitMaskImage: `radial-gradient(circle ${radius}px at ${finalX}px ${finalY}px, transparent 0%, black 100%)`,
-        }}
-      />
+      {/* Z-20: HandLight 마스킹 효과 (고정 위치) */}
+      {(() => {
+        console.log('[HandLight Mask] finalX:', finalX, 'finalY:', finalY, 'radius:', radius);
+        return (
+          <div 
+            className="absolute inset-0 z-20 bg-black pointer-events-none"
+            style={{
+              maskImage: `radial-gradient(circle ${radius}px at ${finalX}px ${finalY}px, transparent 0%, rgba(0,0,0,0.1) 70%, rgba(0,0,0,0.6) 85%, black 100%)`,
+              WebkitMaskImage: `radial-gradient(circle ${radius}px at ${finalX}px ${finalY}px, transparent 0%, transparent 0%, rgba(0,0,0,0.1) 70%, rgba(0,0,0,0.6) 85%, black 100%)`,
+            }}
+          />
+        );
+      })()}
 
       {/* 애니메이션 단계별 오버레이 */}
       <AnimatePresence mode="wait">

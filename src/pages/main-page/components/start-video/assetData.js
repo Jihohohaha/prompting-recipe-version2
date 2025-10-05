@@ -1,3 +1,10 @@
+// 원본 px 좌표/크기 (HandLight 중앙 계산용)
+export const centerImageRaw = {
+  x: 615,
+  y: 279,
+  width: 689,
+  height: 577,
+};
 // 폴더/글씨 asset 정보 및 변환 함수
 import { BASE_WIDTH, BASE_HEIGHT } from './handlightUtil';
 

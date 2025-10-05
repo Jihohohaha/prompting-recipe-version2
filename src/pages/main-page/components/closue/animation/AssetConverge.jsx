@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import { motion } from 'framer-motion';
 
 const AssetConverge = ({ onFinish }) => {
   useEffect(() => {
@@ -20,12 +21,22 @@ const AssetConverge = ({ onFinish }) => {
         />
         
         {/* Closue Dom (열린 상태 유지) */}
-        <img
+        <motion.img
           src="/images/main-page/closue_dom.png"
           alt="closue-dom"
           className="absolute bottom-0 left-0 w-full"
-          style={{ 
-            transform: 'rotate(-60deg) translateY(20px)',
+          initial={{
+            rotate: -20,
+            y: -70,
+            x: 80,
+          }}
+          animate={{
+            rotate: -20,
+            y: -70,
+            x: 80,
+          }}
+          transition={{ duration: 0 }}
+          style={{
             transformOrigin: 'bottom left',
           }}
         />
