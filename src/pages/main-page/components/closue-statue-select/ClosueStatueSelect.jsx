@@ -2,7 +2,12 @@ import React, { useState, useEffect, useRef } from 'react';
 
 const ClosueStatueSelect = () => {
   const [scrollY, setScrollY] = useState(0);
+  const [currentSnapIndex, setCurrentSnapIndex] = useState(2); // 중간 위치(0도)로 시작
   const containerRef = useRef(null);
+  
+  // 스냅 포인트들 (60도씩 회전 - 반시계 방향)
+  const snapAngles = [120, 60, 0, -60, -120];
+  const totalSnaps = snapAngles.length;
   
   // 그릇 데이터 (4개)
   const dishes = [
@@ -40,51 +45,101 @@ const ClosueStatueSelect = () => {
     }
   ];
 
+  // 초기 스크롤 위치 설정 (중간 위치로)
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+    
+    // 페이지 로드 후 중간 위치(2번 인덱스)로 스크롤
+    setTimeout(() => {
+      container.scrollTop = container.clientHeight * 2; // 2번째 섹션으로 이동
+    }, 100);
+  }, []);
+
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
 
+    let scrollTimeout;
+    
     const handleScroll = () => {
+      // 스크롤이 끝날 때까지 기다린 후 위치 업데이트
+      clearTimeout(scrollTimeout);
+      scrollTimeout = setTimeout(() => {
+        const scrollTop = container.scrollTop;
+        const sectionHeight = container.clientHeight;
+        const currentSection = Math.round(scrollTop / sectionHeight);
+        const clampedSection = Math.max(0, Math.min(totalSnaps - 1, currentSection));
+        
+        setCurrentSnapIndex(clampedSection);
+      }, 100); // 100ms 지연으로 스크롤 완료 감지
+      
       setScrollY(container.scrollTop);
     };
 
     container.addEventListener('scroll', handleScroll);
-    return () => container.removeEventListener('scroll', handleScroll);
-  }, []);
+    return () => {
+      container.removeEventListener('scroll', handleScroll);
+      clearTimeout(scrollTimeout);
+    };
+  }, [totalSnaps]);
 
-  // 원형 배치를 위한 각도 계산 (스크롤에 따라 회전)
-  const getCirclePosition = (index, totalItems = 4) => {
-    // 각 그릇의 초기 위치 각도 설정 (화면에 잘 보이도록)
-    const baseAngles = [30, 330, 270, 210]; // 오른쪽, 아래, 왼쪽, 위
+  // 원형 배치를 위한 각도 계산 (스냅 기반)
+  const getCirclePosition = (index) => {
+    // 각 그릇의 초기 위치 각도 설정 (시계방향으로 배치)
+    const baseAngles = [30, 330, 270, 210]; // 오른쪽 위, 오른쪽 아래, 왼쪽 아래, 왼쪽 위
     const baseAngle = baseAngles[index];
-    // 스크롤할 때마다 큰 원을 따라 조금씩 회전하도록 설정 (시계 방향, 최대 60도)
-    const maxRotation = 60; // 최대 회전 각도를 60도로 제한
-    const rawScrollRotation = -(scrollY / 50); // 원본 스크롤 회전값
-    const scrollRotation = Math.max(-maxRotation, Math.min(maxRotation, rawScrollRotation)); // -60도 ~ 60도 사이로 제한
-    const angle = baseAngle + scrollRotation;
-    const radius = 400; // 반지름을 줄여서 화면에 모든 그릇이 보이도록
+    
+    // 현재 스냅 인덱스에 따른 회전각도 (기본값 0)
+    const snapRotation = snapAngles[currentSnapIndex] || 0;
+    const angle = baseAngle + snapRotation;
+    const radius = 400;
     const centerX = window.innerWidth / 2;
-    const centerY = window.innerHeight / 2 + 350; // 중심을 화면 중앙으로
+    const centerY = window.innerHeight / 2 + 350;
 
     const x = centerX + radius * Math.cos((angle * Math.PI) / 180);
     const y = centerY + radius * Math.sin((angle * Math.PI) / 180);
-
+    
     return { x, y, angle };
   };
 
   return (
-    <div className="relative w-screen h-screen overflow-hidden bg-gradient-to-b from-orange-400 to-orange-500">
-      {/* 스크롤 가능한 컨테이너 */}
-      <div
-        ref={containerRef}
-        className="absolute inset-0 overflow-y-scroll z-50"
-        style={{
-          scrollbarWidth: 'none',
-          msOverflowStyle: 'none',
-          pointerEvents: 'auto'
-        }}
-      >
-        <div style={{ height: '600vh' }} /> {/* 60도 회전에 필요한 만큼만 스크롤 가능하게 제한 */}
+    <>
+      {/* 부드러운 전환을 위한 CSS 스타일 */}
+      <style jsx>{`
+        .smooth-scroll-container {
+          scroll-behavior: smooth;
+          -webkit-overflow-scrolling: touch;
+        }
+        .dish-transition {
+          transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+          will-change: transform, opacity;
+        }
+      `}</style>
+      
+      <div className="relative w-screen h-screen overflow-hidden bg-gradient-to-b from-orange-400 to-orange-500">
+        {/* 스크롤 가능한 컨테이너 - Snap Scroll */}
+        <div
+          ref={containerRef}
+          className="absolute inset-0 overflow-y-auto z-50 snap-y snap-mandatory smooth-scroll-container"
+          style={{
+            scrollbarWidth: 'none',
+            msOverflowStyle: 'none',
+            pointerEvents: 'auto',
+            scrollBehavior: 'smooth'
+          }}
+        >
+        {/* 각 스냅 포인트를 위한 섹션들 */}
+        {snapAngles.map((angle, index) => (
+          <div 
+            key={index}
+            className="h-screen w-full snap-start snap-always flex items-center justify-center"
+          >
+            <div className="text-white text-center opacity-20">
+              <div className="text-sm font-light">회전: {angle}°</div>
+            </div>
+          </div>
+        ))}
       </div>
 
       {/* 제목 */}
@@ -118,7 +173,7 @@ const ClosueStatueSelect = () => {
         return (
           <div
             key={dish.id}
-            className="absolute z-30 pointer-events-none"
+            className="absolute z-30 pointer-events-none dish-transition"
             style={{
               left: position.x - 200, // 그릇 크기의 절반만큼 오프셋 (400px의 절반)
               top: position.y - 200,
@@ -166,7 +221,8 @@ const ClosueStatueSelect = () => {
           스크롤하여 그릇을 돌려보세요
         </p>
       </div>
-    </div>
+      </div>
+    </>
   );
 };
 
