@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+
+import React from 'react';
 import { motion } from 'framer-motion';
 
 const OpenedClosue = ({ onComplete }) => {
@@ -85,20 +86,18 @@ const OpenedClosue = ({ onComplete }) => {
   };
 
   return (
-    <div 
-      className="relative w-screen h-screen overflow-hidden bg-[#F5F5F5]"
-      onClick={handleClick}
-      style={{ cursor: isScrollCompleted ? 'pointer' : 'default' }}
-    >
-      {/* 열린 클로슈 (하단) */}
-      <div className="absolute inset-0 z-10 flex items-end justify-center pb-10">
+    <div className="relative w-screen h-screen overflow-hidden">
+      {/* Z-10: 밝은 배경층 */}
+      <div className="absolute inset-0 z-10 bg-[#F5F5F5] flex items-end justify-center pb-10 pointer-events-none">
         <div className="relative" style={{ width: 'calc(60vw * 0.8)', maxWidth: '800px' }}>
+          {/* Closue Plate (고정) */}
           <img
             src="/images/main-page/closue_plate.png"
             alt="closue-plate"
             className="w-full"
             style={{ display: 'block', transform: 'translateY(250px)' }}
           />
+          {/* Closue Dom (열린 상태) */}
           <motion.img
             src="/images/main-page/closue_dom.png"
             alt="closue-dom"
@@ -121,83 +120,71 @@ const OpenedClosue = ({ onComplete }) => {
         </div>
       </div>
 
-      {/* 오버레이 + 서비스명 (상단) */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 1 }}
-        className="absolute inset-0 z-20 flex flex-col items-center justify-center"
+      {/* Z-20: 어두운 흐릿한 오버레이 */}
+      <div
+        className="absolute inset-0 z-20"
         style={{
-          backgroundColor: 'rgba(0, 0, 0, 0.5)',
-          backdropFilter: 'blur(10px)',
+          background: 'rgba(0,0,0,0.7)',
+          backdropFilter: 'blur(1px)',
+          WebkitBackdropFilter: 'blur(1px)',
+          transition: 'opacity 0.2s',
         }}
-      >
-        {/* 서비스명 - 스크롤 채우기 효과 */}
-        <motion.div
-          initial={{ scale: 0.8, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          transition={{ delay: 0.5, duration: 0.8 }}
-          className="absolute text-[80px] font-bold text-center"
+      />
+
+      {/* Z-30: PRomptinG 중심이 페이지 정중앙, [RECIPE]와 서브멘트는 아래 */}
+      <div className="absolute inset-0 z-30 pointer-events-none">
+        <div
+          style={{
+            position: 'absolute',
+            left: '50%',
+            top: '50%',
+            transform: 'translate(-50%, -50%)',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+          }}
         >
-          {/* 기본 텍스트 (흰색) */}
-          <div className="relative">
-            <div className='font-stretch text-white'>PRompting</div>
-            <div className='font-desira text-white'>[RECIPe]</div>
-            
-            {/* 오버레이 텍스트 (주황색) - 스크롤 진행도에 따라 위에서부터 채워짐 */}
-            <div 
-              className="absolute top-0 left-0 overflow-hidden"
-              style={{
-                height: `${scrollProgress * 100}%`,
-              }}
-            >
-              <div className='font-stretch text-orange-500'>PRompting</div>
-              <div className='font-desira text-orange-500'>[RECIPe]</div>
-            </div>
-          </div>
-        </motion.div>
-        
-        {/* FadeScroll 컨테이너 */}
-        <div className="relative w-full h-full">
-          {/* 스크롤 가능한 투명 컨테이너 */}
-          <div
-            ref={containerRef}
-            className="absolute inset-0 overflow-y-scroll"
+          {/* PRomptinG: 정확히 중앙 */}
+          <span
+            className="text-[80px] font-stretch leading-none text-white"
             style={{
-              scrollbarWidth: 'none',
-              msOverflowStyle: 'none'
+              fontFamily: 'StretchPro, sans-serif',
+              lineHeight: 1,
+              pointerEvents: 'none',
             }}
           >
-            <div style={{ height: `${scrollTexts.length * 100}vh` }} />
-          </div>
-          
-          {/* 고정 위치에 배치된 텍스트들 */}
-          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-            {scrollTexts.map((lines, index) => (
-              <div 
-                key={index}
-                className="absolute text-white text-[20px] font-bold font-pretendard mt-[360px] text-center px-4 leading-relaxed"
-                style={{ 
-                  opacity: getOpacity(index)
-                }}
-              >
-                {lines.map((line, lineIndex) => (
-                  <div key={lineIndex}>{line}</div>
-                ))}
-              </div>
-            ))}
+            PRomptinG
+          </span>
+        </div>
+        {/* [RECIPE]와 서브 멘트: PRomptinG 아래에 절대좌표로 배치 */}
+        <div
+          style={{
+            position: 'absolute',
+            left: '50%',
+            top: '50%',
+            transform: 'translate(-50%, 0)',
+            marginTop: '90px', // PRomptinG 아래로 충분히 띄움
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            width: '100%',
+            pointerEvents: 'none',
+          }}
+        >
+          <span
+            className="text-[60px] font-desira leading-none text-white"
+            style={{ fontFamily: 'DesiraDEMO, sans-serif', lineHeight: 1 }}
+          >
+            [RECIPE]
+          </span>
+          <div
+            className="text-center text-white mt-8"
+            style={{ fontFamily: 'Pretendard, sans-serif', fontSize: '20px' }}
+          >
+            그것은 곧 프롬프트 엔지니어링,<br />언어를 다루는 비밀 조리법이었다.
           </div>
         </div>
-      </motion.div>
-      
-      {/* 스크롤 완료 후 클릭 안내 */}
-      {isScrollCompleted && (
-        <div className="absolute bottom-20 left-1/2 transform -translate-x-1/2 z-[100] text-center">
-          <p className="text-xl font-bold px-6 py-3 bg-orange-500 text-white rounded-full animate-pulse shadow-xl border-2 border-white">
-            클릭하세요!
-          </p>
-        </div>
-      )}
+      </div>
     </div>
   );
 };

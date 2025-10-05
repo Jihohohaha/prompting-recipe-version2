@@ -1,7 +1,7 @@
-import React, { useState, useEffect, useCallback } from 'react';
+
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { folders, letters, centerImage, vw, vh, fontUrl } from '../../start-video/assetData';
-// 원본 px 좌표/크기용 centerImageRaw를 assetData.js에서 export한다고 가정
 import { centerImageRaw } from '../../start-video/assetData.js';
 import AppearanceClosue from '../animation/AppearanceClosue';
 import FirstOpeningClosue from '../animation/FirstOpeningClosue';
@@ -12,7 +12,6 @@ import HandLight from '../../../effects/HandLight';
 const AssetsHandLightClosue = ({ mousePos, onAnimationComplete }) => {
   const urlParams = new URLSearchParams(window.location.search);
   const debugStep = parseInt(urlParams.get('step')) || 0;
-  
   const [step, setStep] = useState(debugStep);
   const [isPaused, setIsPaused] = useState(false);
   const isDebugMode = urlParams.has('step');
@@ -38,15 +37,46 @@ const AssetsHandLightClosue = ({ mousePos, onAnimationComplete }) => {
     }
   }, [step, onAnimationComplete, isPaused]);
 
-  // ✅ StartVideo/Prologue와 동일하게 원본 px 좌표로 중앙 계산
+  // 중앙 좌표 계산
   const centerX = centerImageRaw.x + centerImageRaw.width / 2;
   const centerY = centerImageRaw.y + centerImageRaw.height / 2;
-  const radius = 500; // ⬅️ 크기 수정은 여기서 하세요!
-
-  // 고정 위치 계산 (픽셀 단위, 변환 없이 그대로 사용)
+  const radius = 500;
   const finalX = centerX;
   const finalY = centerY;
 
+  // step4에서 handlight/배경 fade와 텍스트 타이밍을 분리 관리
+  // handlight/배경: step4 진입 후 0.1초 뒤 사라짐 (돔 닫힘 타이밍)
+  // 텍스트: step4 진입 후 1.6초 뒤 등장 (돔 열림 타이밍)
+  const [handlightStep4Opacity, setHandlightStep4Opacity] = useState(1);
+  const [handlightStep4BgOpacity, setHandlightStep4BgOpacity] = useState(0);
+  const [showTextOnDomOpen, setShowTextOnDomOpen] = useState(false);
+
+  useEffect(() => {
+    let handlightTimer, bgTimer, textTimer;
+    if (step === 4 && !isPaused) {
+      // handlight/배경 fade out (돔 닫힘 타이밍: 0.1초)
+      setHandlightStep4Opacity(1);
+      setHandlightStep4BgOpacity(0);
+      setShowTextOnDomOpen(false);
+      handlightTimer = setTimeout(() => {
+        setHandlightStep4Opacity(0);
+        setHandlightStep4BgOpacity(1);
+      }, 100); // 돔 닫힘 타이밍
+      // 텍스트 등장 (돔 열림 타이밍: 1.6초)
+      textTimer = setTimeout(() => {
+        setShowTextOnDomOpen(true);
+      }, 1600);
+    } else {
+      setHandlightStep4Opacity(1);
+      setHandlightStep4BgOpacity(0);
+      setShowTextOnDomOpen(false);
+    }
+    return () => {
+      clearTimeout(handlightTimer);
+      clearTimeout(bgTimer);
+      clearTimeout(textTimer);
+    };
+  }, [step, isPaused]);
   const showAssets = step < 4;
 
   return (
@@ -67,7 +97,6 @@ const AssetsHandLightClosue = ({ mousePos, onAnimationComplete }) => {
               {isPaused ? '▶ 재생' : '⏸ 정지'}
             </button>
           </div>
-          
           <div className="flex gap-2 flex-wrap max-w-[200px]">
             {[0, 1, 2, 3, 4, 5].map(s => (
               <button
@@ -83,13 +112,11 @@ const AssetsHandLightClosue = ({ mousePos, onAnimationComplete }) => {
               </button>
             ))}
           </div>
-          
           {isPaused && (
             <div className="mt-2 px-2 py-1 bg-yellow-100 border border-yellow-400 rounded text-xs text-yellow-800">
               ⏸ 애니메이션 정지됨
             </div>
           )}
-          
           <div className="mt-3 text-xs text-gray-600 leading-relaxed">
             <div>0: 초기상태</div>
             <div>1: Appearance (클로슈 등장)</div>
@@ -113,7 +140,7 @@ const AssetsHandLightClosue = ({ mousePos, onAnimationComplete }) => {
       <div className="absolute inset-0 z-10 bg-[#F5F5F5]">
         {showAssets && (
           <>
-            {/* ✅ CreateYourOwnIdea.png 중앙 이미지 추가 */}
+            {/* 중앙 이미지 */}
             <motion.img
               key={`center-${step}`}
               src={centerImage.src}
@@ -135,7 +162,6 @@ const AssetsHandLightClosue = ({ mousePos, onAnimationComplete }) => {
               }}
               draggable={false}
             />
-
             {/* 폴더들 */}
             {folders.map((f, i) => (
               <motion.img
@@ -162,7 +188,6 @@ const AssetsHandLightClosue = ({ mousePos, onAnimationComplete }) => {
                 draggable={false}
               />
             ))}
-
             {/* 글씨들 */}
             <style>{`
               @font-face {
@@ -205,19 +230,86 @@ const AssetsHandLightClosue = ({ mousePos, onAnimationComplete }) => {
         )}
       </div>
 
-      {/* Z-20: HandLight 마스킹 효과 (고정 위치) */}
-      {(() => {
-        console.log('[HandLight Mask] finalX:', finalX, 'finalY:', finalY, 'radius:', radius);
-        return (
-          <div 
-            className="absolute inset-0 z-20 bg-black pointer-events-none"
+      {/* Z-20: HandLight 마스킹 효과 + 항상 검은 배경 (step4에서만 opacity 애니메이션) */}
+      <div
+        className="absolute inset-0 z-20 bg-black pointer-events-none"
+        style={{
+          maskImage: `radial-gradient(circle ${radius}px at ${finalX}px ${finalY}px, transparent 0%, rgba(0,0,0,0.1) 70%, rgba(0,0,0,0.6) 85%, black 100%)`,
+          WebkitMaskImage: `radial-gradient(circle ${radius}px at ${finalX}px ${finalY}px, transparent 0%, transparent 0%, rgba(0,0,0,0.1) 70%, rgba(0,0,0,0.6) 85%, black 100%)`,
+          opacity: step === 4 ? handlightStep4Opacity : 1,
+          transition: 'opacity 0.2s',
+        }}
+      />
+
+
+      {/* step4에서 closue-dom이 열릴 때(SecondOpeningClosue open 타이밍)에만 텍스트 등장 */}
+      {step === 4 && (
+        <>
+          <div
+            className="absolute inset-0 z-30 pointer-events-none"
             style={{
-              maskImage: `radial-gradient(circle ${radius}px at ${finalX}px ${finalY}px, transparent 0%, rgba(0,0,0,0.1) 70%, rgba(0,0,0,0.6) 85%, black 100%)`,
-              WebkitMaskImage: `radial-gradient(circle ${radius}px at ${finalX}px ${finalY}px, transparent 0%, transparent 0%, rgba(0,0,0,0.1) 70%, rgba(0,0,0,0.6) 85%, black 100%)`,
+              background: 'black',
+              opacity: handlightStep4BgOpacity,
+              transition: 'opacity 0.2s',
             }}
           />
-        );
-      })()}
+          {/* 텍스트 구조 OpenedClosue와 동일하게: PRomptinG가 정확히 중앙, [RECIPE]와 서브멘트는 아래 */}
+          <div
+            className="absolute inset-0 z-60 pointer-events-none"
+            style={{ opacity: showTextOnDomOpen ? 1 : 0, transition: 'opacity 0.8s' }}
+          >
+            <div
+              style={{
+                position: 'absolute',
+                left: '50%',
+                top: '50%',
+                transform: 'translate(-50%, -50%)',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+              }}
+            >
+              <span
+                className="text-[80px] font-stretch leading-none text-white"
+                style={{
+                  fontFamily: 'StretchPro, sans-serif',
+                  lineHeight: 1,
+                  pointerEvents: 'none',
+                }}
+              >
+                PRomptinG
+              </span>
+            </div>
+            <div
+              style={{
+                position: 'absolute',
+                left: '50%',
+                top: '50%',
+                transform: 'translate(-50%, 0)',
+                marginTop: '90px',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                width: '100%',
+                pointerEvents: 'none',
+              }}
+            >
+              <span
+                className="text-[60px] font-desira leading-none text-white"
+                style={{ fontFamily: 'DesiraDEMO, sans-serif', lineHeight: 1 }}
+              >
+                [RECIPE]
+              </span>
+              <div
+                className="text-center text-white mt-8"
+                style={{ fontFamily: 'Pretendard, sans-serif', fontSize: '20px' }}
+              >
+                그것은 곧 프롬프트 엔지니어링,<br />언어를 다루는 비밀 조리법이었다.
+              </div>
+            </div>
+          </div>
+        </>
+      )}
 
       {/* 애니메이션 단계별 오버레이 */}
       <AnimatePresence mode="wait">
