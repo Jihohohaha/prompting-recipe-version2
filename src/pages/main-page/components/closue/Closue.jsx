@@ -25,7 +25,7 @@ const Closue = ({ onComplete }) => {
           onAnimationComplete={handleAnimationComplete}
         />
       ) : (
-        <OpenedClosue />
+        <OpenedClosue onComplete={onComplete} />
       )}
     </div>
   );
