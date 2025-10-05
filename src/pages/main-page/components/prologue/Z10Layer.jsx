@@ -23,7 +23,7 @@ const Z10Layer = ({ snapScrollRef, onScrollComplete }) => {
       <div 
         className="
           absolute
-          w-[500px] h-[80px] top-[100px]
+          w-[500px] h-[80px] top-[70px]
           left-1/2 -translate-x-1/2
           rounded-lg z-30
         "
