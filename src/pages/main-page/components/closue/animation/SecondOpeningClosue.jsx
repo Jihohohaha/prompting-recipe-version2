@@ -41,18 +41,21 @@ const SecondOpeningClosue = ({ onFinish }) => {
           alt="closue-dom"
           className="absolute bottom-0 left-0 w-full"
           initial={{
-            rotate: -60,
-            y: 20,
+            rotate: -20,
+            y: -70,
+            x: 80,
           }}
           animate={isOpen ? {
-            rotate: -60,
-            y: 20,
+            rotate: -20,
+            y: -70,
+            x: 80,
           } : {
             rotate: 0,
             y: 100,
+            x: 0,
           }}
           transition={{ duration: 0.8, ease: "easeOut" }}
-          style={{ 
+          style={{
             transformOrigin: 'bottom left',
           }}
         />
