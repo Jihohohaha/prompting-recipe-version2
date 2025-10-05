@@ -253,23 +253,59 @@ const AssetsHandLightClosue = ({ mousePos, onAnimationComplete }) => {
               transition: 'opacity 0.2s',
             }}
           />
+          {/* 텍스트 구조 OpenedClosue와 동일하게: PRomptinG가 정확히 중앙, [RECIPE]와 서브멘트는 아래 */}
           <div
-            className="absolute left-1/2 top-1/2 z-60 flex flex-col items-center justify-center w-full transition-opacity duration-800"
-            style={{
-              transform: 'translate(-50%, -50%)',
-              pointerEvents: 'none',
-              opacity: showTextOnDomOpen ? 1 : 0,
-              transition: 'opacity 0.8s',
-            }}
+            className="absolute inset-0 z-60 pointer-events-none"
+            style={{ opacity: showTextOnDomOpen ? 1 : 0, transition: 'opacity 0.8s' }}
           >
-            {/* 메인 타이틀 (HeroTitle.jsx 참고, 폰트/크기/구조) */}
-            <div className="flex flex-col items-center mb-10">
-              <span className="text-[80px] font-stretch leading-none text-white" style={{ fontFamily: 'StretchPro, sans-serif' }}>PRomptinG</span>
-              <span className="text-[80px] font-desira leading-none text-white" style={{ fontFamily: 'DesiraDEMO, sans-serif' }}>[RECIPE]</span>
+            <div
+              style={{
+                position: 'absolute',
+                left: '50%',
+                top: '50%',
+                transform: 'translate(-50%, -50%)',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+              }}
+            >
+              <span
+                className="text-[80px] font-stretch leading-none text-white"
+                style={{
+                  fontFamily: 'StretchPro, sans-serif',
+                  lineHeight: 1,
+                  pointerEvents: 'none',
+                }}
+              >
+                PRomptinG
+              </span>
             </div>
-            {/* 서브 멘트 */}
-            <div className="text-center text-white" style={{ fontFamily: 'Pretendard, sans-serif', fontSize: '20px' }}>
-              그것은 곧 프롬프트 엔지니어링,<br />언어를 다루는 비밀 조리법이었다.
+            <div
+              style={{
+                position: 'absolute',
+                left: '50%',
+                top: '50%',
+                transform: 'translate(-50%, 0)',
+                marginTop: '90px',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                width: '100%',
+                pointerEvents: 'none',
+              }}
+            >
+              <span
+                className="text-[60px] font-desira leading-none text-white"
+                style={{ fontFamily: 'DesiraDEMO, sans-serif', lineHeight: 1 }}
+              >
+                [RECIPE]
+              </span>
+              <div
+                className="text-center text-white mt-8"
+                style={{ fontFamily: 'Pretendard, sans-serif', fontSize: '20px' }}
+              >
+                그것은 곧 프롬프트 엔지니어링,<br />언어를 다루는 비밀 조리법이었다.
+              </div>
             </div>
           </div>
         </>
