@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { folders, letters, centerImage, vw, vh, fontUrl } from '../../start-video/assetData';
 // 원본 px 좌표/크기용 centerImageRaw를 assetData.js에서 export한다고 가정
@@ -46,6 +46,63 @@ const AssetsHandLightClosue = ({ mousePos, onAnimationComplete }) => {
   // 고정 위치 계산 (픽셀 단위, 변환 없이 그대로 사용)
   const finalX = centerX;
   const finalY = centerY;
+
+
+
+
+  // step4에서만 handlight와 검은 배경 fade를 관리하는 커스텀 훅
+  function useStep4HandlightFade(step, isPaused) {
+    const [opacity, setOpacity] = useState(1);
+    const [bgOpacity, setBgOpacity] = useState(0);
+    const animRef = useRef();
+    const [secondOpenClosed, setSecondOpenClosed] = useState(false);
+
+    // SecondOpeningClosue 닫힘 타이밍 감지
+    useEffect(() => {
+      if (step === 4 && !isPaused) {
+        setSecondOpenClosed(false);
+        setOpacity(1);
+        setBgOpacity(0);
+        const timer = setTimeout(() => setSecondOpenClosed(true), 100);
+        return () => clearTimeout(timer);
+      } else {
+        setSecondOpenClosed(false);
+        setOpacity(1);
+        setBgOpacity(0);
+      }
+    }, [step, isPaused]);
+
+    // 닫힘 타이밍에 맞춰 handlight와 검은 배경 opacity 동시 fade
+    useEffect(() => {
+      if (step === 4 && secondOpenClosed && !isPaused) {
+        let start = null;
+        const duration = 800;
+        function animate(ts) {
+          if (!start) start = ts;
+          const elapsed = ts - start;
+          let p = Math.min(elapsed / duration, 1);
+          setOpacity(1 - p);
+          setBgOpacity(p);
+          if (p < 1 && step === 4 && !isPaused && secondOpenClosed) {
+            animRef.current = requestAnimationFrame(animate);
+          } else {
+            setOpacity(0);
+            setBgOpacity(1);
+          }
+        }
+        animRef.current = requestAnimationFrame(animate);
+        return () => cancelAnimationFrame(animRef.current);
+      } else if (step !== 4) {
+        setOpacity(1);
+        setBgOpacity(0);
+      }
+    }, [step, isPaused, secondOpenClosed]);
+
+    return { opacity, bgOpacity };
+  }
+
+  // step4에서만 사용, 나머지 step은 영향 없음
+  const { opacity: handlightStep4Opacity, bgOpacity: handlightStep4BgOpacity } = useStep4HandlightFade(step, isPaused);
 
   const showAssets = step < 4;
 
@@ -205,19 +262,30 @@ const AssetsHandLightClosue = ({ mousePos, onAnimationComplete }) => {
         )}
       </div>
 
-      {/* Z-20: HandLight 마스킹 효과 (고정 위치) */}
-      {(() => {
-        console.log('[HandLight Mask] finalX:', finalX, 'finalY:', finalY, 'radius:', radius);
-        return (
-          <div 
-            className="absolute inset-0 z-20 bg-black pointer-events-none"
-            style={{
-              maskImage: `radial-gradient(circle ${radius}px at ${finalX}px ${finalY}px, transparent 0%, rgba(0,0,0,0.1) 70%, rgba(0,0,0,0.6) 85%, black 100%)`,
-              WebkitMaskImage: `radial-gradient(circle ${radius}px at ${finalX}px ${finalY}px, transparent 0%, transparent 0%, rgba(0,0,0,0.1) 70%, rgba(0,0,0,0.6) 85%, black 100%)`,
-            }}
-          />
-        );
-      })()}
+
+
+      {/* Z-20: HandLight 마스킹 효과 + 항상 검은 배경 (step4에서만 opacity 애니메이션) */}
+      <div
+        className="absolute inset-0 z-20 bg-black pointer-events-none"
+        style={{
+          maskImage: `radial-gradient(circle ${radius}px at ${finalX}px ${finalY}px, transparent 0%, rgba(0,0,0,0.1) 70%, rgba(0,0,0,0.6) 85%, black 100%)`,
+          WebkitMaskImage: `radial-gradient(circle ${radius}px at ${finalX}px ${finalY}px, transparent 0%, transparent 0%, rgba(0,0,0,0.1) 70%, rgba(0,0,0,0.6) 85%, black 100%)`,
+          opacity: step === 4 ? handlightStep4Opacity : 1,
+          transition: 'opacity 0.2s',
+        }}
+      />
+
+      {/* step4에서 handlight fade-out과 동시에 검은 배경 fade-in */}
+      {step === 4 && (
+        <div
+          className="absolute inset-0 z-30 pointer-events-none"
+          style={{
+            background: 'black',
+            opacity: handlightStep4BgOpacity,
+            transition: 'opacity 0.2s',
+          }}
+        />
+      )}
 
       {/* 애니메이션 단계별 오버레이 */}
       <AnimatePresence mode="wait">
