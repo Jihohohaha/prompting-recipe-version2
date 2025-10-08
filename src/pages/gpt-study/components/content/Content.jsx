@@ -2,6 +2,7 @@
 import { useEffect, useRef, useState } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { ScrollToPlugin } from 'gsap/ScrollToPlugin';
 import { gptStudyData } from '../../data';
 import Section from './Section';
 import useGPTStudyStore from '../../store';
@@ -11,10 +12,26 @@ const Content = () => {
   const { activeSection, setActiveSection } = useGPTStudyStore();
   const [isScrolling, setIsScrolling] = useState(false);
   const isManualScroll = useRef(false);
+  const [isReady, setIsReady] = useState(false); // ✅ DOM 준비 상태
 
-  // ScrollTrigger 설정 (섹션 감지)
+  // ✅ GSAP 플러그인 등록 (Content에서도)
   useEffect(() => {
-    if (!contentRef.current) return;
+    gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
+  }, []);
+
+  // ✅ DOM 준비 확인
+  useEffect(() => {
+    if (contentRef.current) {
+      // 다음 프레임까지 대기 (DOM이 완전히 렌더링되도록)
+      requestAnimationFrame(() => {
+        setIsReady(true);
+      });
+    }
+  }, []);
+
+  // ScrollTrigger 설정 (섹션 감지) - isReady 의존성 추가
+  useEffect(() => {
+    if (!contentRef.current || !isReady) return; // ✅ isReady 체크
 
     // 기존 ScrollTrigger 정리
     ScrollTrigger.getAll().forEach(trigger => trigger.kill());
@@ -43,19 +60,17 @@ const Content = () => {
               setActiveSection(index);
             }
           },
-          // markers: true // ✅ 디버깅 시 활성화
         });
       }
     });
 
-    // ✅ 스크롤 이벤트 핸들러 (스크롤 끝 감지)
+    // 스크롤 이벤트 핸들러 (스크롤 끝 감지)
     const handleScroll = () => {
       isManualScroll.current = true;
       
       const { scrollTop, scrollHeight, clientHeight } = container;
-      const isAtBottom = scrollTop + clientHeight >= scrollHeight - 10; // 10px 여유
+      const isAtBottom = scrollTop + clientHeight >= scrollHeight - 10;
       
-      // 스크롤이 끝에 도달하면 마지막 섹션 활성화
       if (isAtBottom) {
         console.log('📍 Reached bottom, activating last section');
         setActiveSection(gptStudyData.length - 1);
@@ -68,12 +83,12 @@ const Content = () => {
       ScrollTrigger.getAll().forEach(trigger => trigger.kill());
       container.removeEventListener('scroll', handleScroll);
     };
-  }, [setActiveSection]);
+  }, [setActiveSection, isReady]); // ✅ isReady 의존성 추가
 
   // activeSection 변화 감지 → 스크롤 이동 (Sidebar 클릭 시)
   useEffect(() => {
     if (activeSection === null || activeSection === undefined) return;
-    if (!contentRef.current) return;
+    if (!contentRef.current || !isReady) return; // ✅ isReady 체크
 
     const targetSection = contentRef.current.querySelector(`#section-${activeSection}`);
     
@@ -99,7 +114,7 @@ const Content = () => {
         }
       });
     }
-  }, [activeSection]);
+  }, [activeSection, isReady]); // ✅ isReady 의존성 추가
 
   return (
     <main 
@@ -109,7 +124,7 @@ const Content = () => {
         ${isScrolling ? '' : 'snap-y snap-mandatory'}
       `}
     >
-      <div className="flex flex-col">
+      <div className="flex flex-col gap-6">
         {gptStudyData.map((recipe, index) => (
           <Section 
             key={recipe.id} 

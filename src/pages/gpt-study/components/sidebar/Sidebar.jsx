@@ -25,7 +25,7 @@ const Sidebar = () => {
       gsap.to(sidebarRef.current, {
         scrollTo: {
           y: targetItem,
-          offsetY: 100 // 상단에서 100px 여유 공간
+          offsetY: 150 // 상단에서 100px 여유 공간
         },
         duration: 0.6,
         ease: "power2.out"

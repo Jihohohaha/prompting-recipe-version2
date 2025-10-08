@@ -39,13 +39,11 @@ const TabInterface = ({ recipe }) => {
               className={`
                 flex-1 h-14 font-bold text-lg font-pretendard
                 rounded-t-lg transition-all duration-300
-                ${isActive 
-                  ? 'bg-[#FE7525] text-white' 
-                  : 'bg-[#FE7525]/88 text-white/80'
-                }
-                ${!isActive && 'hover:bg-[#FE7525]/95'}
+                ${!isActive && 'hover:opacity-95'}
               `}
               style={{
+                backgroundColor: isActive ? '#FE7525' : 'rgba(254, 117, 37, 0.88)', // ✅ rgba 사용
+                color: isActive ? '#FFFFFF' : 'rgba(255, 255, 255, 0.8)', // ✅ rgba 사용
                 borderRight: tab.id !== 'quiz' ? '1px solid rgba(0, 0, 0, 0.2)' : 'none'
               }}
             >
