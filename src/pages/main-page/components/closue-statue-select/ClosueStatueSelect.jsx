@@ -256,6 +256,12 @@ const ClosueStatueSelect = () => {
           {frontDish.ekw4}
         </KeywordText>
 
+        {/* 접시 위 도구들 */}
+        <img src="/images/main-page/spoon.png" alt="Spoon" className="absolute bottom-[280px] right-[450px] w-[300px] h-[300px] object-contain z-40 pointer-events-none" />
+        <img src="/images/main-page/knife.png" alt="Knife" className="absolute bottom-[150px] left-[400px] w-[300px] h-[300px] object-contain z-40 pointer-events-none" />
+        <img src="/images/main-page/fork1.png" alt="Fork1" className="absolute bottom-[280px] right-[500px] w-[150px] h-[150px] object-contain z-40 pointer-events-none" />
+        <img src="/images/main-page/fork2.png" alt="Fork2" className="absolute bottom-[280px] left-[450px] w-[300px] h-[300px] object-contain z-40 pointer-events-none" />
+
         {/* 중앙 석상 */}
         <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 z-50 pointer-events-none">
           <img 
