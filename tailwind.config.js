@@ -13,6 +13,7 @@ export default {
         bromawo: ['"Bromawo"', "sans-serif"],
         koolegant: ['Koolegant', 'sans-serif'],
         watermelon: ['116Watermelon', 'sans-serif'],
+        sacramento: ['"Sacramento"', 'cursive'],
       },
       zIndex: {
         60: '60',
