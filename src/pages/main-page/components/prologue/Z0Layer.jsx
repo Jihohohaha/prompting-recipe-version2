@@ -8,13 +8,7 @@ const Z0Layer = () => {
       className="
       relative
       w-screen h-screen
-      "
-      style={{
-        backgroundImage: `url(${Z0_BACKGROUND_URL})`,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundRepeat: 'no-repeat',
-      }}
+      bg-[#F5F5F5]"
     >
     </div>
   );

@@ -6,6 +6,7 @@ import Z20Layer from './Z20Layer';
 import Z30Layer from './Z30Layer'; 
 import HandLight from '../../effects/HandLight';
 import StartVideo from '../start-video/StartVideo';
+import FadeScroll from '../../effects/FadeScroll';
 
 const Prologue = ({ onComplete }) => {
   const snapScrollRef = useRef();
@@ -13,6 +14,12 @@ const Prologue = ({ onComplete }) => {
   const lastUpdateRef = useRef(0); // 마지막 업데이트 시간
   const [mousePos, setMousePos] = useState(null);
   const [isHover, setIsHover] = useState(false);
+
+  const snapTexts = [
+    `어느 날, 단어를 재료 삼아\n현실을 만들어내는 "레시피"가 세상에 흩어졌다.`,
+    `그것은 곧 프롬프팅 엔지니어링,\n언어를 다루는 비밀의 조리법이었다.`,
+    `이제, 당신은 그 레시피를 배우고 익히기 위해 \n프롬프팅 레시피 아카이브에 들어왔다.`
+  ];
 
   // wheel 이벤트를 SnapScroll로 전달
   const handleWheel = useCallback((e) => {
@@ -74,12 +81,11 @@ const Prologue = ({ onComplete }) => {
 
   return (
     <div
-      className="relative mx-auto overflow-hidden"
-      style={{ width: '1920px', height: '1080px' }}
+      className="relative w-screen h-screen overflow-hidden"
     >
       <div className={videoEnded ? 'visible' : 'invisible'}>
         <Z0Layer />
-        <Z10Layer snapScrollRef={snapScrollRef} onScrollComplete={handleScrollComplete} />
+        <Z10Layer />
         <Z20Layer />
         <Z30Layer
           onWheel={handleWheel}
@@ -90,6 +96,22 @@ const Prologue = ({ onComplete }) => {
           maskStyle={maskStyle}
           isClickable={isScrollCompleted}
         />
+        
+        {/* FadeScroll을 별도 레이어로 분리 - 마스크 영향 없음 */}
+        <div 
+          className="
+            absolute
+            w-[min(800px,80vw)] h-[120px] top-[100px]
+            left-1/2 -translate-x-1/2
+            rounded-lg z-50 pointer-events-none
+          "
+        >
+          <FadeScroll 
+            ref={snapScrollRef} 
+            snaps={snapTexts} 
+            onScrollComplete={handleScrollComplete}
+          />
+        </div>
       </div>
       
       {!videoEnded && (

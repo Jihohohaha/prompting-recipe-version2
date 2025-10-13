@@ -89,7 +89,7 @@ const FadeScroll = forwardRef(({ snaps, onScrollComplete }, ref) => {
         {snaps.map((text, index) => (
           <p 
             key={index}
-            className="absolute text-[#f5f5f5] text-xl font-bold px-6 py-2 leading-relaxed whitespace-pre-wrap text-center bg-red-500 bg-opacity-80 rounded-lg backdrop-blur-sm"
+            className="absolute text-[#f5f5f5] text-xl font-bold px-6 py-2 leading-relaxed whitespace-pre-wrap text-center bg-black bg-opacity-80 rounded-lg backdrop-blur-sm"
             style={{ 
               opacity: getOpacity(index)
             }}

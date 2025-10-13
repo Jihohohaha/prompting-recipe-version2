@@ -69,7 +69,7 @@ const Z30Layer = React.memo(({
   onMouseLeave, 
   onClick,
   maskStyle = {},
-  isClickable = false 
+  isClickable = false
 }) => {
   const containerRef = useRef(null);
 
