@@ -1,23 +1,73 @@
 // src/pages/gpt-study/components/content/Section.jsx
+import { motion, AnimatePresence } from 'framer-motion';
+import { useParams, useNavigate } from 'react-router-dom';
 import TabInterface from './TabInterface';
+import useGPTStudyStore from '../../store';
 
 const Section = ({ recipe, index }) => {
+  const navigate = useNavigate();
+  const { tab } = useParams();
+  const { expandedContent, collapseContent, setActiveSection } = useGPTStudyStore();
+  
+  // 현재 Section이 펼쳐져 있는지 확인
+  const isExpanded = expandedContent?.recipeId === recipe.id && tab;
+
+  const handleCollapse = () => {
+    console.log('🔼 Collapsing content');
+    // store 상태 업데이트
+    collapseContent();
+    // activeSection 업데이트 (Section 최상단으로 스크롤)
+    setActiveSection(recipe.id - 1);
+    // URL 변경
+    navigate(`/gpt-study/${recipe.slug}`);
+  };
+
   return (
     <section 
       id={`section-${index}`}
-      className="min-h-screen flex flex-col gap-6 px-12 snap-start"
+      className="flex flex-col px-12 py-8 snap-start"
     >
-      <div className="py-12 gap-6 flex flex-col">
-        {/* 탭 인터페이스 */}
-        <TabInterface recipe={recipe} />
+      {/* 탭 인터페이스 */}
+      <TabInterface recipe={recipe} />
 
-        {/* Rounded Div */}
-        <div className="bg-[#FF9E4A] rounded-xl px-20 py-2 w-full">
-            <h3 className="text-black text-lg font-bold font-pretendard text-center">
-            {recipe.displayTitle}
-            </h3>
-        </div>
-      </div>
+      {/* 펼쳐진 콘텐츠 영역 (애니메이션) */}
+      <AnimatePresence>
+        {isExpanded && (
+          <motion.div
+            id={`expanded-content-${recipe.id}`}
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.5, ease: 'easeInOut' }}
+            className="overflow-hidden"
+          >
+            <div className="bg-black py-8">
+              {/* 임시 콘텐츠 - Phase 5~7에서 실제 컴포넌트로 교체 */}
+              <div className="text-white text-center py-20">
+                <h2 className="text-4xl font-bold mb-4">
+                  {recipe.title} - {tab?.toUpperCase()}
+                </h2>
+                <p className="text-xl text-gray-400">
+                  콘텐츠가 여기에 표시됩니다.
+                </p>
+                <p className="text-sm text-gray-500 mt-4">
+                  Phase 5~7에서 실제 Tutorial/Quiz/Chat 컴포넌트로 교체 예정
+                </p>
+              </div>
+
+              {/* 접기 버튼 */}
+              <div className="flex justify-center mt-8">
+                <button
+                  onClick={handleCollapse}
+                  className="px-8 py-3 bg-white text-black font-bold rounded-lg hover:bg-gray-200 transition-all"
+                >
+                  접기 ▲
+                </button>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </section>
   );
 };
