@@ -12,33 +12,30 @@ const Content = () => {
   const { activeSection, setActiveSection } = useGPTStudyStore();
   const [isScrolling, setIsScrolling] = useState(false);
   const isManualScroll = useRef(false);
-  const [isReady, setIsReady] = useState(false); // ✅ DOM 준비 상태
+  const [isReady, setIsReady] = useState(false);
 
-  // ✅ GSAP 플러그인 등록 (Content에서도)
+  // GSAP 플러그인 등록
   useEffect(() => {
     gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
   }, []);
 
-  // ✅ DOM 준비 확인
+  // DOM 준비 확인
   useEffect(() => {
     if (contentRef.current) {
-      // 다음 프레임까지 대기 (DOM이 완전히 렌더링되도록)
       requestAnimationFrame(() => {
         setIsReady(true);
       });
     }
   }, []);
 
-  // ScrollTrigger 설정 (섹션 감지) - isReady 의존성 추가
+  // ScrollTrigger 설정 (섹션 감지)
   useEffect(() => {
-    if (!contentRef.current || !isReady) return; // ✅ isReady 체크
+    if (!contentRef.current || !isReady) return;
 
-    // 기존 ScrollTrigger 정리
     ScrollTrigger.getAll().forEach(trigger => trigger.kill());
 
     const container = contentRef.current;
 
-    // 각 섹션에 대한 ScrollTrigger 생성
     gptStudyData.forEach((recipe, index) => {
       const sectionEl = container.querySelector(`#section-${index}`);
       
@@ -64,7 +61,6 @@ const Content = () => {
       }
     });
 
-    // 스크롤 이벤트 핸들러 (스크롤 끝 감지)
     const handleScroll = () => {
       isManualScroll.current = true;
       
@@ -83,21 +79,20 @@ const Content = () => {
       ScrollTrigger.getAll().forEach(trigger => trigger.kill());
       container.removeEventListener('scroll', handleScroll);
     };
-  }, [setActiveSection, isReady]); // ✅ isReady 의존성 추가
+  }, [setActiveSection, isReady]);
 
-  // activeSection 변화 감지 → 스크롤 이동 (Sidebar 클릭 시)
+  // activeSection 변화 감지 → 스크롤 이동
   useEffect(() => {
     if (activeSection === null || activeSection === undefined) return;
-    if (!contentRef.current || !isReady) return; // ✅ isReady 체크
+    if (!contentRef.current || !isReady) return;
 
     const targetSection = contentRef.current.querySelector(`#section-${activeSection}`);
     
     if (targetSection) {
-      // 프로그래매틱 스크롤 시작
       isManualScroll.current = false;
       setIsScrolling(true);
       
-      console.log(`📍 Scrolling to section ${activeSection}:`, targetSection);
+      console.log(`📍 Scrolling to section ${activeSection}`);
 
       gsap.to(contentRef.current, {
         scrollTo: {
@@ -114,7 +109,7 @@ const Content = () => {
         }
       });
     }
-  }, [activeSection, isReady]); // ✅ isReady 의존성 추가
+  }, [activeSection, isReady]);
 
   return (
     <main 
@@ -124,7 +119,8 @@ const Content = () => {
         ${isScrolling ? '' : 'snap-y snap-mandatory'}
       `}
     >
-      <div className="flex flex-col gap-6">
+      {/* 방법론 간 간격 제거 */}
+      <div className="flex flex-col gap-0">
         {gptStudyData.map((recipe, index) => (
           <Section 
             key={recipe.id} 
