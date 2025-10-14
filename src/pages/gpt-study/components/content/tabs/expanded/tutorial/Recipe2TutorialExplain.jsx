@@ -4,7 +4,7 @@ import { useRef } from 'react';
 
 const Recipe2TutorialExplain = () => {
   return (
-    <div className="bg-white">
+    <div className="bg-white rounded-3xl">
       {/* Section 1: 헤더 */}
       <FadeSection>
         <SectionHeader />
