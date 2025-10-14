@@ -99,51 +99,30 @@ const SectionDivider = () => {
 // Section 3: Zero-shot 그래픽
 const SectionZeroGraphic = () => {
   return (
-<<<<<<< HEAD
     <div className="w-full relative" style={{ height: "1120px" }}>
-=======
-    <div className="w-full relative" style={{ height: '1120px' }}>
->>>>>>> cd12b37276474999e73fe022277687a4f84cb9f7
       {/* FFC300 원 (작은) */}
       <div
         className="absolute bg-[#FFC300] rounded-full"
-<<<<<<< HEAD
         style={{
           width: "150px",
           height: "150px",
           left: "920px",
           top: "70px",
-=======
-        style={{ 
-          width: '150px', 
-          height: '150px',
-          left: '920px', 
-          top: '70px' 
->>>>>>> cd12b37276474999e73fe022277687a4f84cb9f7
         }}
       />
 
       {/* FFC300 링 (큰) */}
       <div
         className="absolute rounded-full ring-20 ring-[#FFC300]"
-<<<<<<< HEAD
         style={{
           width: "544px",
           height: "544px",
           left: "70px",
           top: "129px",
-=======
-        style={{ 
-          width: '544px', 
-          height: '544px',
-          left: '70px', 
-          top: '129px' 
->>>>>>> cd12b37276474999e73fe022277687a4f84cb9f7
         }}
       />
 
       {/* zero 텍스트 */}
-<<<<<<< HEAD
       <div
         className="absolute font-koolegant text-black text-[17rem]"
         style={{
@@ -151,15 +130,6 @@ const SectionZeroGraphic = () => {
           top: "190px",
           width: "350px",
           height: "130px",
-=======
-      <div 
-        className="absolute font-koolegant text-black text-[17rem]"
-        style={{ 
-          left: '100px', 
-          top: '190px', 
-          width: '350px', 
-          height: '130px' 
->>>>>>> cd12b37276474999e73fe022277687a4f84cb9f7
         }}
       >
         zero
@@ -167,24 +137,15 @@ const SectionZeroGraphic = () => {
       {/* FFC300 원 (중간) */}
       <div
         className="absolute bg-[#FFC300] rounded-full"
-<<<<<<< HEAD
         style={{
           width: "337px",
           height: "337px",
           left: "760px",
           top: "584px",
-=======
-        style={{ 
-          width: '337px', 
-          height: '337px',
-          left: '760px', 
-          top: '584px' 
->>>>>>> cd12b37276474999e73fe022277687a4f84cb9f7
         }}
       />
 
       {/* shot 텍스트 */}
-<<<<<<< HEAD
       <div
         className="absolute font-koolegant text-black text-[17rem]"
         style={{
@@ -192,15 +153,6 @@ const SectionZeroGraphic = () => {
           top: "572px",
           width: "392px",
           height: "137px",
-=======
-      <div 
-        className="absolute font-koolegant text-black text-[17rem]"
-        style={{ 
-          left: '580px', 
-          top: '572px', 
-          width: '392px', 
-          height: '137px' 
->>>>>>> cd12b37276474999e73fe022277687a4f84cb9f7
         }}
       >
         shot
@@ -211,19 +163,11 @@ const SectionZeroGraphic = () => {
         src="/images/gpt-study/few-shot/ZeroShot.png"
         alt="Zero Shot"
         className="absolute"
-<<<<<<< HEAD
         style={{
           left: "318px",
           top: "260px",
           width: "550px",
           height: "550px",
-=======
-        style={{ 
-          left: '318px', 
-          top: '260px', 
-          width: '550px', 
-          height: '550px' 
->>>>>>> cd12b37276474999e73fe022277687a4f84cb9f7
         }}
       />
     </div>
@@ -305,29 +249,17 @@ const SectionGPTAnswer = () => {
 // Section 7: V 동상
 const SectionVStatue = () => {
   return (
-<<<<<<< HEAD
     <div className="w-full relative" style={{ height: "858px" }}>
-=======
-    <div className="w-full relative" style={{ height: '858px' }}>
->>>>>>> cd12b37276474999e73fe022277687a4f84cb9f7
       {/* V 동상 이미지 */}
       <img
         src="/images/gpt-study/few-shot/VStatue.png"
         alt="V Statue"
         className="absolute"
-<<<<<<< HEAD
         style={{
           left: "320px",
           top: "86px",
           width: "535px",
           height: "590px",
-=======
-        style={{ 
-          left: '320px', 
-          top: '86px', 
-          width: '535px', 
-          height: '590px' 
->>>>>>> cd12b37276474999e73fe022277687a4f84cb9f7
         }}
       />
 
@@ -336,32 +268,18 @@ const SectionVStatue = () => {
         src="/images/gpt-study/few-shot/Star.png"
         alt="Star"
         className="absolute"
-<<<<<<< HEAD
         style={{
           left: "810px",
           top: "564px",
           width: "105px",
           height: "89px",
-=======
-        style={{ 
-          left: '810px', 
-          top: '564px', 
-          width: '105px', 
-          height: '89px' 
->>>>>>> cd12b37276474999e73fe022277687a4f84cb9f7
         }}
       />
 
       {/* 텍스트 */}
-<<<<<<< HEAD
       <div
         className="absolute text-center font-pretendard text-4xl font-bold"
         style={{ top: "640px", left: "50%", transform: "translateX(-50%)" }}
-=======
-      <div 
-        className="absolute text-center font-pretendard text-4xl font-bold" 
-        style={{ top: '640px', left: '50%', transform: 'translateX(-50%)' }}
->>>>>>> cd12b37276474999e73fe022277687a4f84cb9f7
       >
         <p>겉보기엔 괜찮아보이죠?</p>
         <p>근데 더 좋은 방법이 있다는 사실!</p>
@@ -372,19 +290,11 @@ const SectionVStatue = () => {
         src="/images/gpt-study/few-shot/Underline.png"
         alt="Underline"
         className="absolute"
-<<<<<<< HEAD
         style={{
           left: "228px",
           top: "655px",
           width: "742px",
           height: "85px",
-=======
-        style={{ 
-          left: '228px', 
-          top: '655px', 
-          width: '742px', 
-          height: '85px' 
->>>>>>> cd12b37276474999e73fe022277687a4f84cb9f7
         }}
       />
     </div>
@@ -397,66 +307,37 @@ const SectionFewGraphic = () => {
   const isInView = useInView(ref, { once: false, amount: 0.5 });
 
   return (
-<<<<<<< HEAD
     <div ref={ref} className="w-full relative" style={{ height: "1112px" }}>
-=======
-    <div ref={ref} className="w-full relative" style={{ height: '1112px' }}>
->>>>>>> cd12b37276474999e73fe022277687a4f84cb9f7
       {/* FFC300 원들 */}
       <div
         className="absolute bg-[#FFC300] rounded-full"
-<<<<<<< HEAD
         style={{
           width: "150px",
           height: "150px",
           left: "920px",
           top: "70px",
-=======
-        style={{ 
-          width: '150px', 
-          height: '150px',
-          left: '920px', 
-          top: '70px' 
->>>>>>> cd12b37276474999e73fe022277687a4f84cb9f7
         }}
       />
       <div
         className="absolute rounded-full ring-20 ring-[#FFC300]"
-<<<<<<< HEAD
         style={{
           width: "544px",
           height: "544px",
           left: "70px",
           top: "129px",
-=======
-        style={{ 
-          width: '544px', 
-          height: '544px',
-          left: '70px', 
-          top: '129px' 
->>>>>>> cd12b37276474999e73fe022277687a4f84cb9f7
         }}
       />
       <div
         className="absolute bg-[#FFC300] rounded-full"
-<<<<<<< HEAD
         style={{
           width: "377px",
           height: "377px",
           left: "760px",
           top: "584px",
-=======
-        style={{ 
-          width: '377px', 
-          height: '377px',
-          left: '760px', 
-          top: '584px' 
->>>>>>> cd12b37276474999e73fe022277687a4f84cb9f7
         }}
       />
 
       {/* few 텍스트 */}
-<<<<<<< HEAD
       <div
         className="absolute font-koolegant text-black text-[17rem] z-10"
         style={{
@@ -464,22 +345,12 @@ const SectionFewGraphic = () => {
           top: "190px",
           width: "350px",
           height: "130px",
-=======
-      <div 
-        className="absolute font-koolegant text-black text-[17rem] z-10"
-        style={{ 
-          left: '100px', 
-          top: '190px', 
-          width: '350px', 
-          height: '130px' 
->>>>>>> cd12b37276474999e73fe022277687a4f84cb9f7
         }}
       >
         few
       </div>
 
       {/* shot 텍스트 */}
-<<<<<<< HEAD
       <div
         className="absolute font-koolegant text-black text-[17rem] z-10"
         style={{
@@ -487,15 +358,6 @@ const SectionFewGraphic = () => {
           top: "572px",
           width: "392px",
           height: "137px",
-=======
-      <div 
-        className="absolute font-koolegant text-black text-[17rem] z-10"
-        style={{ 
-          left: '580px', 
-          top: '572px', 
-          width: '392px', 
-          height: '137px' 
->>>>>>> cd12b37276474999e73fe022277687a4f84cb9f7
         }}
       >
         shot
@@ -506,21 +368,12 @@ const SectionFewGraphic = () => {
         src="/images/gpt-study/few-shot/FewShot.png"
         alt="Few Shot"
         className="absolute z-20"
-<<<<<<< HEAD
         style={{
           left: "318px",
           top: "260px",
           width: "550px",
           height: "550px",
           transformOrigin: "top right",
-=======
-        style={{ 
-          left: '318px', 
-          top: '260px', 
-          width: '550px', 
-          height: '550px',
-          transformOrigin: 'top right'
->>>>>>> cd12b37276474999e73fe022277687a4f84cb9f7
         }}
         animate={
           isInView
