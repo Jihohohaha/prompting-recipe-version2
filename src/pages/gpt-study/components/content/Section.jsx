@@ -6,6 +6,7 @@ import useGPTStudyStore from "../../store";
 
 // Tutorial 컴포넌트 import
 import Recipe2TutorialExplain from "./tabs/expanded/tutorial/Recipe2TutorialExplain";
+import Recipe2TutorialExample from "./tabs/expanded/tutorial/Recipe2TutorialExample";
 import Recipe6TutorialExplain from "./tabs/expanded/tutorial/Recipe6TutorialExplain";
 
 const Section = ({ recipe, index }) => {
@@ -19,12 +20,23 @@ const Section = ({ recipe, index }) => {
 
   const handleCollapse = () => {
     console.log("🔼 Collapsing content");
-    // store 상태 업데이트
-    collapseContent();
-    // activeSection 업데이트 (Section 최상단으로 스크롤)
-    setActiveSection(recipe.id - 1);
-    // URL 변경
-    navigate(`/gpt-study/${recipe.slug}`);
+    
+    // 1. Section 시작점으로 스크롤
+    const sectionElement = document.getElementById(`section-${index}`);
+    if (sectionElement) {
+      sectionElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+    
+    // 2. 약간의 딜레이 후 접기 시작
+    setTimeout(() => {
+      collapseContent();
+      setActiveSection(recipe.id - 1);
+      
+      // 3. 애니메이션이 끝난 후 URL 변경 (1.2초 후)
+      setTimeout(() => {
+        navigate(`/gpt-study/${recipe.slug}`);
+      }, 1200);
+    }, 300);
   };
 
   // 펼쳐진 콘텐츠 렌더링
@@ -33,7 +45,14 @@ const Section = ({ recipe, index }) => {
     if (recipe.id === 2 && tab === "tutorial") {
       return (
         <>
+          {/* Explain 컴포넌트 */}
           <Recipe2TutorialExplain />
+
+          {/* Gap - 검은색 배경이 보이는 구간 */}
+          <div className="w-full h-12"></div>
+
+          {/* Example 컴포넌트 (버튼 포함) */}
+          <Recipe2TutorialExample recipeId={recipe.id} index={index} />
         </>
       );
     }
@@ -89,22 +108,12 @@ const Section = ({ recipe, index }) => {
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.5, ease: "easeInOut" }}
+            transition={{ duration: 1.2, ease: "easeInOut" }} // ✅ 0.5 → 1.2초로 증가
             className="overflow-hidden"
           >
             <div className="bg-black py-8">
               {/* 실제 콘텐츠 렌더링 */}
               {renderExpandedContent()}
-
-              {/* 접기 버튼 */}
-              <div className="flex justify-center mt-8">
-                <button
-                  onClick={handleCollapse}
-                  className="px-8 py-3 bg-white text-black font-bold rounded-lg hover:bg-gray-200 transition-all"
-                >
-                  접기 ▲
-                </button>
-              </div>
             </div>
           </motion.div>
         )}
