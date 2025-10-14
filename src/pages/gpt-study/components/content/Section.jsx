@@ -7,6 +7,7 @@ import useGPTStudyStore from "../../store";
 // Tutorial 컴포넌트 import
 import Recipe2TutorialExplain from "./tabs/expanded/tutorial/Recipe2TutorialExplain";
 import Recipe6TutorialExplain from "./tabs/expanded/tutorial/Recipe6TutorialExplain";
+import Recipe5TutorialExplain from "./tabs/expanded/tutorial/Recipe5TutorialExplain";
 
 const Section = ({ recipe, index }) => {
   const navigate = useNavigate();
@@ -34,6 +35,15 @@ const Section = ({ recipe, index }) => {
       return (
         <>
           <Recipe2TutorialExplain />
+        </>
+      );
+    }
+
+    // Recipe 5 - Tutorial
+    if (recipe.id === 5 && tab === "tutorial") {
+      return (
+        <>
+          <Recipe5TutorialExplain />
         </>
       );
     }

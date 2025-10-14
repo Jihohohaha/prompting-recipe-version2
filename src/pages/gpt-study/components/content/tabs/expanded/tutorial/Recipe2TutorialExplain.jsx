@@ -1,6 +1,6 @@
 // src/pages/gpt-study/components/content/tabs/expanded/tutorial/Recipe2TutorialExplain.jsx
-import { motion, useInView } from 'framer-motion';
-import { useRef } from 'react';
+import { motion, useInView } from "framer-motion";
+import { useRef } from "react";
 
 const Recipe2TutorialExplain = () => {
   return (
@@ -75,12 +75,12 @@ const SectionHeader = () => {
     <div className="w-full flex items-center justify-between px-[48px] pt-[48px]">
       {/* (FEW-SHOT) */}
       <div className="font-mortend text-3xl font-black">( FEW-SHOT )</div>
-      
+
       {/* 너비가 긴 선 */}
       <div className="flex-1 mx-[20px]">
         <span className="block w-full h-[2px] bg-black"></span>
       </div>
-      
+
       {/* RECIPE 1. */}
       <div className="font-koolegant text-4xl">RECIPE 1.</div>
     </div>
@@ -91,7 +91,7 @@ const SectionHeader = () => {
 const SectionDivider = () => {
   return (
     <div className="w-full flex items-center justify-center pt-[24px] pb-[70px]">
-      <div className="w-[1408px] h-[2px] bg-black"></div>
+      <div className="w-[1126px] h-[2px] bg-black"></div>
     </div>
   );
 };
@@ -99,60 +99,60 @@ const SectionDivider = () => {
 // Section 3: Zero-shot 그래픽
 const SectionZeroGraphic = () => {
   return (
-    <div className="w-full relative" style={{ height: '1272px' }}>
+    <div className="w-full relative" style={{ height: "1120px" }}>
       {/* FFC300 원 (작은) */}
-      <div 
+      <div
         className="absolute bg-[#FFC300] rounded-full"
-        style={{ 
-          width: '188px', 
-          height: '188px',
-          left: '1150px', 
-          top: '88px' 
+        style={{
+          width: "150px",
+          height: "150px",
+          left: "920px",
+          top: "70px",
         }}
       />
-      
+
       {/* FFC300 링 (큰) */}
-      <div 
+      <div
         className="absolute rounded-full ring-20 ring-[#FFC300]"
-        style={{ 
-          width: '680px', 
-          height: '680px',
-          left: '88px', 
-          top: '162px' 
+        style={{
+          width: "544px",
+          height: "544px",
+          left: "70px",
+          top: "129px",
         }}
       />
-      
+
       {/* zero 텍스트 */}
-      <div 
-        className="absolute font-koolegant text-black text-[19rem]"
-        style={{ 
-          left: '173px', 
-          top: '286px', 
-          width: '520px', 
-          height: '172px' 
+      <div
+        className="absolute font-koolegant text-black text-[17rem]"
+        style={{
+          left: "100px",
+          top: "190px",
+          width: "350px",
+          height: "130px",
         }}
       >
         zero
       </div>
       {/* FFC300 원 (중간) */}
-      <div 
+      <div
         className="absolute bg-[#FFC300] rounded-full"
-        style={{ 
-          width: '422px', 
-          height: '422px',
-          left: '950px', 
-          top: '730px' 
+        style={{
+          width: "337px",
+          height: "337px",
+          left: "760px",
+          top: "584px",
         }}
       />
 
       {/* shot 텍스트 */}
-      <div 
-        className="absolute font-koolegant text-black text-[19rem]"
-        style={{ 
-          left: '725px', 
-          top: '716px', 
-          width: '491px', 
-          height: '172px' 
+      <div
+        className="absolute font-koolegant text-black text-[17rem]"
+        style={{
+          left: "580px",
+          top: "572px",
+          width: "392px",
+          height: "137px",
         }}
       >
         shot
@@ -163,14 +163,13 @@ const SectionZeroGraphic = () => {
         src="/images/gpt-study/few-shot/ZeroShot.png"
         alt="Zero Shot"
         className="absolute"
-        style={{ 
-          left: '398px', 
-          top: '324px', 
-          width: '673px', 
-          height: '673px' 
+        style={{
+          left: "318px",
+          top: "260px",
+          width: "550px",
+          height: "550px",
         }}
       />
-      
     </div>
   );
 };
@@ -181,16 +180,34 @@ const SectionZeroExplain = () => {
     <div className="w-full flex items-center justify-center py-[0px]">
       <div className="text-center font-pretendard text-4xl font-medium leading-relaxed">
         <p className="mb-4">
-          자 먼저 이건 <span className="bg-[#FFC300] px-2 py-1 text-5xl font-extrabold">zero-shot</span> 이에요.
+          자 먼저 이건{" "}
+          <span className="bg-[#FFC300] px-2 py-1 text-5xl font-extrabold">
+            zero-shot
+          </span>{" "}
+          이에요.
         </p>
         <p className="mb-4">
-          보이는 것처럼 <span className="bg-[#FFC300] px-2 py-1 text-5xl font-extrabold">비어있는 샷</span> 이죠.
+          보이는 것처럼{" "}
+          <span className="bg-[#FFC300] px-2 py-1 text-5xl font-extrabold">
+            비어있는 샷
+          </span>{" "}
+          이죠.
         </p>
         <p className="mb-4">
-          이 <span className="bg-[#FFC300] px-2 py-1 text-5xl font-extrabold">zero-shot</span> 은 다음과 같이 <span className="bg-[#FFC300] px-2 py-1 text-5xl font-extrabold">예시를 제시하지 않고</span>
+          이{" "}
+          <span className="bg-[#FFC300] px-2 py-1 text-5xl font-extrabold">
+            zero-shot
+          </span>{" "}
+          은 다음과 같이{" "}
+          <span className="bg-[#FFC300] px-2 py-1 text-5xl font-extrabold">
+            예시를 제시하지 않고
+          </span>
         </p>
         <p>
-          <span className="bg-[#FFC300] px-2 py-1 text-5xl font-extrabold">명령어를 입력</span> 하는 방식이에요.
+          <span className="bg-[#FFC300] px-2 py-1 text-5xl font-extrabold">
+            명령어를 입력
+          </span>{" "}
+          하는 방식이에요.
         </p>
       </div>
     </div>
@@ -200,12 +217,12 @@ const SectionZeroExplain = () => {
 // Section 5: 예시
 const SectionExample = () => {
   return (
-    <div className="w-full flex flex-col items-center justify-center gap-8 py-[108px]">
+    <div className="w-full flex flex-col items-center justify-center gap-8 py-[158px]">
       {/* 예시 박스 */}
       <div className="border-6 border-[#FFC300] px-1 py-4 font-pretendard text-5xl font-medium">
         I love apples 라는 영어 문장을 한국어로 번역해줘
       </div>
-      
+
       {/* 설명 텍스트 */}
       <div className="font-pretendard text-4xl font-medium">
         이런식으로요! 그러면 GPT는 아래와 같이 답변합니다.
@@ -219,10 +236,8 @@ const SectionGPTAnswer = () => {
   return (
     <div className="w-full flex flex-col items-center justify-center gap-8 py-[0px]">
       {/* GPT의 답변 제목 */}
-      <div className="font-pretendard text-4xl font-bold">
-        GPT의 답변
-      </div>
-      
+      <div className="font-pretendard text-4xl font-bold">GPT의 답변</div>
+
       {/* 답변 박스 */}
       <div className="bg-[#FFC300] border border-black px-64 py-6 font-pretendard text-5xl font-semibold">
         나는 사과를 좋아한다
@@ -234,52 +249,52 @@ const SectionGPTAnswer = () => {
 // Section 7: V 동상
 const SectionVStatue = () => {
   return (
-    <div className="w-full relative" style={{ height: '988px' }}>
+    <div className="w-full relative" style={{ height: "858px" }}>
       {/* V 동상 이미지 */}
       <img
         src="/images/gpt-study/few-shot/VStatue.png"
         alt="V Statue"
         className="absolute"
-        style={{ 
-          left: '400px', 
-          top: '108px', 
-          width: '669px', 
-          height: '739px' 
+        style={{
+          left: "320px",
+          top: "86px",
+          width: "535px",
+          height: "590px",
         }}
       />
-      
+
       {/* 별 이미지 */}
       <img
         src="/images/gpt-study/few-shot/Star.png"
         alt="Star"
         className="absolute"
-        style={{ 
-          left: '1013px', 
-          top: '706px', 
-          width: '132px', 
-          height: '112px' 
+        style={{
+          left: "810px",
+          top: "564px",
+          width: "105px",
+          height: "89px",
         }}
       />
-      
+
       {/* 텍스트 */}
-      <div 
-        className="absolute text-center font-pretendard text-4xl font-bold" 
-        style={{ top: '800px', left: '50%', transform: 'translateX(-50%)' }}
+      <div
+        className="absolute text-center font-pretendard text-4xl font-bold"
+        style={{ top: "640px", left: "50%", transform: "translateX(-50%)" }}
       >
         <p>겉보기엔 괜찮아보이죠?</p>
         <p>근데 더 좋은 방법이 있다는 사실!</p>
       </div>
-      
+
       {/* 밑줄 이미지 */}
       <img
         src="/images/gpt-study/few-shot/Underline.png"
         alt="Underline"
         className="absolute"
-        style={{ 
-          left: '373px', 
-          top: '807px', 
-          width: '803px', 
-          height: '107px' 
+        style={{
+          left: "228px",
+          top: "655px",
+          width: "742px",
+          height: "85px",
         }}
       />
     </div>
@@ -292,83 +307,87 @@ const SectionFewGraphic = () => {
   const isInView = useInView(ref, { once: false, amount: 0.5 });
 
   return (
-    <div ref={ref} className="w-full relative" style={{ height: '1312px' }}>
+    <div ref={ref} className="w-full relative" style={{ height: "1112px" }}>
       {/* FFC300 원들 */}
-      <div 
+      <div
         className="absolute bg-[#FFC300] rounded-full"
-        style={{ 
-          width: '188px', 
-          height: '188px',
-          left: '1150px', 
-          top: '88px' 
+        style={{
+          width: "150px",
+          height: "150px",
+          left: "920px",
+          top: "70px",
         }}
       />
-      <div 
+      <div
         className="absolute rounded-full ring-20 ring-[#FFC300]"
-        style={{ 
-          width: '680px', 
-          height: '680px',
-          left: '88px', 
-          top: '162px' 
+        style={{
+          width: "544px",
+          height: "544px",
+          left: "70px",
+          top: "129px",
         }}
       />
-      <div 
+      <div
         className="absolute bg-[#FFC300] rounded-full"
-        style={{ 
-          width: '422px', 
-          height: '422px',
-          left: '950px', 
-          top: '730px' 
+        style={{
+          width: "377px",
+          height: "377px",
+          left: "760px",
+          top: "584px",
         }}
       />
-      
+
       {/* few 텍스트 */}
-      <div 
-        className="absolute font-koolegant text-black text-[19rem] z-10"
-        style={{ 
-          left: '173px', 
-          top: '286px', 
-          width: '520px', 
-          height: '172px' 
+      <div
+        className="absolute font-koolegant text-black text-[17rem] z-10"
+        style={{
+          left: "100px",
+          top: "190px",
+          width: "350px",
+          height: "130px",
         }}
       >
         few
       </div>
-      
+
       {/* shot 텍스트 */}
-      <div 
-        className="absolute font-koolegant text-black text-[19rem] z-10"
-        style={{ 
-          left: '725px', 
-          top: '716px', 
-          width: '491px', 
-          height: '172px' 
+      <div
+        className="absolute font-koolegant text-black text-[17rem] z-10"
+        style={{
+          left: "580px",
+          top: "572px",
+          width: "392px",
+          height: "137px",
         }}
       >
         shot
       </div>
-      
+
       {/* FewShot 이미지 (흔들림 애니메이션) */}
       <motion.img
         src="/images/gpt-study/few-shot/FewShot.png"
         alt="Few Shot"
         className="absolute z-20"
-        style={{ 
-          left: '393px', 
-          top: '324px', 
-          width: '673px', 
-          height: '729px',
-          transformOrigin: 'top right'
+        style={{
+          left: "318px",
+          top: "260px",
+          width: "550px",
+          height: "550px",
+          transformOrigin: "top right",
         }}
-        animate={isInView ? {
-          rotate: [0, 2, -2, 2, -2, 0],
-          y: [0, -2, 2, -2, 2, 0]
-        } : {}}
+        animate={
+          isInView
+            ? {
+                rotate: [0, 2, -2, 2, -2, 0],
+                y: [0, -2, 2, -2, 2, 0],
+              }
+            : {}
+        }
         transition={{
           duration: 2,
           ease: "easeInOut",
           times: [0, 0.2, 0.4, 0.6, 0.8, 1],
-          delay: 0.3
+          delay: 0.3,
         }}
       />
     </div>
@@ -381,16 +400,33 @@ const SectionFewExplain = () => {
     <div className="w-full flex items-center justify-center py-[0px] pb-[50px]">
       <div className="text-center font-pretendard text-4xl font-medium leading-relaxed">
         <p className="mb-4">
-          자, 이번엔 <span className="bg-[#FFC300] px-2 py-1 text-5xl font-extrabold">few-shot</span> 이에요.
+          자, 이번엔{" "}
+          <span className="bg-[#FFC300] px-2 py-1 text-5xl font-extrabold">
+            few-shot
+          </span>{" "}
+          이에요.
         </p>
         <p className="mb-4">
-          이번엔 비어 있지 않은, <span className="bg-[#FFC300] px-2 py-1 text-5xl font-extrabold">조금 찬 샷</span> 이라고 생각해볼게요.
+          이번엔 비어 있지 않은,{" "}
+          <span className="bg-[#FFC300] px-2 py-1 text-5xl font-extrabold">
+            조금 찬 샷
+          </span>{" "}
+          이라고 생각해볼게요.
         </p>
         <p className="mb-4">
-          <span className="bg-[#FFC300] px-2 py-1 text-5xl font-extrabold">few-shot</span> 은 다음과 같이 <span className="bg-[#FFC300] px-2 py-1 text-5xl font-extrabold">예시를 먼저 제시한 뒤</span>
+          <span className="bg-[#FFC300] px-2 py-1 text-5xl font-extrabold">
+            few-shot
+          </span>{" "}
+          은 다음과 같이{" "}
+          <span className="bg-[#FFC300] px-2 py-1 text-5xl font-extrabold">
+            예시를 먼저 제시한 뒤
+          </span>
         </p>
         <p>
-          <span className="bg-[#FFC300] px-2 py-1 text-5xl font-extrabold">그 패턴을 따라</span> 새로운 결과를 만들어내는 방식이에요.
+          <span className="bg-[#FFC300] px-2 py-1 text-5xl font-extrabold">
+            그 패턴을 따라
+          </span>{" "}
+          새로운 결과를 만들어내는 방식이에요.
         </p>
       </div>
     </div>
