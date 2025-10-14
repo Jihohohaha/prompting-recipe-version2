@@ -2,6 +2,7 @@
 import { motion } from 'framer-motion';
 import { useNavigate, useParams } from 'react-router-dom';
 import useGPTStudyStore from '../../../../../store';
+import {useState, useEffect} from 'react';
 
 const Recipe2TutorialExample = ({ recipeId, index }) => {
   return (
@@ -209,10 +210,176 @@ const Section4 = () => {
 
 // Section 5
 const Section5 = () => {
+  const [showAnimation, setShowAnimation] = useState(false);
+  const [cycleCount, setCycleCount] = useState(0);
+  useEffect(() => {
+    const animationCycle = () => {
+      setShowAnimation(false);
+      
+      setTimeout(() => {
+        setShowAnimation(true); // 그 다음 true
+      }, 100);
+      // 6초 후 모든 애니메이션 요소 사라짐
+
+      setTimeout(() => {
+        setShowAnimation(false);
+      }, 6000);
+      
+      // 0.1초 후 다시 시작
+      setTimeout(() => {
+        setCycleCount(prev => prev + 1);
+        animationCycle();
+      }, 6100);
+    };
+
+    animationCycle();
+    
+    // cleanup
+    return () => {};
+  }, []);
+
   return (
-    <div className="w-full flex items-center justify-center py-24">
-      <div className="text-center font-pretendard text-xl">
-        Section 5 - 여기에 내용이 들어갑니다
+    <div className="w-full flex flex-col items-center justify-center pt-40 pb-56 gap-8">
+      {/* 1. GPT의 답변 */}
+      <div className="text-4xl font-semibold font-pretendard">
+        GPT의 답변
+      </div>
+
+      {/* 2. 답변 박스 */}
+      <div className="bg-[#FFC300] border-2 border-black px-48 py-6 text-5xl font-semibold font-pretendard">
+        나는 사과를 좋아한다
+      </div>
+
+      {/* 3. 애니메이션 영역 */}
+      <div className="relative w-[2068px] h-[459px] mt-12">
+        {/* 애니메이션 요소들 - clip-path wipe */}
+        {showAnimation && (
+          <>
+            {/* FirstLine */}
+            <motion.img
+              key="firstline"
+              src="/images/gpt-study/few-shot/FirstLine.png"
+              alt="First Line"
+              className="absolute"
+              style={{
+                left: '450px',
+                top: '200px',
+                width: '280px',
+                height: '269px'
+              }}
+              initial={{ clipPath: 'inset(0 100% 0 0)' }}
+              animate={{ clipPath: 'inset(0 0 0 0)' }}
+              transition={{ duration: 1, ease: "easeOut" }}
+            />
+
+            {/* SecondLine */}
+            <motion.img
+              key="secondline"
+              src="/images/gpt-study/few-shot/SecondLine.png"
+              alt="Second Line"
+              className="absolute"
+              style={{
+                left: '1736px',
+                top: '-100px',
+                width: '712px',
+                height: '617px',
+                transform: 'rotate(-188.26deg)',
+                transformOrigin: 'left center'
+              }}
+              initial={{ clipPath: 'inset(0 0 0 100%)' }}
+              animate={{ clipPath: 'inset(0 0 0 0)' }}
+              transition={{ duration: 1.5, delay: 1, ease: "easeOut" }}
+            />
+
+            {/* 짧은 선 1 */}
+            <motion.div
+              key="line1"
+              className="absolute bg-[#FFC300] rounded"
+              style={{
+                left: '1123px',
+                top: '95px',
+                width: '60px',
+                height: '7px',
+                transform: 'rotate(35deg)',
+                transformOrigin: 'left center'
+              }}
+              initial={{ clipPath: 'inset(0 100% 0 0)' }}
+              animate={{ clipPath: 'inset(0 0 0 0)' }}
+              transition={{ duration: 0.5, delay: 2.5, ease: "easeOut" }}
+            />
+
+            {/* 짧은 선 2 */}
+            <motion.div
+              key="line2"
+              className="absolute bg-[#FFC300] rounded"
+              style={{
+                left: '1197px',
+                top: '30px',
+                width: '60px',
+                height: '7px',
+                transform: 'rotate(60deg)',
+                transformOrigin: 'left center'
+              }}
+              initial={{ clipPath: 'inset(0 100% 0 0)' }}
+              animate={{ clipPath: 'inset(0 0 0 0)' }}
+              transition={{ duration: 0.5, delay: 3, ease: "easeOut" }}
+            />
+
+            {/* 짧은 선 3 */}
+            <motion.div
+              key="line3"
+              className="absolute bg-[#FFC300] rounded"
+              style={{
+                left: '1333px',
+                top: '23px',
+                width: '60px',
+                height: '7px',
+                transform: 'rotate(120deg)',
+                transformOrigin: 'left center'
+              }}
+              initial={{ clipPath: 'inset(0 100% 0 0)' }}
+              animate={{ clipPath: 'inset(0 0 0 0)' }}
+              transition={{ duration: 0.5, delay: 3.5, ease: "easeOut" }}
+            />
+          </>
+        )}
+
+        {/* 고정 이미지들 */}
+        <img
+          src="/images/gpt-study/few-shot/HeartApple.png"
+          alt="Heart Apple"
+          className="absolute"
+          style={{
+            left: '497px',
+            top: '0px',
+            width: '406px',
+            height: '406px'
+          }}
+        />
+        
+        <img
+          src="/images/gpt-study/few-shot/AppleStatue.png"
+          alt="Apple Statue"
+          className="absolute"
+          style={{
+            left: '634px',
+            top: '123px',
+            width: '535px',
+            height: '590px'
+          }}
+        />
+        
+        <img
+          src="/images/gpt-study/few-shot/EatenApple.png"
+          alt="Eaten Apple"
+          className="absolute"
+          style={{
+            left: '857px',
+            top: '68px',
+            width: '910px',
+            height: '593px'
+          }}
+        />
       </div>
     </div>
   );
