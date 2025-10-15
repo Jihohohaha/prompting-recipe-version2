@@ -91,7 +91,7 @@ const TabInterface = ({ recipe }) => {
         </div>
 
         {/* 방법론 제목 텍스트 (좌측 정렬, 상단 여백 추가) */}
-        <div className="text-white font-bold mt-72 text-8xl font-pretendard whitespace-pre-line text-left mt-8">
+        <div className="text-white font-bold mt-72 text-8xl font-pretendard whitespace-pre-line text-left mt-16">
           {recipe.displayTitle}
         </div>
 

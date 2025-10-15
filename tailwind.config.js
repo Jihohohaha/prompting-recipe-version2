@@ -14,6 +14,7 @@ export default {
         koolegant: ['Koolegant', 'sans-serif'],
         watermelon: ['116Watermelon', 'sans-serif'],
         sacramento: ['"Sacramento"', 'cursive'],
+        mortend: ["Mortend", "sans-serif"],
       },
       zIndex: {
         60: '60',
@@ -22,6 +23,14 @@ export default {
         90: '90',
         100: '100',
       },
+      ringWidth: {
+        20: '20px',
+        28: '28px',
+      },
+      borderWidth: {
+        3: '3px',
+        6: '6px',
+      }
     },
   },
   plugins: [],
