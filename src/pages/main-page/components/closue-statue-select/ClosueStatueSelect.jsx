@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 
 // 상수 정의
-const ROTATION_SPEED = -0.04;
+const ROTATION_SPEED = -0.045; // 5도씩 회전하도록 속도 조정
 const RADIUS = 500;
 const DISH_SIZE = 400;
 const SCROLL_RESET_THRESHOLD = { TOP: 0.1, BOTTOM: 0.9 };
@@ -48,34 +48,57 @@ const dishes = [...DISHES_DATA, ...DISHES_DATA.map(dish => ({ ...dish, id: dish.
 const ClosueStatueSelect = () => {
   const [rotationAngle, setRotationAngle] = useState(0);
   const [showMask, setShowMask] = useState(true);
+  const [selectedDish, setSelectedDish] = useState(null);
+  const [isTransitioning, setIsTransitioning] = useState(false);
   const containerRef = useRef(null);
   const lastScrollY = useRef(0);
+  
+  // 각 접시의 스케일 상태를 개별적으로 관리
+  const [dishScales, setDishScales] = useState(Array(8).fill(1));
 
-  // 원형 배치 계산 최적화
-  const getCirclePosition = useCallback((index) => {
-    const baseAngle = index * 45;
-    const angle = baseAngle + rotationAngle;
-    const radian = (angle * Math.PI) / 180;
-    
-    const centerX = window.innerWidth / 2;
-    const centerY = window.innerHeight / 2 + 530;
-
-    return {
-      x: centerX + RADIUS * Math.cos(radian),
-      y: centerY + RADIUS * Math.sin(radian),
-      angle
-    };
+  // 앞쪽 접시 인덱스 계산
+  const frontDishIndex = useMemo(() => {
+    // 위쪽(12시 방향)에 있는 접시가 선택되도록 계산
+    const normalizedAngle = ((-rotationAngle % 360) + 360) % 360;
+    const rawIndex = Math.round((normalizedAngle - 90) / 45);
+    return ((rawIndex % 8) + 8) % 8;
   }, [rotationAngle]);
 
-  // 가장 앞쪽 접시 찾기 최적화
+  // 현재 앞쪽 접시 정보
   const frontDish = useMemo(() => {
-    // 간단한 수학적 계산으로 최적화
-    const normalizedAngle = ((rotationAngle % 360) + 360) % 360;
-    const frontIndex = Math.round((normalizedAngle / 45) % 8);
-    return dishes[frontIndex] || dishes[0];
-  }, [rotationAngle]);
+    return dishes[frontDishIndex] || dishes[0];
+  }, [frontDishIndex]);
 
-  // 스크롤 핸들러 최적화
+  // frontDishIndex가 변경될 때 스케일 상태 업데이트
+  useEffect(() => {
+    setDishScales(prevScales => 
+      prevScales.map((_, index) => index === frontDishIndex ? 1.1 : 1)
+    );
+  }, [frontDishIndex]);
+
+  // 접시 클릭 핸들러
+  const handleDishClick = useCallback((dish) => {
+    if (selectedDish || isTransitioning) return;
+    
+    setIsTransitioning(true);
+    setTimeout(() => {
+      setSelectedDish(dish);
+      setIsTransitioning(false);
+    }, 500);
+  }, [selectedDish, isTransitioning]);
+
+  // 뒤로가기 핸들러
+  const handleBackClick = useCallback(() => {
+    if (isTransitioning) return;
+    
+    setIsTransitioning(true);
+    setTimeout(() => {
+      setSelectedDish(null);
+      setIsTransitioning(false);
+    }, 500);
+  }, [isTransitioning]);
+
+  // 스크롤 핸들러 - 단순 회전
   const handleScroll = useCallback(() => {
     const container = containerRef.current;
     if (!container) return;
@@ -83,10 +106,12 @@ const ClosueStatueSelect = () => {
     const currentScrollY = container.scrollTop;
     const scrollDelta = currentScrollY - lastScrollY.current;
     
-    if (Math.abs(scrollDelta) < 1) return; // 미세한 움직임 무시
+    if (Math.abs(scrollDelta) < 1) return;
 
+    // 단순 회전 로직 (5도씩)
     const angleChange = scrollDelta * ROTATION_SPEED;
     setRotationAngle(prev => prev + angleChange);
+    
     lastScrollY.current = currentScrollY;
     
     // 무한 스크롤 리셋
@@ -116,14 +141,14 @@ const ClosueStatueSelect = () => {
     return () => container.removeEventListener('scroll', handleScroll);
   }, [handleScroll]);
 
-  // 키워드 컴포넌트 최적화 - 한글/영어 폰트 자동 선택
-  const KeywordText = React.memo(({ children, className, style }) => {
-    // 한글 포함 여부 검사
+  // 키워드 컴포넌트 최적화
+  const KeywordText = React.memo(({ children, className, style, isHighlighted }) => {
     const hasKorean = /[ㄱ-ㅎ|ㅏ-ㅣ|가-힣]/.test(children);
     const fontClass = hasKorean ? 'font-pretendard' : 'font-sacramento';
+    const scaleClass = isHighlighted ? 'scale-110' : 'scale-100';
     
     return (
-      <div className={`absolute text-white z-30 pointer-events-none transition-all duration-500 ${fontClass} ${className}`} style={style}>
+      <div className={`absolute text-white z-30 pointer-events-none transition-all duration-500 ${fontClass} ${scaleClass} ${className}`} style={style}>
         {children}
       </div>
     );
@@ -134,37 +159,71 @@ const ClosueStatueSelect = () => {
     <img src={src} alt={alt} className={`absolute object-contain z-10 pointer-events-none ${className}`} />
   ));
 
-  // 접시 컴포넌트 최적화
-  const DishItem = React.memo(({ dish, position }) => (
-    <div
-      className="absolute z-30 pointer-events-none"
-      style={{
-        left: position.x - DISH_SIZE / 2,
-        top: position.y - DISH_SIZE / 2,
-        width: DISH_SIZE,
-        height: DISH_SIZE,
-        transform: 'translate3d(0, 0, 0)', // 하드웨어 가속
-      }}
-    >
+  // 접시 컨테이너 컴포넌트
+  const DishContainer = React.memo(() => {
+    return (
       <div 
-        className="flex flex-col items-center justify-center relative overflow-hidden w-full h-full dish-transition"
-        style={{ 
-          backgroundImage: 'url(/images/main-page/dish.png)',
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
+        className="absolute"
+        style={{
+          left: window.innerWidth / 2,
+          top: window.innerHeight / 2 + 530,
+          transformOrigin: '0 0',
+          transform: `rotate(${rotationAngle}deg)`,
         }}
       >
-        <div className="absolute inset-0 flex flex-col items-center justify-center p-4 text-center">
-          <h3 className="text-[24px] font-bold text-black mb-1 font-bromawo">
-            {dish.title}
-          </h3>
-          <p className="text-[20px] text-black font-pretendard font-bold">
-            {dish.subtitle}
-          </p>
+        {dishes.map((dish, index) => (
+          <DishItem key={`dish-${index}`} dish={dish} index={index} />
+        ))}
+      </div>
+    );
+  });
+
+  // 접시 컴포넌트
+  const DishItem = React.memo(({ dish, index }) => {
+    const isFrontDish = index === frontDishIndex;
+    const scale = dishScales[index];
+    
+    // 기본 위치 계산
+    const baseAngle = index * 45;
+    const radian = (baseAngle * Math.PI) / 180;
+    const x = RADIUS * Math.cos(radian);
+    const y = RADIUS * Math.sin(radian);
+    
+    return (
+      <div
+        className="absolute"
+        style={{
+          left: x - DISH_SIZE / 2,
+          top: y - DISH_SIZE / 2,
+          width: DISH_SIZE,
+          height: DISH_SIZE,
+          transformOrigin: 'center center',
+          transform: `rotate(${-rotationAngle}deg) scale(${scale})`,
+          transition: 'transform 0.5s cubic-bezier(0.25, 0.1, 0.25, 1)',
+          cursor: isFrontDish ? 'pointer' : 'default',
+          pointerEvents: isFrontDish ? 'auto' : 'none',
+          zIndex: isFrontDish ? 35 : 30,
+        }}
+        onClick={() => isFrontDish && handleDishClick(dish)}
+      >
+        <div 
+          className="w-full h-full flex flex-col items-center justify-center overflow-hidden bg-cover bg-center"
+          style={{ 
+            backgroundImage: 'url(/images/main-page/dish.png)',
+          }}
+        >
+          <div className="absolute inset-0 flex flex-col items-center justify-center p-4 text-center">
+            <h3 className="text-2xl font-bold text-black mb-1 font-bromawo">
+              {dish.title}
+            </h3>
+            <p className="text-xl text-black font-pretendard font-bold">
+              {dish.subtitle}
+            </p>
+          </div>
         </div>
       </div>
-    </div>
-  ));
+    );
+  });
 
   return (
     <>
@@ -183,31 +242,17 @@ const ClosueStatueSelect = () => {
           <div className="text-white text-lg">Click</div>
         </div>
       )}
-
-      {/* CSS 스타일 */}
-      <style jsx>{`
-        .smooth-scroll-container {
-          scroll-behavior: smooth;
-          -webkit-overflow-scrolling: touch;
-        }
-        .dish-transition {
-          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-          will-change: transform, opacity;
-        }
-      `}</style>
       
       <div className="relative w-screen h-screen overflow-hidden bg-gradient-to-b from-orange-400 to-orange-500">
         {/* 스크롤 컨테이너 */}
         <div
           ref={containerRef}
-          className="absolute inset-0 overflow-y-auto z-50"
+          className="absolute inset-0 overflow-y-auto z-50 scrollbar-hide"
           style={{
-            scrollbarWidth: 'none',
-            msOverflowStyle: 'none',
             WebkitOverflowScrolling: 'touch',
           }}
         >
-          <div style={{ height: '1000vh' }} />
+          <div className="h-[1000vh]" />
         </div>
 
         {/* 제목 */}
@@ -222,37 +267,61 @@ const ClosueStatueSelect = () => {
 
         {/* 플로팅 이미지들 */}
         <FloatingImage src="/images/main-page/flower.png" alt="Flower" 
-          className="bottom-[392px] left-[160px] w-[300px] h-[300px]" />
+          className="bottom-[392px] left-[160px] w-[300px] h-[300px] z-0" />
         <FloatingImage src="/images/main-page/cup.png" alt="Cup" 
-          className="bottom-[375px] left-[360px] w-[200px] h-[200px]" />
+          className="bottom-[375px] left-[360px] w-[200px] h-[200px] z-0" />
         <FloatingImage src="/images/main-page/salt.png" alt="Salt" 
-          className="bottom-[400px] right-[360px] w-[200px] h-[200px]" />
+          className="bottom-[400px] right-[360px] w-[200px] h-[200px] z-0" />
         <FloatingImage src="/images/main-page/glass.png" alt="Glass" 
-          className="bottom-[392px] right-[160px] w-[300px] h-[300px]" />
+          className="bottom-[392px] right-[160px] w-[300px] h-[300px] z-0" />
         
         {/* 키워드 텍스트들 */}
-        <KeywordText className="bottom-[470px] left-[290px] -translate-x-1/2 text-lg">
+        <KeywordText 
+          className="bottom-[470px] left-[290px] -translate-x-1/2 text-lg"
+          isHighlighted={frontDishIndex === 6 || frontDishIndex === 7}
+        >
           {frontDish.kw1}
         </KeywordText>
-        <KeywordText className="bottom-[450px] left-[290px] -translate-x-1/2 text-sm">
+        <KeywordText 
+          className="bottom-[450px] left-[290px] -translate-x-1/2 text-sm"
+          isHighlighted={frontDishIndex === 6 || frontDishIndex === 7}
+        >
           {frontDish.ekw1}
         </KeywordText>
-        <KeywordText className="bottom-[480px] left-[470px] -translate-x-1/2 text-lg">
+        <KeywordText 
+          className="bottom-[480px] left-[470px] -translate-x-1/2 text-lg"
+          isHighlighted={frontDishIndex === 0 || frontDishIndex === 1}
+        >
           {frontDish.kw2}
         </KeywordText>
-        <KeywordText className="bottom-[460px] left-[470px] -translate-x-1/2 text-sm">
+        <KeywordText 
+          className="bottom-[460px] left-[470px] -translate-x-1/2 text-sm"
+          isHighlighted={frontDishIndex === 0 || frontDishIndex === 1}
+        >
           {frontDish.ekw2}
         </KeywordText>
-        <KeywordText className="bottom-[470px] right-[460px] translate-x-1/2 text-lg">
+        <KeywordText 
+          className="bottom-[470px] right-[460px] translate-x-1/2 text-lg"
+          isHighlighted={frontDishIndex === 2 || frontDishIndex === 3}
+        >
           {frontDish.kw3}
         </KeywordText>
-        <KeywordText className="bottom-[450px] right-[460px] translate-x-1/2 text-sm">
+        <KeywordText 
+          className="bottom-[450px] right-[460px] translate-x-1/2 text-sm"
+          isHighlighted={frontDishIndex === 2 || frontDishIndex === 3}
+        >
           {frontDish.ekw3}
         </KeywordText>
-        <KeywordText className="bottom-[600px] right-[290px] translate-x-1/2 text-lg">
+        <KeywordText 
+          className="bottom-[600px] right-[290px] translate-x-1/2 text-lg"
+          isHighlighted={frontDishIndex === 4 || frontDishIndex === 5}
+        >
           {frontDish.kw4}
         </KeywordText>
-        <KeywordText className="bottom-[580px] right-[290px] translate-x-1/2 text-sm">
+        <KeywordText 
+          className="bottom-[580px] right-[290px] translate-x-1/2 text-sm"
+          isHighlighted={frontDishIndex === 4 || frontDishIndex === 5}
+        >
           {frontDish.ekw4}
         </KeywordText>
 
@@ -272,10 +341,7 @@ const ClosueStatueSelect = () => {
         </div>
 
         {/* 회전하는 그릇들 */}
-        {dishes.map((dish, index) => {
-          const position = getCirclePosition(index);
-          return <DishItem key={dish.id} dish={dish} position={position} />;
-        })}
+        <DishContainer />
       </div>
     </>
   );
