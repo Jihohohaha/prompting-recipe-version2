@@ -388,9 +388,23 @@ const Section5 = () => {
 // Section 6
 const Section6 = () => {
   return (
-    <div className="w-full flex items-center justify-center py-24">
-      <div className="text-center font-pretendard text-xl">
-        Section 6 - 여기에 내용이 들어갑니다
+    <div className="w-full flex flex-col items-center justify-center pt-32 pb-32 gap-6">
+      {/* 1. 아까랑 뭐가 다르냐고요? */}
+      <div className="text-3xl font-pretendard">
+        아까랑 뭐가 다르냐고요?
+      </div>
+
+      {/* 2. 여기서는 예시 2개를 주니, */}
+      <div className="text-3xl font-pretendard">
+        여기서는 예시 2개를 주니,
+      </div>
+
+      {/* 3. 모델이 패턴을 학습해서... */}
+      <div className="text-3xl font-pretendard">
+        <span className="bg-[#FFC300] px-0 py-1 text-4xl font-bold">
+          모델이 패턴을 학습해서 비슷하게 번역
+        </span>{' '}
+        한 거예요.
       </div>
     </div>
   );
@@ -399,9 +413,17 @@ const Section6 = () => {
 // Section 7
 const Section7 = () => {
   return (
-    <div className="w-full flex items-center justify-center py-24">
-      <div className="text-center font-pretendard text-xl">
-        Section 7 - 여기에 내용이 들어갑니다
+    <div className="w-full h-[700px] flex items-center justify-center bg-[#FFC300]">
+      <div className="rounded-full w-[600px] h-[600px] bg-white flex items-center justify-center font-pretendard text-3xl">
+        <div className="text-center p-8 leading-loose">
+          <span className="font-extrabold underline underline-offset-8 decoration-[#FFC300] decoration-4 text-4xl"> few-shot </span>이 더 좋은 이유는 <br />
+          모델이 단순히 문맥만 추론하는 게 아니라<br />
+          예시를 통해 “이런 식으로 대답하면 된다”는<br />
+          <span className="font-extrabold underline underline-offset-8 decoration-[#FFC300] decoration-4 text-4xl">규칙과 형식</span>
+          <span className="underline underline-offset-8 decoration-[#FFC300] decoration-4">을 </span>
+          <span className="font-extrabold underline underline-offset-8 decoration-[#FFC300] decoration-4 text-4xl">학습</span>
+          하기 때문이에요.
+        </div>
       </div>
     </div>
   );
@@ -410,10 +432,57 @@ const Section7 = () => {
 // Section 8
 const Section8 = () => {
   return (
-    <div className="w-full flex items-center justify-center py-24">
-      <div className="text-center font-pretendard text-xl">
-        Section 8 - 여기에 내용이 들어갑니다
+    <div className="w-full flex flex-col items-center justify-center pt-32 relative">
+      {/* Vector 1 - 상단 */}
+      <motion.img
+        src="/images/gpt-study/few-shot/Vector.png"
+        alt="Vector 1"
+        className="absolute"
+        style={{
+          left: '300px',
+          top: '50px',
+          width: '45px',
+          height: '65px'
+        }}
+        animate={{ rotateY: [0, -360] }}
+        transition={{
+          duration: 1,
+          repeat: Infinity,
+          ease: "linear"
+        }}
+      />
+
+      {/* 1. 텍스트 */}
+      <div className="text-3xl font-pretendard text-center">
+        그래서 <span className="text-4xl font-extrabold">정답률이 높고, 결과의 일관성</span> 이 유지돼요.
       </div>
+
+      {/* 2. Underline */}
+      <img
+        src="/images/gpt-study/few-shot/Underline.png"
+        alt="Underline"
+        className="w-full mt-[-30px]"
+        style={{ height: '50px' }}
+      />
+
+      {/* Vector 2 - 하단 */}
+      <motion.img
+        src="/images/gpt-study/few-shot/Vector.png"
+        alt="Vector 2"
+        className="absolute"
+        style={{
+          right: '350px',
+          bottom: '-80px',
+          width: '45px',
+          height: '65px'
+        }}
+        animate={{ rotateY: [0, -360] }}
+        transition={{
+          duration: 1,
+          repeat: Infinity,
+          ease: "linear"
+        }}
+      />
     </div>
   );
 };
@@ -421,9 +490,70 @@ const Section8 = () => {
 // Section 9
 const Section9 = () => {
   return (
-    <div className="w-full flex items-center justify-center py-24">
-      <div className="text-center font-pretendard text-xl">
-        Section 9 - 여기에 내용이 들어갑니다
+    <div className="w-full flex flex-col justify-center pt-48 px-6">
+      {/* 제목 */}
+      <p className="flex items-left px-12 text-3xl mb-4 font-pretendard pb-8">
+        정리하자면!<span className='font-bold font-pretendard mx-2'> few-shot </span>   은
+      </p>
+
+      {/* 탭 + 박스 */}
+      <div className="relative w-full px-12">
+        {/* 상단 탭 */}
+        <div className="h-14 w-60 bg-[#FFC300] rounded-t-2xl border-x border-t border-black"></div>
+        {/* 메인 박스 */}
+        <div className="flex flex-col items-center justify-center leading-extra-loose bg-[#FFC300] py-20 px-2 rounded-b-2xl border-2 border-black shadow-lg font-pretendard">
+          {/* 1. 예시 몇 개를 보여주고 문제를 풀게 하는 방법 부분 */}
+          <p className="text-3xl font-semibold mb-6">
+            <div className="bg-white font-bold text-4xl p-1 inline-block mx-1">
+              예시 몇 개를 보여주고 문제를 풀게 하는 방법
+            </div>
+            이에요.
+          </p>
+          {/* 2. 장점은 / 규칙을 따르게 만들기 쉽고 부분 */}
+          <p className="text-3xl font-semibold mb-6">
+            장점은 
+            <div className="bg-white font-bold text-4xl p-1 inline-block mx-1">
+              규칙을 따르게 만들기 쉽고
+            </div>
+          </p>
+          
+          <p className="text-3xl font-semibold mb-6">
+            <div className="bg-white font-bold text-4xl p-1 inline-block mx-1">
+              원하는 형식을 잘 지키는 거
+            </div>
+            예요.
+          </p>
+          
+          {/* 3. 대신, / 예시를 잘못 주면 부분 */}
+          <p className="text-3xl font-semibold mb-6">
+            대신, 
+            <div className="bg-white font-bold text-4xl p-1 inline-block mx-1">
+              예시를 잘못 주면
+            </div>
+            모델이
+          </p>
+
+          {/* 4. 패턴을 그대로 따라가서 오답 부분 */}
+          <p className="text-3xl font-semibold">
+            그 
+            <div className="bg-white font-bold text-4xl p-1 inline-block mx-1">
+              패턴을 그대로 따라가서 오답
+            </div>
+            이 나올 수도 있죠.
+          </p>
+        </div>
+      </div>
+
+      {/* YellowFewShot 이미지 */}
+      <div className="flex justify-center mt-16">
+        <img
+          src="/images/gpt-study/few-shot/YellowFewShot.png"
+          alt="Yellow Few Shot"
+          style={{
+            width: '550px',
+            height: '550px'
+          }}
+        />
       </div>
     </div>
   );
