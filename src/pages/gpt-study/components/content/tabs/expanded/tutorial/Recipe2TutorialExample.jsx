@@ -62,14 +62,9 @@ const Recipe2TutorialExample = ({ recipeId, index }) => {
         <Section11 />
       </FadeSection>
 
-      {/* Section 12 */}
+      {/* Section 12 - 버튼 포함 */}
       <FadeSection>
-        <Section12 />
-      </FadeSection>
-
-      {/* Section 13 - 버튼 포함 */}
-      <FadeSection>
-        <Section13 recipeId={recipeId} index={index} />
+        <Section12 recipeId={recipeId} index={index} />
       </FadeSection>
     </div>
   );
@@ -543,8 +538,14 @@ const Section9 = () => {
           </p>
         </div>
       </div>
+    </div>
+  );
+};
 
-      {/* YellowFewShot 이미지 */}
+// Section 10
+const Section10 = () => {
+  return (
+    <>{/* YellowFewShot 이미지 */}
       <div className="flex justify-center mt-16">
         <img
           src="/images/gpt-study/few-shot/YellowFewShot.png"
@@ -555,69 +556,117 @@ const Section9 = () => {
           }}
         />
       </div>
-    </div>
-  );
-};
-
-// Section 10
-const Section10 = () => {
-  return (
-    <div className="w-full flex items-center justify-center py-24">
-      <div className="text-center font-pretendard text-xl">
-        Section 10 - 여기에 내용이 들어갑니다
-      </div>
-    </div>
+    </>
   );
 };
 
 // Section 11
 const Section11 = () => {
+  const navigate = useNavigate();
+  const { slug } = useParams();
+
+  const handleGoToChat = () => {
+    navigate(`/gpt-study/${slug}/chat`);
+  };
+
   return (
-    <div className="w-full flex items-center justify-center py-24">
-      <div className="text-center font-pretendard text-xl">
-        Section 11 - 여기에 내용이 들어갑니다
+    <div className="w-full flex flex-col items-center justify-center pt-72 relative">
+      {/* FirstLine2 */}
+      <img
+        src="/images/gpt-study/few-shot/FirstLine2.png"
+        alt="First Line 2"
+        className="absolute"
+        style={{
+          left: '0px',
+          top: '120px',
+          width: '310px',
+          height: '250px'
+        }}
+      />
+
+      {/* SecondLine2 */}
+      <img
+        src="/images/gpt-study/few-shot/SecondLine2.png"
+        alt="Second Line 2"
+        className="absolute"
+        style={{
+          right: '0px',
+          top: '200px',
+          width: '350px',
+          height: '250px'
+        }}
+      />
+
+      {/* Star 1 - '그럼' 좌측 하단 */}
+      <img
+        src="/images/gpt-study/few-shot/Star.png"
+        alt="Star 1"
+        className="absolute"
+        style={{
+          left: '250px',
+          top: '480px',
+          width: '105px',
+          height: '89px'
+        }}
+      />
+
+      {/* Star 2 - '감이' 위 */}
+      <img
+        src="/images/gpt-study/few-shot/Star.png"
+        alt="Star 2"
+        className="absolute"
+        style={{
+          left: '700px',
+          top: '145px',
+          width: '105px',
+          height: '89px'
+        }}
+      />
+
+      {/* 텍스트 */}
+      <div className="text-3xl font-pretendard leading-[2.5] text-center z-10">
+        <p className='md-20'>
+          어때요? <span className="font-bold text-4xl">Few-shot</span> 에 대해 이제 감이 오죠?
+        </p>
+        <p>
+          좋아요! 하지만 <span className="underline underline-offset-8 decoration-[#FFC300] decoration-2">진짜 셰프가 되려면 조금 더 학습</span>이 필요하답니다.
+        </p>
+        <p>
+          그럼 이제 다음 단계로 넘어가 볼까요?
+        </p>
       </div>
+
+      {/* 버튼 + SpoonAndChopsticks */}
+      <div className="w-full flex items-center justify-center gap-4 mt-12 z-10">
+        <button
+          onClick={handleGoToChat}
+          className="bg-[#FFC300] border-2 border-black rounded-full px-12 py-4 text-3xl font-medium font-pretendard hover:bg-[#FFD54F] transition-colors"
+        >
+          레시피 연습하러 가기
+        </button>
+      </div>
+      {/* SpoonAndChopsticks */}
+      <img
+        src="/images/gpt-study/few-shot/SpoonAndChopsticks.png"
+        alt="Spoon and Chopsticks"
+        style={{
+          right: '0px',
+          top: '350px',
+          position: 'absolute',
+          width: '400px',
+          height: '500px'
+        }}
+      />
     </div>
   );
 };
+
 
 // Section 12
-const Section12 = () => {
-  return (
-    <div className="w-full flex items-center justify-center py-24">
-      <div className="text-center font-pretendard text-xl">
-        Section 12 - 여기에 내용이 들어갑니다
-      </div>
-    </div>
-  );
-};
-
-// Section 13 - 버튼 포함
-const Section13 = ({ recipeId, index }) => {
+const Section12 = ({ recipeId, index }) => {
   const navigate = useNavigate();
   const { slug } = useParams();
   const { collapseContent, setActiveSection } = useGPTStudyStore();
-
-  const handleChatTabOpen = () => {
-    console.log("💬 Opening Chat tab with smooth collapse");
-    
-    // 1. Section 시작점으로 스크롤
-    const sectionElement = document.getElementById(`section-${index}`);
-    if (sectionElement) {
-      sectionElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
-    
-    // 2. 약간의 딜레이 후 접기 & Chat 탭 열기
-    setTimeout(() => {
-      collapseContent();
-      setActiveSection(recipeId - 1);
-      
-      // 3. 애니메이션이 끝난 후 Chat 탭으로 URL 변경 (1.2초 후)
-      setTimeout(() => {
-        navigate(`/gpt-study/${slug}/chat`);
-      }, 1200);
-    }, 300);
-  };
 
   const handleCloseTutorial = () => {
     console.log("🔼 Closing Tutorial with smooth collapse");
@@ -641,27 +690,25 @@ const Section13 = ({ recipeId, index }) => {
   };
 
   return (
-    <div className="w-full flex flex-col items-center justify-center py-24">
-      <div className="text-center font-pretendard text-xl mb-12">
-        Section 13 - 여기에 내용이 들어갑니다
-      </div>
-
+    <div className="w-full flex flex-col items-center justify-center pt-72 pb-12">
       {/* 버튼 영역 */}
-      <div className="flex items-center justify-center gap-6">
-        {/* Chat 탭 열기 버튼 */}
-        <button
-          onClick={handleChatTabOpen}
-          className="px-8 py-4 bg-[#FE7525] text-white font-bold text-lg font-pretendard rounded-lg hover:bg-[#FF9E4A] transition-all duration-300"
-        >
-          CHAT 탭 열기
-        </button>
-
+      <div className="flex flex-col items-center">
+        {/* Triangle 이미지 */}
+        <img
+          src="/images/gpt-study/few-shot/Triangle.png"
+          alt="Triangle"
+          style={{
+            width: '40px',
+            height: '35px'
+          }}
+        />
+        
         {/* Tutorial 접기 버튼 */}
         <button
           onClick={handleCloseTutorial}
-          className="px-8 py-4 bg-gray-700 text-white font-bold text-lg font-pretendard rounded-lg hover:bg-gray-600 transition-all duration-300"
+          className="bg-[#FFC300] border-2 border-black text-black mt-2 py-4 px-96 text-3xl font-medium font-pretendard"
         >
-          TUTORIAL 접기
+          다른 레시피 더 알아보기
         </button>
       </div>
     </div>
