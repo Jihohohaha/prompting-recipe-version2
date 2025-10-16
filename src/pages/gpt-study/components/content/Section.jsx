@@ -5,8 +5,11 @@ import TabInterface from "./TabInterface";
 import useGPTStudyStore from "../../store";
 
 // Tutorial 컴포넌트 import
+import Recipe1TutorialExplain from "./tabs/expanded/tutorial/Recipe1TutorialExplain";
 import Recipe2TutorialExplain from "./tabs/expanded/tutorial/Recipe2TutorialExplain";
 import Recipe2TutorialExample from "./tabs/expanded/tutorial/Recipe2TutorialExample";
+import Recipe3TutorialExplain from "./tabs/expanded/tutorial/Recipe3TutorialExplain";
+import Recipe4TutorialExplain from "./tabs/expanded/tutorial/Recipe4TutorialExplain";
 import Recipe6TutorialExplain from "./tabs/expanded/tutorial/Recipe6TutorialExplain";
 import Recipe5TutorialExplain from "./tabs/expanded/tutorial/Recipe5TutorialExplain";
 
@@ -21,18 +24,18 @@ const Section = ({ recipe, index }) => {
 
   const handleCollapse = () => {
     console.log("🔼 Collapsing content");
-    
+
     // 1. Section 시작점으로 스크롤
     const sectionElement = document.getElementById(`section-${index}`);
     if (sectionElement) {
-      sectionElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      sectionElement.scrollIntoView({ behavior: "smooth", block: "start" });
     }
-    
+
     // 2. 약간의 딜레이 후 접기 시작
     setTimeout(() => {
       collapseContent();
       setActiveSection(recipe.id - 1);
-      
+
       // 3. 애니메이션이 끝난 후 URL 변경 (1.2초 후)
       setTimeout(() => {
         navigate(`/gpt-study/${recipe.slug}`);
@@ -42,6 +45,16 @@ const Section = ({ recipe, index }) => {
 
   // 펼쳐진 콘텐츠 렌더링
   const renderExpandedContent = () => {
+    // Recipe 1 - Tutorial
+    if (recipe.id === 1 && tab === "tutorial") {
+      return (
+        <>
+          {/* Explain 컴포넌트 */}
+          <Recipe1TutorialExplain />
+        </>
+      );
+    }
+
     // Recipe 2 - Tutorial
     if (recipe.id === 2 && tab === "tutorial") {
       return (
@@ -54,6 +67,25 @@ const Section = ({ recipe, index }) => {
 
           {/* Example 컴포넌트 (버튼 포함) */}
           <Recipe2TutorialExample recipeId={recipe.id} index={index} />
+        </>
+      );
+    }
+
+    // Recipe 3 - Tutorial
+    if (recipe.id === 3 && tab === "tutorial") {
+      return (
+        <>
+          {/* Explain 컴포넌트 */}
+          <Recipe3TutorialExplain />
+        </>
+      );
+    }
+
+    // Recipe 4 - Tutorial
+    if (recipe.id === 4 && tab === "tutorial") {
+      return (
+        <>
+          <Recipe4TutorialExplain />
         </>
       );
     }
