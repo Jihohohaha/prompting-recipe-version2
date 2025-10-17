@@ -162,7 +162,7 @@ const FailResult = ({ onRetry }) => {
     >
       <div className="w-full flex items-center justify-between px-[48px] pt-[28px]">
         <div className="font-mortend text-3xl font-bold text-white">
-          ( FEW <br /> SHOT )
+          ( ROLE <br /> PROMPTING )
         </div>
 
         <div className="flex-1 mx-[20px]">
@@ -173,6 +173,45 @@ const FailResult = ({ onRetry }) => {
       </div>
 
       {/* 여기에 실패 화면 컨텐츠 추가 */}
+      <img 
+        src="/images/gpt-study/quiz/FailMain.png"
+        alt="Fail Main"
+        className="absolute"
+        style={{
+          left: '48%',
+          top: '40%',
+          transform: 'translate(-50%, -50%)',
+          width: '900px',
+          height: 'auto'
+        }}
+      />
+
+      <img 
+        src="/images/gpt-study/quiz/WaiterStatue.png"
+        alt="Waiter Statue"
+        className="absolute bottom-0 left-0"
+        style={{
+          width: '390px',
+          height: 'auto'
+        }}
+      />
+
+      <div 
+        className="absolute font-pretendard text-xl text-white text-center tracking-widest leading-relaxed"
+        style={{
+          left: '32%',
+          bottom: '70px'
+        }}
+      >
+        앗, 비밀 레시피북 대신 석상이가 튀어나왔어요!<br/>
+        괜찮아요, 다시 도전하면 이번엔 진짜 레시피북이 나올지도 몰라요!
+      </div>
+
+      <button
+        className="absolute bottom-16 right-20 bg-[#FE7525] text-white text-xl font-pretendard px-16 py-3 rounded-full hover:bg-[#FF8C42] transition-colors"
+      >
+        다시 풀러가기
+      </button>
     </div>
   );
 }
