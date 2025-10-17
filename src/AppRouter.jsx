@@ -2,7 +2,7 @@
 import { Routes, Route } from 'react-router-dom';
 import MainPage from './pages/main-page/MainPage';
 import GPTStudy from './pages/gpt-study/GPTStudy';
-
+import Recipe1QuizMultipleResult from './pages/gpt-study/components/content/tabs/expanded/quiz/Recipe1QuizMultipleResult'
 const AppRouter = () => {
   return (
     <Routes>
@@ -11,6 +11,7 @@ const AppRouter = () => {
       <Route path="/gpt-study/:slug" element={<GPTStudy />} />
       <Route path="/gpt-study/:slug/:tab" element={<GPTStudy />} />
       <Route path="/gpt-study/:slug/:tab/:subTab" element={<GPTStudy />} />
+      <Route path="/test" element={<Recipe1QuizMultipleResult />} />
     </Routes>
   );
 };
