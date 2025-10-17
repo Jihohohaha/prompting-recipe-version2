@@ -55,7 +55,7 @@ const Section2 = () => {
   return (
     <div className="flex items-center justify-center text-white
      font-medium mt-[60px] py-[40px] bg-[#FE7525] rounded-2xl mx-[48px] 
-     text-center text-3xl font-pretendard leading-relaxed tracking-wider">
+     text-center text-2xl font-pretendard leading-relaxed tracking-wider">
       이번 요리는 석상이가 ‘진짜 사람’이 되기 위한 테스트예요.<br/>
       당신이 직접 주제와 역할을 정해, 나만의 Role Prompting 프롬프트를 완성해야 합니다.<br/>
       이 레시피가 완성되면, 석상이는 드디어 말하고 생각하는 존재로 깨어날 거예요.
