@@ -18,7 +18,7 @@ const DishItem = React.memo(({ dish, index, frontDishIndex, scale, handleDishCli
         // 컨테이너 회전 상쇄: 접시 자체는 제자리 방향 유지
         transform: `rotate(${-orbitAngle}deg) scale(${scale}) rotateX(${tilt}deg)`,
         transformStyle: 'preserve-3d',
-        transition: 'none', // 스크롤 즉시 반응
+        transition: 'none',
       }}
       onClick={() => clickable && handleDishClick(dish)}
     >

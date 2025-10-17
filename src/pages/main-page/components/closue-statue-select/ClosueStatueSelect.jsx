@@ -3,15 +3,21 @@ import DishContainer from './DishContainer';
 import FloatingImage from './FloatingImage';
 import KeywordText from './KeywordText';
 import OrbitOverlay from './OrbitOverlay';
-import { dishes, ROTATION_FACTOR, ROTATION_DIR, SCROLL_RESET_THRESHOLD } from './dishesData';
+import { dishes } from './dishesData';
+
+// 스냅/제스처 설정
+const STEP_DEG = 45;            // 한 칸 각도
+const WHEEL_STEP = 80;          // wheel 누적 임계치 (트랙패드 감도에 따라 조절)
+const TOUCH_STEP_PX = 40;       // 터치 스크롤 임계치
+const STEP_COOLDOWN_MS = 300;   // 한 스텝 후 쿨다운(궤도 280ms 모션과 맞춤)
 
 const ClosueStatueSelect = () => {
   const [rotationAngle, setRotationAngle] = useState(0);
   const [showMask, setShowMask] = useState(true);
   const [selectedDish, setSelectedDish] = useState(null);
-  const [orbitTiltDeg, setOrbitTiltDeg] = useState(0); // 원 클릭으로 토글되는 궤도 기울기(0 ↔ -80)
+  const [orbitTiltDeg, setOrbitTiltDeg] = useState(0); // 0 ↔ -70
 
-  // ✅ 직전 상태 복구용 히스토리 스택 (rotationAngle, orbitTiltDeg, selectedDish)
+  // 히스토리
   const [history, setHistory] = useState([]);
   const pushHistory = useCallback(() => {
     setHistory(prev => [...prev, { rotationAngle, orbitTiltDeg, selectedDish }]);
@@ -28,83 +34,131 @@ const ClosueStatueSelect = () => {
     });
   }, []);
 
+  // 루트/스크롤 프록시 ref
+  const rootRef = useRef(null);
   const containerRef = useRef(null);
-  const lastScrollY = useRef(0);
+
+  // 스냅 제스처 제어
+  const stepLockRef = useRef(false);     // 한 스텝 처리 후 쿨다운 락
+  const wheelAccumRef = useRef(0);       // wheel 누적(deltaY)
+  const lastTouchYRef = useRef(null);    // 터치 시작 y
+  const touchAccumRef = useRef(0);       // 터치 누적
 
   const frontDishIndex = useMemo(() => {
     const normalized = ((-rotationAngle % 360) + 360) % 360;
-    const rawIndex = Math.round((normalized - 90) / 45);
+    const rawIndex = Math.round((normalized - 90) / 45); // 12시 기준
     return ((rawIndex % dishes.length) + dishes.length) % dishes.length;
   }, [rotationAngle]);
 
   const frontDish = dishes[frontDishIndex] ?? dishes[0];
 
-  // 기울어진 상태(-80)면 모든 텍스트 숨김
+  // UI 상태들
   const hideText = orbitTiltDeg !== 0;
-
-  // 🍴 포크/스푼 페이드아웃(궤도 기울 때)
-  const utensilOpacity = orbitTiltDeg !== 0 ? 0 : 1;
+  const titleScale = orbitTiltDeg !== 0 ? 2.5 : 1;
+  const descriptionScale = orbitTiltDeg !== 0 ? 2 : 1;
+  const statueScale = orbitTiltDeg !== 0 ? 1.6 : 1;
   const utensilStyle = {
-    opacity: utensilOpacity,
+    opacity: orbitTiltDeg !== 0 ? 0 : 1,
     transition: 'opacity 800ms cubic-bezier(0.2, 0.8, 0.2, 1)',
   };
-
-  // 🗿 석상 상승량: 요청대로 -200px 고정
-  const statueLiftY = orbitTiltDeg !== 0 ? -200 : 0;
+  const floatingStyle = {
+    opacity: orbitTiltDeg !== 0 ? 0 : 1,
+    transition: 'opacity 800ms cubic-bezier(0.2, 0.8, 0.2, 1)',
+  };
+  const statueLiftY = orbitTiltDeg !== 0 ? -250 : 0;
+  const statueZ = orbitTiltDeg !== 0 ? 20 : 30;
 
   const [dishScales, setDishScales] = useState(Array(dishes.length).fill(1));
   useEffect(() => {
     setDishScales(prev => prev.map((_, i) => (i === frontDishIndex ? 1.1 : 1)));
   }, [frontDishIndex]);
 
-  // 접시 클릭: 상태 저장 후 선택
   const handleDishClick = useCallback((dish) => {
     pushHistory();
     setSelectedDish(dish);
   }, [pushHistory]);
 
   const canGoBack = history.length > 0;
-  const handleBack = useCallback(() => {
-    if (!canGoBack) return;
-    popHistory();
-  }, [canGoBack, popHistory]);
 
-  // 스크롤 기반 회전 (즉시 반응)
-  const handleScroll = useCallback(() => {
-    const el = containerRef.current;
-    if (!el) return;
-    const cur = el.scrollTop;
-    const delta = cur - lastScrollY.current;
-    if (Math.abs(delta) < 1) return;
-    const angleChange = delta * ROTATION_FACTOR * ROTATION_DIR;
-    setRotationAngle(prev => prev + angleChange);
-    lastScrollY.current = cur;
-
-    const maxScroll = el.scrollHeight - el.clientHeight;
-    if (cur >= maxScroll * SCROLL_RESET_THRESHOLD.BOTTOM || cur <= maxScroll * SCROLL_RESET_THRESHOLD.TOP) {
-      el.scrollTop = el.scrollHeight / 2;
-      lastScrollY.current = el.scrollTop;
-    }
+  // ✅ 한 스텝 회전 공통 함수 (방향: +1 아래/오른쪽, -1 위/왼쪽)
+  const doStep = useCallback((dir) => {
+    if (stepLockRef.current) return;
+    setRotationAngle(prev => prev + STEP_DEG * dir * -1); // 기존 시계방향 설정 유지(ROTATION_DIR=-1)
+    stepLockRef.current = true;
+    setTimeout(() => { stepLockRef.current = false; }, STEP_COOLDOWN_MS);
   }, []);
 
+  // ✅ 전역 wheel: 우리 컴포넌트 영역에서만 처리 + 그때만 preventDefault
   useEffect(() => {
-    const el = containerRef.current;
-    if (!el) return;
-    el.scrollTop = el.scrollHeight / 2;
-    lastScrollY.current = el.scrollTop;
-  }, []);
+    const onWheel = (e) => {
+      const root = rootRef.current;
+      if (!root || !root.contains(e.target)) return; // 영역 밖이면 무시
+      e.preventDefault(); // 우리 영역일 때만 기본 스크롤 차단
 
+      if (stepLockRef.current) return;
+      wheelAccumRef.current += e.deltaY;
+      if (Math.abs(wheelAccumRef.current) >= WHEEL_STEP) {
+        const dir = wheelAccumRef.current > 0 ? 1 : -1;
+        wheelAccumRef.current = 0;
+        doStep(dir);
+      }
+    };
+    window.addEventListener('wheel', onWheel, { passive: false });
+    return () => window.removeEventListener('wheel', onWheel);
+  }, [doStep]);
+
+  // ✅ 전역 터치: 우리 영역에서만 스냅 처리(기본 스크롤은 유지)
   useEffect(() => {
-    const el = containerRef.current;
-    if (!el) return;
-    el.addEventListener('scroll', handleScroll, { passive: true });
-    return () => el.removeEventListener('scroll', handleScroll);
-  }, [handleScroll]);
+    const withinRoot = (target) => {
+      const root = rootRef.current;
+      return !!root && root.contains(target);
+    };
 
-  // 빨간 원 클릭: 상태 저장 후 궤도 기울기 토글 (-80 ↔ 0)
+    const onTouchStart = (e) => {
+      if (!withinRoot(e.target)) return;
+      if (!e.touches || e.touches.length === 0) return;
+      lastTouchYRef.current = e.touches[0].clientY;
+      touchAccumRef.current = 0;
+    };
+
+    const onTouchMove = (e) => {
+      if (!withinRoot(e.target)) return;
+      if (stepLockRef.current || lastTouchYRef.current == null) return;
+      if (!e.touches || e.touches.length === 0) return;
+
+      const y = e.touches[0].clientY;
+      const dy = lastTouchYRef.current - y; // 아래로 스와이프 = +dy
+      lastTouchYRef.current = y;
+
+      touchAccumRef.current += dy;
+      if (Math.abs(touchAccumRef.current) >= TOUCH_STEP_PX) {
+        const dir = touchAccumRef.current > 0 ? 1 : -1;
+        touchAccumRef.current = 0;
+        doStep(dir);
+      }
+    };
+
+    const onTouchEnd = (e) => {
+      if (!withinRoot(e.target)) return;
+      lastTouchYRef.current = null;
+      touchAccumRef.current = 0;
+    };
+
+    window.addEventListener('touchstart', onTouchStart, { passive: true });
+    window.addEventListener('touchmove', onTouchMove, { passive: true });
+    window.addEventListener('touchend', onTouchEnd, { passive: true });
+
+    return () => {
+      window.removeEventListener('touchstart', onTouchStart);
+      window.removeEventListener('touchmove', onTouchMove);
+      window.removeEventListener('touchend', onTouchEnd);
+    };
+  }, [doStep]);
+
+  // 빨간 원 클릭: 상태 저장 후 궤도 기울기 토글
   const handleOverlayClick = useCallback(() => {
     pushHistory();
-    setOrbitTiltDeg(prev => (prev === 0 ? -80 : 0));
+    setOrbitTiltDeg(prev => (prev === 0 ? -70 : 0));
   }, [pushHistory]);
 
   return (
@@ -120,8 +174,8 @@ const ClosueStatueSelect = () => {
         </div>
       )}
 
-      <div className="relative w-screen h-screen overflow-hidden bg-gradient-to-b from-orange-400 to-orange-500">
-        {/* Scroll proxy */}
+      <div ref={rootRef} className="relative w-screen h-screen overflow-hidden bg-gradient-to-b from-orange-400 to-orange-500">
+        {/* Scroll proxy (실제 스크롤은 막고 wheel/touch로만 회전 제어) */}
         <div
           ref={containerRef}
           className="absolute inset-0 overflow-y-auto z-50 scrollbar-hide"
@@ -132,15 +186,36 @@ const ClosueStatueSelect = () => {
 
         {/* Title / description */}
         <div className="absolute top-20 left-1/2 -translate-x-1/2 text-center z-20 pointer-events-none">
-          <h1 className="text-6xl font-bold text-black mb-4 transition-all duration-500 font-koolegant">{frontDish.title}</h1>
-          <p className="text-xl text-black transition-all duration-500">{frontDish.description}</p>
+          <h1
+            className="text-6xl font-bold text-black mb-4 font-koolegant"
+            style={{
+              transform: `scale(${titleScale})`,
+              transformOrigin: 'center bottom',
+              transition: 'transform 800ms cubic-bezier(0.2, 0.8, 0.2, 1)',
+            }}
+          >
+            {frontDish.title}
+          </h1>
+          <p
+            className="text-xl text-black"
+            style={{
+              transform: `scale(${descriptionScale})`,
+              transformOrigin: 'center bottom',
+              transition: 'opacity 0ms', // opacity 추가
+              opacity: descriptionScale === 1 ? 1 : 0, // descriptionScale에 따라 투명도 조정
+            }}
+          >
+            {frontDish.description}
+          </p>
         </div>
 
-        {/* Floating decor */}
-        <FloatingImage src="/images/main-page/flower.png" alt="Flower" className="bottom-[392px] left-[160px] w-[300px] h-[300px] z-0" />
-        <FloatingImage src="/images/main-page/cup.png" alt="Cup" className="bottom-[375px] left-[360px] w-[200px] h-[200px] z-0" />
-        <FloatingImage src="/images/main-page/salt.png" alt="Salt" className="bottom-[400px] right-[360px] w-[200px] h-[200px] z-0" />
-        <FloatingImage src="/images/main-page/glass.png" alt="Glass" className="bottom-[392px] right-[160px] w-[300px] h-[300px] z-0" />
+        {/* Floating decor — 빨간 원 클릭 시 페이드아웃 */}
+        <div style={floatingStyle}>
+          <FloatingImage src="/images/main-page/flower.png" alt="Flower" className="bottom-[392px] left-[160px] w-[300px] h-[300px] z-0" />
+          <FloatingImage src="/images/main-page/cup.png" alt="Cup" className="bottom-[375px] left-[360px] w-[200px] h-[200px] z-0" />
+          <FloatingImage src="/images/main-page/salt.png" alt="Salt" className="bottom-[400px] right-[360px] w-[200px] h-[200px] z-0" />
+          <FloatingImage src="/images/main-page/glass.png" alt="Glass" className="bottom-[392px] right-[160px] w-[300px] h-[300px] z-0" />
+        </div>
 
         {/* Keywords — 궤도 기울면 숨김 */}
         {!hideText && (
@@ -156,21 +231,31 @@ const ClosueStatueSelect = () => {
           </>
         )}
 
-        {/* Utensils (포크/스푼 등) — z-20, 기울 때 페이드아웃 */}
+        {/* Utensils (포크/스푼 등) */}
         <img src="/images/main-page/spoon.png" alt="Spoon" className="absolute bottom-[280px] right-[450px] w-[300px] h-[300px] object-contain z-20 pointer-events-none" style={utensilStyle} />
         <img src="/images/main-page/knife.png" alt="Knife" className="absolute bottom-[150px] left-[400px] w-[300px] h-[300px] object-contain z-20 pointer-events-none" style={utensilStyle} />
         <img src="/images/main-page/fork1.png" alt="Fork1" className="absolute bottom-[280px] right-[500px] w-[150px] h-[150px] object-contain z-20 pointer-events-none" style={utensilStyle} />
         <img src="/images/main-page/fork2.png" alt="Fork2" className="absolute bottom-[280px] left-[450px] w-[300px] h-[300px] object-contain z-20 pointer-events-none" style={utensilStyle} />
 
-        {/* Statue — 궤도 기울일 때 같이 위로 200px만 상승 */}
+        {/* Statue */}
         <div
-          className="absolute bottom-0 left-1/2 z-30 pointer-events-none"
+          className="absolute bottom-0 left-1/2 pointer-events-none"
           style={{
+            zIndex: statueZ,
             transform: `translateX(-50%) translateY(${statueLiftY}px)`,
-            transition: 'transform 800ms cubic-bezier(0.2, 0.8, 0.2, 1)',
+            transition: 'transform 2000ms cubic-bezier(0.2, 0.8, 0.2, 1)',
           }}
         >
-          <img src="/images/main-page/statue.png" alt="석상" className="w-96 h-[250px] object-contain" />
+          <img
+            src="/images/main-page/statue.png"
+            alt="석상"
+            className="w-96 h-[250px] object-contain"
+            style={{
+              transform: `scale(${statueScale})`,
+              transformOrigin: 'bottom center',
+              transition: 'transform 1000ms cubic-bezier(0.2, 0.8, 0.2, 1)',
+            }}
+          />
         </div>
 
         {/* Orbit center wrapper */}
@@ -182,7 +267,6 @@ const ClosueStatueSelect = () => {
             transformOrigin: '0 0',
           }}
         >
-          {/* 접시: 기울 때 zIndex 40으로 석상 앞 */}
           <DishContainer
             rotationAngle={rotationAngle}
             orbitTiltDeg={orbitTiltDeg}
@@ -193,17 +277,13 @@ const ClosueStatueSelect = () => {
             hideText={hideText}
           />
 
-          {/* 빨간 원 오버레이 (클릭 토글) */}
           <OrbitOverlay
             rotationAngle={rotationAngle}
             orbitTiltDeg={orbitTiltDeg}
             frontDishIndex={frontDishIndex}
             dishScales={dishScales}
             selectedDish={selectedDish}
-            onCircleClick={() => {
-              pushHistory();
-              setOrbitTiltDeg(prev => (prev === 0 ? -80 : 0));
-            }}
+            onCircleClick={handleOverlayClick}
           />
         </div>
 
