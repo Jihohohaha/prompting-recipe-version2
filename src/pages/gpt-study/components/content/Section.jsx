@@ -14,6 +14,9 @@ import Recipe4TutorialExplain from "./tabs/expanded/tutorial/Recipe4TutorialExpl
 import Recipe6TutorialExplain from "./tabs/expanded/tutorial/Recipe6TutorialExplain";
 import Recipe5TutorialExplain from "./tabs/expanded/tutorial/Recipe5TutorialExplain";
 
+// Quiz Container import (✅ 추가)
+import Recipe1QuizContainer from "./tabs/expanded/quiz/Recipe1QuizContainer";
+
 const Section = ({ recipe, index }) => {
   const navigate = useNavigate();
   const { tab } = useParams();
@@ -60,6 +63,11 @@ const Section = ({ recipe, index }) => {
           <Recipe1TutorialExample recipeId={recipe.id} index={index} />
         </>
       );
+    }
+    
+    // Recipe 1 - Quiz (✅ Container로 변경)
+    if (recipe.id === 1 && tab === "quiz") {
+      return <Recipe1QuizContainer />;
     }
 
     // Recipe 2 - Tutorial
@@ -146,8 +154,10 @@ const Section = ({ recipe, index }) => {
       id={`section-${index}`}
       className="flex flex-col px-12 py-8 snap-start"
     >
-      {/* 탭 인터페이스 */}
-      <TabInterface recipe={recipe} />
+      {/* 탭 인터페이스에 id 추가 (✅ 스크롤용) */}
+      <div id={`tab-interface-${recipe.id}`}>
+        <TabInterface recipe={recipe} />
+      </div>
 
       {/* 펼쳐진 콘텐츠 영역 (애니메이션) */}
       <AnimatePresence>
@@ -157,7 +167,7 @@ const Section = ({ recipe, index }) => {
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 1.2, ease: "easeInOut" }} // ✅ 0.5 → 1.2초로 증가
+            transition={{ duration: 1.2, ease: "easeInOut" }}
             className="overflow-hidden"
           >
             <div className="bg-black py-8">
