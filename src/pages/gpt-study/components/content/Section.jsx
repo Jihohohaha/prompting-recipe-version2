@@ -6,6 +6,7 @@ import useGPTStudyStore from "../../store";
 
 // Tutorial 컴포넌트 import
 import Recipe1TutorialExplain from "./tabs/expanded/tutorial/Recipe1TutorialExplain";
+import Recipe1TutorialExample from "./tabs/expanded/tutorial/Recipe1TutorialExample";
 import Recipe2TutorialExplain from "./tabs/expanded/tutorial/Recipe2TutorialExplain";
 import Recipe2TutorialExample from "./tabs/expanded/tutorial/Recipe2TutorialExample";
 import Recipe3TutorialExplain from "./tabs/expanded/tutorial/Recipe3TutorialExplain";
@@ -51,6 +52,12 @@ const Section = ({ recipe, index }) => {
         <>
           {/* Explain 컴포넌트 */}
           <Recipe1TutorialExplain />
+
+          {/* Gap - 검은색 배경이 보이는 구간 */}
+          <div className="w-full h-12"></div>
+
+          {/* Example 컴포넌트 (버튼 포함) */}
+          <Recipe1TutorialExample recipeId={recipe.id} index={index} />
         </>
       );
     }
