@@ -10,6 +10,8 @@ import Recipe2TutorialExample from "./tabs/expanded/tutorial/Recipe2TutorialExam
 import Recipe6TutorialExplain from "./tabs/expanded/tutorial/Recipe6TutorialExplain";
 import Recipe5TutorialExplain from "./tabs/expanded/tutorial/Recipe5TutorialExplain";
 
+import Recipe1QuizMultiple from "./tabs/expanded/quiz/Recipe1QuizMultiple";
+
 const Section = ({ recipe, index }) => {
   const navigate = useNavigate();
   const { tab } = useParams();
@@ -42,6 +44,14 @@ const Section = ({ recipe, index }) => {
 
   // 펼쳐진 콘텐츠 렌더링
   const renderExpandedContent = () => {
+    if(recipe.id === 1 && tab === "quiz") {
+      return (
+        <>
+          <Recipe1QuizMultiple />
+        </>
+      );
+    }
+
     // Recipe 2 - Tutorial
     if (recipe.id === 2 && tab === "tutorial") {
       return (

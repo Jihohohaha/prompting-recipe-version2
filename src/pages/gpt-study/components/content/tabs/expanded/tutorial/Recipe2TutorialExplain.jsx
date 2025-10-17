@@ -81,8 +81,8 @@ const SectionHeader = () => {
         <span className="block w-full h-[2px] bg-black"></span>
       </div>
 
-      {/* RECIPE 1. */}
-      <div className="font-koolegant text-4xl">RECIPE 1.</div>
+      {/* RECIPE 2. */}
+      <div className="font-koolegant text-4xl">RECIPE 2.</div>
     </div>
   );
 };

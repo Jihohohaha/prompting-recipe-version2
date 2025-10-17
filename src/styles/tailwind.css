@@ -8,6 +8,18 @@
     @apply font-sans antialiased;
   }
 }
+@layer components {
+  .text-gradient-custom {
+    /* 배경은 CSS로 직접 지정 */
+    background-image: linear-gradient(to bottom, #FF6C43, #FFFFFF);
+    
+    /* 나머지 속성은 CSS로 직접 지정 */
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-fill-color: transparent;
+  }
+}
 /* 폰트 */
 @font-face {
   font-family: 'Koolegant';
