@@ -74,7 +74,9 @@ const SectionHeader = () => {
   return (
     <div className="w-full flex items-center justify-between px-[48px] pt-[48px]">
       {/* (FEW-SHOT) */}
-      <div className="font-mortend text-3xl font-black">( FEW-SHOT )</div>
+      <div className="text-black font-mortend text-3xl font-black">
+        ( FEW-SHOT )
+      </div>
 
       {/* 너비가 긴 선 */}
       <div className="flex-1 mx-[20px]">
@@ -82,7 +84,7 @@ const SectionHeader = () => {
       </div>
 
       {/* RECIPE 2. */}
-      <div className="font-koolegant text-4xl">RECIPE 2.</div>
+      <div className="text-black font-koolegant text-4xl">RECIPE 2.</div>
     </div>
   );
 };
@@ -178,7 +180,7 @@ const SectionZeroGraphic = () => {
 const SectionZeroExplain = () => {
   return (
     <div className="w-full flex items-center justify-center py-[0px]">
-      <div className="text-center font-pretendard text-4xl font-medium leading-relaxed">
+      <div className="text-black text-center font-pretendard text-4xl font-medium leading-relaxed">
         <p className="mb-4">
           자 먼저 이건{" "}
           <span className="bg-[#FFC300] px-2 py-1 text-5xl font-extrabold">
@@ -219,12 +221,12 @@ const SectionExample = () => {
   return (
     <div className="w-full flex flex-col items-center justify-center gap-8 py-[158px]">
       {/* 예시 박스 */}
-      <div className="border-6 border-[#FFC300] px-1 py-4 font-pretendard text-5xl font-medium">
+      <div className="text-black border-6 border-[#FFC300] px-1 py-4 font-pretendard text-5xl font-medium">
         I love apples 라는 영어 문장을 한국어로 번역해줘
       </div>
 
       {/* 설명 텍스트 */}
-      <div className="font-pretendard text-4xl font-medium">
+      <div className="text-black font-pretendard text-4xl font-medium">
         이런식으로요! 그러면 GPT는 아래와 같이 답변합니다.
       </div>
     </div>
@@ -236,10 +238,12 @@ const SectionGPTAnswer = () => {
   return (
     <div className="w-full flex flex-col items-center justify-center gap-8 py-[0px]">
       {/* GPT의 답변 제목 */}
-      <div className="font-pretendard text-4xl font-bold">GPT의 답변</div>
+      <div className="text-black font-pretendard text-4xl font-bold">
+        GPT의 답변
+      </div>
 
       {/* 답변 박스 */}
-      <div className="bg-[#FFC300] border border-black px-64 py-6 font-pretendard text-5xl font-semibold">
+      <div className="text-black bg-[#FFC300] border border-black px-64 py-6 font-pretendard text-5xl font-semibold">
         나는 사과를 좋아한다
       </div>
     </div>
@@ -278,10 +282,10 @@ const SectionVStatue = () => {
 
       {/* 텍스트 */}
       <div
-        className="absolute text-center font-pretendard text-4xl font-bold"
+        className="text-black absolute text-center font-pretendard text-4xl font-bold"
         style={{ top: "640px", left: "50%", transform: "translateX(-50%)" }}
       >
-        <p>겉보기엔 괜찮아보이죠?</p>
+        <p className="mb-10">겉보기엔 괜찮아보이죠?</p>
         <p>근데 더 좋은 방법이 있다는 사실!</p>
       </div>
 
@@ -291,10 +295,10 @@ const SectionVStatue = () => {
         alt="Underline"
         className="absolute"
         style={{
-          left: "228px",
-          top: "655px",
-          width: "742px",
-          height: "85px",
+          left: "0px",
+          top: "705px",
+          width: "1182px",
+          height: "107px",
         }}
       />
     </div>
@@ -397,7 +401,7 @@ const SectionFewGraphic = () => {
 // Section 9: Few-shot 설명
 const SectionFewExplain = () => {
   return (
-    <div className="w-full flex items-center justify-center py-[0px] pb-[50px]">
+    <div className="text-black w-full flex items-center justify-center py-[0px] pb-[50px]">
       <div className="text-center font-pretendard text-4xl font-medium leading-relaxed">
         <p className="mb-4">
           자, 이번엔{" "}

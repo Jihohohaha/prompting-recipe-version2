@@ -12,6 +12,7 @@ import Recipe2TutorialExample from "./tabs/expanded/tutorial/Recipe2TutorialExam
 import Recipe3TutorialExplain from "./tabs/expanded/tutorial/Recipe3TutorialExplain";
 import Recipe3TutorialExample from "./tabs/expanded/tutorial/Recipe3TutorialExample";
 import Recipe4TutorialExplain from "./tabs/expanded/tutorial/Recipe4TutorialExplain";
+import Recipe4TutorialExample from "./tabs/expanded/tutorial/Recipe4TutorialExample";
 import Recipe6TutorialExplain from "./tabs/expanded/tutorial/Recipe6TutorialExplain";
 import Recipe5TutorialExplain from "./tabs/expanded/tutorial/Recipe5TutorialExplain";
 
@@ -108,6 +109,12 @@ const Section = ({ recipe, index }) => {
       return (
         <>
           <Recipe4TutorialExplain />
+
+          {/* Gap - 검은색 배경이 보이는 구간 */}
+          <div className="w-full h-12"></div>
+
+          {/* Example 컴포넌트 (버튼 포함) */}
+          <Recipe4TutorialExample recipeId={recipe.id} index={index} />
         </>
       );
     }

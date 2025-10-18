@@ -1,12 +1,18 @@
-import React, { useRef, useState, useCallback, useEffect, useMemo } from 'react';
+import React, {
+  useRef,
+  useState,
+  useCallback,
+  useEffect,
+  useMemo,
+} from "react";
 
-import Z0Layer from './Z0Layer'; 
-import Z10Layer from './Z10Layer'; 
-import Z20Layer from './Z20Layer'; 
-import Z30Layer from './Z30Layer'; 
-import HandLight from '../../effects/HandLight';
-import StartVideo from '../start-video/StartVideo';
-import FadeScroll from '../../effects/FadeScroll';
+import Z0Layer from "./Z0Layer";
+import Z10Layer from "./Z10Layer";
+import Z20Layer from "./Z20Layer";
+import Z30Layer from "./Z30Layer";
+import HandLight from "../../effects/HandLight";
+import StartVideo from "../start-video/StartVideo";
+import FadeScroll from "../../effects/FadeScroll";
 
 const Prologue = ({ onComplete }) => {
   const snapScrollRef = useRef();
@@ -18,7 +24,7 @@ const Prologue = ({ onComplete }) => {
   const snapTexts = [
     `어느 날, 단어를 재료 삼아\n현실을 만들어내는 "레시피"가 세상에 흩어졌다.`,
     `그것은 곧 프롬프팅 엔지니어링,\n언어를 다루는 비밀의 조리법이었다.`,
-    `이제, 당신은 그 레시피를 배우고 익히기 위해 \n프롬프팅 레시피 아카이브에 들어왔다.`
+    `이제, 당신은 그 레시피를 배우고 익히기 위해 \n프롬프팅 레시피 아카이브에 들어왔다.`,
   ];
 
   // wheel 이벤트를 SnapScroll로 전달
@@ -26,7 +32,7 @@ const Prologue = ({ onComplete }) => {
     if (snapScrollRef.current) {
       snapScrollRef.current.scrollBy({
         top: e.deltaY,
-        behavior: 'smooth'
+        behavior: "smooth",
       });
     }
   }, []);
@@ -37,7 +43,7 @@ const Prologue = ({ onComplete }) => {
   // 최적화된 마우스 이벤트 - RAF만 사용하고 시간 기반 throttling 제거
   const handleMouseMove = useCallback((e) => {
     if (rafRef.current) return;
-    
+
     rafRef.current = requestAnimationFrame(() => {
       setMousePos({ x: e.clientX, y: e.clientY });
       rafRef.current = null;
@@ -68,7 +74,7 @@ const Prologue = ({ onComplete }) => {
     if (!isHover || !mousePos) return {};
     return HandLight({ mousePos, radius: 230 });
   }, [isHover, mousePos]);
-  
+
   useEffect(() => {
     const t = setTimeout(() => setVideoEnded(true), 9000);
     return () => {
@@ -80,10 +86,8 @@ const Prologue = ({ onComplete }) => {
   }, []);
 
   return (
-    <div
-      className="relative w-screen h-screen overflow-hidden"
-    >
-      <div className={videoEnded ? 'visible' : 'invisible'}>
+    <div className="relative w-screen h-screen overflow-hidden">
+      <div className={videoEnded ? "visible" : "invisible"}>
         <Z0Layer />
         <Z10Layer />
         <Z20Layer />
@@ -96,9 +100,9 @@ const Prologue = ({ onComplete }) => {
           maskStyle={maskStyle}
           isClickable={isScrollCompleted}
         />
-        
+
         {/* FadeScroll을 별도 레이어로 분리 - 마스크 영향 없음 */}
-        <div 
+        <div
           className="
             absolute
             w-[min(800px,80vw)] h-[120px] top-[100px]
@@ -106,20 +110,20 @@ const Prologue = ({ onComplete }) => {
             rounded-lg z-50 pointer-events-none
           "
         >
-          <FadeScroll 
-            ref={snapScrollRef} 
-            snaps={snapTexts} 
+          <FadeScroll
+            ref={snapScrollRef}
+            snaps={snapTexts}
             onScrollComplete={handleScrollComplete}
           />
         </div>
       </div>
-      
+
       {!videoEnded && (
         <div className="absolute inset-0 z-50">
           <StartVideo />
         </div>
       )}
-      
+
       {videoEnded && (
         <div className="absolute bottom-20 left-1/2 transform -translate-x-1/2 z-[100] text-center pointer-events-none">
           {!isScrollCompleted ? (
@@ -127,7 +131,7 @@ const Prologue = ({ onComplete }) => {
               스크롤하여 모든 문장을 확인하세요
             </p>
           ) : (
-            <p className="text-xl font-bold px-6 py-3 bg-blue-600 text-white rounded-full animate-pulse shadow-xl border-2 border-white">
+            <p className="text-xl font-bold px-6 py-3 bg-[#FE7525] text-white rounded-full animate-pulse shadow-xl border-2 border-white">
               클릭하세요!
             </p>
           )}
