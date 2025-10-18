@@ -10,6 +10,7 @@ import Recipe1TutorialExample from "./tabs/expanded/tutorial/Recipe1TutorialExam
 import Recipe2TutorialExplain from "./tabs/expanded/tutorial/Recipe2TutorialExplain";
 import Recipe2TutorialExample from "./tabs/expanded/tutorial/Recipe2TutorialExample";
 import Recipe3TutorialExplain from "./tabs/expanded/tutorial/Recipe3TutorialExplain";
+import Recipe3TutorialExample from "./tabs/expanded/tutorial/Recipe3TutorialExample";
 import Recipe4TutorialExplain from "./tabs/expanded/tutorial/Recipe4TutorialExplain";
 import Recipe6TutorialExplain from "./tabs/expanded/tutorial/Recipe6TutorialExplain";
 import Recipe5TutorialExplain from "./tabs/expanded/tutorial/Recipe5TutorialExplain";
@@ -64,7 +65,7 @@ const Section = ({ recipe, index }) => {
         </>
       );
     }
-    
+
     // Recipe 1 - Quiz (✅ Container로 변경)
     if (recipe.id === 1 && tab === "quiz") {
       return <Recipe1QuizContainer />;
@@ -92,6 +93,12 @@ const Section = ({ recipe, index }) => {
         <>
           {/* Explain 컴포넌트 */}
           <Recipe3TutorialExplain />
+
+          {/* Gap - 검은색 배경이 보이는 구간 */}
+          <div className="w-full h-12"></div>
+
+          {/* Example 컴포넌트 (버튼 포함) */}
+          <Recipe3TutorialExample recipeId={recipe.id} index={index} />
         </>
       );
     }

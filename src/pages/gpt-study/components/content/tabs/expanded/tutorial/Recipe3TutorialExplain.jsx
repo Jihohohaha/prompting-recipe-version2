@@ -334,7 +334,7 @@ const SectionHalluExplain = () => {
       {/* 상단 문장 */}
 
       {/* 보라색 배경 */}
-      <div className="w-full flex items-center justify-center bg-[#9F5BF8] py-[200px]">
+      <div className="w-full flex items-center justify-center bg-[#87CA34] py-[200px]">
         {/* 흰색 원 */}
         <div className="relative bg-white rounded-full w-[850px] h-[850px] flex flex-col items-center justify-center text-center leading-relaxed space-y-[48px]">
           {/* 1️⃣ 첫 문장 */}
@@ -350,7 +350,7 @@ const SectionHalluExplain = () => {
               만 해보려고 하는 거죠.
             </p>
 
-            <div className="w-[630px] h-[6px] bg-[#9F5BF8] mx-auto rounded-full"></div>
+            <div className="w-[630px] h-[6px] bg-[#87CA34] mx-auto rounded-full"></div>
           </div>
 
           {/* 2️⃣ ‘답변 후 자기 검토’ */}
@@ -359,7 +359,7 @@ const SectionHalluExplain = () => {
               겉으로 보기엔 말투도 자신감 넘치고
             </p>
 
-            <div className="w-[510px] h-[6px] bg-[#9F5BF8] mx-auto rounded-full"></div>
+            <div className="w-[510px] h-[6px] bg-[#87CA34] mx-auto rounded-full"></div>
           </div>
 
           <div className="space-y-[16px]">
@@ -369,7 +369,7 @@ const SectionHalluExplain = () => {
               </span>{" "}
               싶지만,
             </p>
-            <div className="w-[440px] h-[6px] bg-[#9F5BF8] mx-auto rounded-full"></div>
+            <div className="w-[440px] h-[6px] bg-[#87CA34] mx-auto rounded-full"></div>
           </div>
 
           <div className="space-y-[25px]">
@@ -378,14 +378,14 @@ const SectionHalluExplain = () => {
               <span className="text-5xl font-extrabold">헛배부른 느낌</span>
               이에요.
             </p>
-            <div className="w-[600px] h-[6px] bg-[#9F5BF8] mx-auto rounded-full"></div>
+            <div className="w-[600px] h-[6px] bg-[#87CA34] mx-auto rounded-full"></div>
 
             <div className="space-y-[16px]">
               <p className="text-4xl font-medium">
                 <span className="text-5xl font-extrabold">근거는 없고,</span>
                 내용은 텅 비어 있거든요.
               </p>
-              <div className="w-[580px] h-[6px] bg-[#9F5BF8] mx-auto rounded-full"></div>
+              <div className="w-[580px] h-[6px] bg-[#87CA34] mx-auto rounded-full"></div>
             </div>
           </div>
         </div>
