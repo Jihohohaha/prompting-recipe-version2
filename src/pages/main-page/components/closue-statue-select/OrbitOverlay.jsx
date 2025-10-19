@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { dishes, DISH_SIZE, RADIUS } from './dishesData';
+import { DISH_SIZE, RADIUS } from './dishesData';
 
 const TILT_MS = 800; // 기울기/상승 모션(ms)
 const FADE_MS = 280; // 등장/퇴장 모션(ms)
 
-// 접시와 동일한 페이드 프레즌스 (위 고정 확대)
 function FadePresence({ show, children, style = {}, className = '' }) {
   const [render, setRender] = useState(show);
   const [visible, setVisible] = useState(false);
@@ -30,7 +29,7 @@ function FadePresence({ show, children, style = {}, className = '' }) {
         transform: visible ? 'scale(1)' : 'scale(0.92)',
         transition: `opacity ${FADE_MS}ms ease, transform ${FADE_MS}ms ease`,
         willChange: 'opacity, transform',
-        transformOrigin: '50% 0%', // ⬅️ 위쪽 기준(Top-Center)
+        transformOrigin: '50% 0%',
         ...style,
       }}
     >
@@ -40,6 +39,7 @@ function FadePresence({ show, children, style = {}, className = '' }) {
 }
 
 const OrbitOverlay = React.memo(function OrbitOverlay({
+  items, // ← 데이터 배열(렌더 포지션 동일)
   rotationAngle,
   orbitTiltDeg = 0,
   frontDishIndex,
@@ -47,24 +47,26 @@ const OrbitOverlay = React.memo(function OrbitOverlay({
   selectedDish,
   onCircleClick,
 }) {
-  // 12시 기준: 기울었거나 선택 모드면 (11시,12시,1시)만 보이기
+  const n = items?.length ?? 0;
+
+  // 기울었거나 선택 모드면 (11시,12시,1시)만 보이기
   const isNarrow = orbitTiltDeg !== 0 || selectedDish !== null;
   let visibleIndexes = null;
-  if (isNarrow) {
+  if (isNarrow && n) {
     visibleIndexes = [
-      ((frontDishIndex - 5) + dishes.length) % dishes.length, // 5시
-      ((frontDishIndex - 4) + dishes.length) % dishes.length, // 6시(센터)
-      (frontDishIndex + 5) % dishes.length,                   // 7시
+      ((frontDishIndex - 5) + n) % n, // 11시
+      ((frontDishIndex - 4) + n) % n, // 12시(센터)
+      (frontDishIndex + 5) % n,       // 1시
     ];
   }
 
   const orbitAngle = rotationAngle + (selectedDish ? 180 : 0);
-  const baseTilt = orbitTiltDeg + (selectedDish ? -60 : 0); // 기존 기울기 로직 유지
+  const baseTilt = orbitTiltDeg + (selectedDish ? -60 : 0);
 
   // 기울어진 상태면 궤도 중심을 위로 600px 올리기
   const liftY = orbitTiltDeg !== 0 ? -600 : 0;
 
-  // 바깥 래퍼: 기울기/상승 모션 (원래 로직 유지)
+  // 바깥 래퍼: 기울기/상승 모션
   const outerTiltTransform = selectedDish
     ? `translateY(${ -600 + liftY }px) rotateX(${baseTilt}deg)`
     : `translateY(${ liftY }px) rotateX(${baseTilt}deg)`;
@@ -72,17 +74,20 @@ const OrbitOverlay = React.memo(function OrbitOverlay({
   // 안쪽 래퍼: 궤도 회전
   const innerOrbitTransform = `rotate(${orbitAngle}deg)`;
 
+  // 프리-틸트에서는 오버레이를 클릭 불가로 → DishItem이 클릭 받음
+  const overlayPointerEvents = orbitTiltDeg === 0 ? 'none' : 'auto';
+
   return (
     <div
       className="absolute z-[60] perspective-[2000px]"
       style={{
         transform: outerTiltTransform,
         transition: `transform ${TILT_MS}ms cubic-bezier(0.2, 0.8, 0.2, 1)`,
+        pointerEvents: overlayPointerEvents,
       }}
     >
-      {/* 스냅 모션용 짧은 트랜지션 */}
       <div style={{ transform: innerOrbitTransform, transition: 'transform 1000ms cubic-bezier(0.2, 0.8, 0.2, 1)' }}>
-        {dishes.map((dish, index) => {
+        {items.map((dish, index) => {
           const shouldShow = !visibleIndexes || visibleIndexes.includes(index);
           const baseAngle = index * 45;
           const rad = (baseAngle * Math.PI) / 180;
@@ -91,15 +96,15 @@ const OrbitOverlay = React.memo(function OrbitOverlay({
 
           let tilt = 0;
           if (selectedDish !== null) {
-            const leftIdx  = ((frontDishIndex - 1) + dishes.length) % dishes.length;
-            const rightIdx = (frontDishIndex + 1) % dishes.length;
+            const leftIdx  = ((frontDishIndex - 1) + n) % n;
+            const rightIdx = (frontDishIndex + 1) % n;
             if (index === leftIdx) tilt = -60;
             else if (index === rightIdx) tilt = 60;
             else if (index === frontDishIndex) tilt = 0;
           }
 
           const scale = dishScales?.[index] ?? 1;
-          const size = Math.max(0, DISH_SIZE - 40); // 반지름 20px 감소
+          const size = Math.max(0, DISH_SIZE - 40); // 디자인 유지
 
           return (
             <FadePresence key={`overlay-${index}`} show={shouldShow}>
@@ -111,7 +116,6 @@ const OrbitOverlay = React.memo(function OrbitOverlay({
                   top: `${y - size / 2}px`,
                   width: `${size}px`,
                   height: `${size}px`,
-                  // 접시와 동일하게 제자리 방향 유지
                   transform: `rotate(${-orbitAngle}deg) scale(${scale}) rotateX(${tilt}deg)`,
                   transformStyle: 'preserve-3d',
                   transition: 'none',
