@@ -18,6 +18,11 @@ const useGPTStudyStore = create((set) => ({
   // 탭 펼치기/접기
   setExpandedContent: (content) => set({ expandedContent: content }),
   
+  // ✅ expandContent 별칭 추가 (기존 코드 호환성)
+  expandContent: (recipeId, tabId, subTab = null) => set({ 
+    expandedContent: { recipeId, tabId, subTab } 
+  }),
+  
   // 특정 탭이 펼쳐져 있는지 확인
   isTabExpanded: (recipeId, tabId, subTab = null) => {
     const state = useGPTStudyStore.getState();

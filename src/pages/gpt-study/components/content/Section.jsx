@@ -5,12 +5,19 @@ import TabInterface from "./TabInterface";
 import useGPTStudyStore from "../../store";
 
 // Tutorial 컴포넌트 import
+import Recipe1TutorialExplain from "./tabs/expanded/tutorial/Recipe1TutorialExplain";
+import Recipe1TutorialExample from "./tabs/expanded/tutorial/Recipe1TutorialExample";
 import Recipe2TutorialExplain from "./tabs/expanded/tutorial/Recipe2TutorialExplain";
 import Recipe2TutorialExample from "./tabs/expanded/tutorial/Recipe2TutorialExample";
+import Recipe3TutorialExplain from "./tabs/expanded/tutorial/Recipe3TutorialExplain";
+import Recipe3TutorialExample from "./tabs/expanded/tutorial/Recipe3TutorialExample";
+import Recipe4TutorialExplain from "./tabs/expanded/tutorial/Recipe4TutorialExplain";
+import Recipe4TutorialExample from "./tabs/expanded/tutorial/Recipe4TutorialExample";
 import Recipe6TutorialExplain from "./tabs/expanded/tutorial/Recipe6TutorialExplain";
 import Recipe5TutorialExplain from "./tabs/expanded/tutorial/Recipe5TutorialExplain";
 
-import Recipe1QuizMultiple from "./tabs/expanded/quiz/Recipe1QuizMultiple";
+// Quiz Container import (✅ 추가)
+import Recipe1QuizContainer from "./tabs/expanded/quiz/Recipe1QuizContainer";
 
 const Section = ({ recipe, index }) => {
   const navigate = useNavigate();
@@ -23,18 +30,18 @@ const Section = ({ recipe, index }) => {
 
   const handleCollapse = () => {
     console.log("🔼 Collapsing content");
-    
+
     // 1. Section 시작점으로 스크롤
     const sectionElement = document.getElementById(`section-${index}`);
     if (sectionElement) {
-      sectionElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      sectionElement.scrollIntoView({ behavior: "smooth", block: "start" });
     }
-    
+
     // 2. 약간의 딜레이 후 접기 시작
     setTimeout(() => {
       collapseContent();
       setActiveSection(recipe.id - 1);
-      
+
       // 3. 애니메이션이 끝난 후 URL 변경 (1.2초 후)
       setTimeout(() => {
         navigate(`/gpt-study/${recipe.slug}`);
@@ -44,12 +51,25 @@ const Section = ({ recipe, index }) => {
 
   // 펼쳐진 콘텐츠 렌더링
   const renderExpandedContent = () => {
-    if(recipe.id === 1 && tab === "quiz") {
+    // Recipe 1 - Tutorial
+    if (recipe.id === 1 && tab === "tutorial") {
       return (
         <>
-          <Recipe1QuizMultiple />
+          {/* Explain 컴포넌트 */}
+          <Recipe1TutorialExplain />
+
+          {/* Gap - 검은색 배경이 보이는 구간 */}
+          <div className="w-full h-12"></div>
+
+          {/* Example 컴포넌트 (버튼 포함) */}
+          <Recipe1TutorialExample recipeId={recipe.id} index={index} />
         </>
       );
+    }
+
+    // Recipe 1 - Quiz (✅ Container로 변경)
+    if (recipe.id === 1 && tab === "quiz") {
+      return <Recipe1QuizContainer />;
     }
 
     // Recipe 2 - Tutorial
@@ -64,6 +84,37 @@ const Section = ({ recipe, index }) => {
 
           {/* Example 컴포넌트 (버튼 포함) */}
           <Recipe2TutorialExample recipeId={recipe.id} index={index} />
+        </>
+      );
+    }
+
+    // Recipe 3 - Tutorial
+    if (recipe.id === 3 && tab === "tutorial") {
+      return (
+        <>
+          {/* Explain 컴포넌트 */}
+          <Recipe3TutorialExplain />
+
+          {/* Gap - 검은색 배경이 보이는 구간 */}
+          <div className="w-full h-12"></div>
+
+          {/* Example 컴포넌트 (버튼 포함) */}
+          <Recipe3TutorialExample recipeId={recipe.id} index={index} />
+        </>
+      );
+    }
+
+    // Recipe 4 - Tutorial
+    if (recipe.id === 4 && tab === "tutorial") {
+      return (
+        <>
+          <Recipe4TutorialExplain />
+
+          {/* Gap - 검은색 배경이 보이는 구간 */}
+          <div className="w-full h-12"></div>
+
+          {/* Example 컴포넌트 (버튼 포함) */}
+          <Recipe4TutorialExample recipeId={recipe.id} index={index} />
         </>
       );
     }
@@ -117,8 +168,10 @@ const Section = ({ recipe, index }) => {
       id={`section-${index}`}
       className="flex flex-col px-12 py-8 snap-start"
     >
-      {/* 탭 인터페이스 */}
-      <TabInterface recipe={recipe} />
+      {/* 탭 인터페이스에 id 추가 (✅ 스크롤용) */}
+      <div id={`tab-interface-${recipe.id}`}>
+        <TabInterface recipe={recipe} />
+      </div>
 
       {/* 펼쳐진 콘텐츠 영역 (애니메이션) */}
       <AnimatePresence>
@@ -128,7 +181,7 @@ const Section = ({ recipe, index }) => {
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 1.2, ease: "easeInOut" }} // ✅ 0.5 → 1.2초로 증가
+            transition={{ duration: 1.2, ease: "easeInOut" }}
             className="overflow-hidden"
           >
             <div className="bg-black py-8">
