@@ -23,7 +23,7 @@ export const dishes = [
 export const AI_LOGOS = {
   chatgpt:     '/images/main-page/ai/chatgpt.png',
   cursor:      '/images/main-page/ai/cursor.png',
-  copilot:     '/images/main-page/ai/copilot.png',
+  kiro:        '/images/main-page/ai/kiro.png',
   claude:      '/images/main-page/ai/claude.png',
   nexbot:      '/images/main-page/ai/nexbot.png',
   sudowrite:   '/images/main-page/ai/sudowrite.png',
@@ -42,7 +42,7 @@ const makeRing = (arr) => ([
 
 /** ───────── 카테고리별 AI 세트 4종 ───────── **/
 
-// 1) Programming (요청: ChatGPT, Cursor, Copilot, Claude)
+// 1) Programming (요청: ChatGPT, Cursor, Kiro, Claude)
 //   - 기본 카테고리 이름: Engineering(프로그래밍/개발로 매핑)
 const AI_PROGRAMMING = makeRing([
   {
@@ -56,6 +56,7 @@ const AI_PROGRAMMING = makeRing([
     kw1: '대화', kw2: '코딩', kw3: '요약', kw4: '번역',
     ekw1: 'Chat', ekw2: 'Coding', ekw3: 'Summarize', ekw4: 'Translate',
     logo: AI_LOGOS.chatgpt,
+    address: '/gpt-study',
   },
   {
     id: 202,
@@ -65,15 +66,17 @@ const AI_PROGRAMMING = makeRing([
     kw1: '자동완성', kw2: '리팩토링', kw3: '맥락', kw4: '속도',
     ekw1: 'Autocomplete', ekw2: 'Refactor', ekw3: 'Context', ekw4: 'Speed',
     logo: AI_LOGOS.cursor,
+    address: '/cursor-study',
   },
   {
     id: 203,
-    title: 'Copilot',
+    title: 'Kiro',
     subtitle: '깃허브 코파일럿',
     description: 'IDE 통합 자동완성 특화. 보일러플레이트에 효율적.',
     kw1: 'IDE', kw2: '자동완성', kw3: '테스트', kw4: '생산성',
     ekw1: 'IDE', ekw2: 'Completion', ekw3: 'Tests', ekw4: 'Productivity',
-    logo: AI_LOGOS.copilot,
+    logo: AI_LOGOS.kiro,
+    address: '/kiro-study',
   },
   {
     id: 204,
@@ -83,6 +86,7 @@ const AI_PROGRAMMING = makeRing([
     kw1: '장문', kw2: '분석', kw3: '안전', kw4: '글쓰기',
     ekw1: 'Long', ekw2: 'Analysis', ekw3: 'Safety', ekw4: 'Writing',
     logo: AI_LOGOS.claude,
+    address: '/claude-study',
   },
 ]);
 
@@ -96,6 +100,7 @@ const AI_ESSAY = makeRing([
     kw1: '개요', kw2: '톤', kw3: '요약', kw4: '교정',
     ekw1: 'Outline', ekw2: 'Tone', ekw3: 'Summarize', ekw4: 'Edit',
     logo: AI_LOGOS.chatgpt,
+    address: '/gpt-study',
   },
   {
     id: 212,
@@ -105,6 +110,7 @@ const AI_ESSAY = makeRing([
     kw1: '아이디어', kw2: '확장', kw3: '브리프', kw4: '키워드',
     ekw1: 'Ideas', ekw2: 'Expand', ekw3: 'Brief', ekw4: 'Keyword',
     logo: AI_LOGOS.nexbot,
+    address: '/nexbot-study',
   },
   {
     id: 213,
@@ -114,6 +120,7 @@ const AI_ESSAY = makeRing([
     kw1: '창작', kw2: '프롬프트', kw3: '확장', kw4: '리라이트',
     ekw1: 'Creative', ekw2: 'Prompt', ekw3: 'Expand', ekw4: 'Rewrite',
     logo: AI_LOGOS.sudowrite,
+    address: '/sudowrite-study',
   },
   {
     id: 214,
@@ -123,6 +130,7 @@ const AI_ESSAY = makeRing([
     kw1: '한글', kw2: '카피', kw3: '요약', kw4: '템플릿',
     ekw1: 'Korean', ekw2: 'Copy', ekw3: 'Summary', ekw4: 'Template',
     logo: AI_LOGOS.wrtn,
+    address: '/wrtn-study',
   },
 ]);
 
@@ -136,6 +144,7 @@ const AI_INTEGRATION = makeRing([
     kw1: '허브', kw2: '자동화', kw3: '요약', kw4: '코딩',
     ekw1: 'Hub', ekw2: 'Automation', ekw3: 'Summarize', ekw4: 'Coding',
     logo: AI_LOGOS.chatgpt,
+    address: '/gpt-study',
   },
   {
     id: 222,
@@ -145,6 +154,7 @@ const AI_INTEGRATION = makeRing([
     kw1: '정책', kw2: '문서', kw3: '검토', kw4: '분석',
     ekw1: 'Policy', ekw2: 'Docs', ekw3: 'Review', ekw4: 'Analysis',
     logo: AI_LOGOS.claude,
+    address: '/claude-study',
   },
   {
     id: 223,
@@ -154,6 +164,7 @@ const AI_INTEGRATION = makeRing([
     kw1: '멀티모달', kw2: '검색', kw3: '코드', kw4: '확장',
     ekw1: 'Multimodal', ekw2: 'Search', ekw3: 'Code', ekw4: 'Extend',
     logo: AI_LOGOS.gemini,
+    address: '/gemini-study',
   },
   {
     id: 224,
@@ -163,6 +174,7 @@ const AI_INTEGRATION = makeRing([
     kw1: '검색', kw2: '인용', kw3: '요약', kw4: '사실성',
     ekw1: 'Search', ekw2: 'Citations', ekw3: 'Summary', ekw4: 'Factual',
     logo: AI_LOGOS.perplexity,
+    address: '/perplexity-study',
   },
 ]);
 
@@ -176,6 +188,7 @@ const AI_ART = makeRing([
     kw1: '콘셉트', kw2: '브리프', kw3: '네이밍', kw4: '스토리',
     ekw1: 'Concept', ekw2: 'Brief', ekw3: 'Naming', ekw4: 'Story',
     logo: AI_LOGOS.chatgpt,
+    address: '/gpt-study',
   },
   {
     id: 232,
@@ -185,6 +198,7 @@ const AI_ART = makeRing([
     kw1: '스타일', kw2: '합성', kw3: '레퍼런스', kw4: '프롬프트',
     ekw1: 'Style', ekw2: 'Synthesis', ekw3: 'Reference', ekw4: 'Prompt',
     logo: AI_LOGOS.midjourney,
+    address: '/midjourney-study',
   },
   {
     id: 233,
@@ -194,6 +208,7 @@ const AI_ART = makeRing([
     kw1: '픽셀', kw2: '라이트', kw3: '무드', kw4: '모션',
     ekw1: 'Pixel', ekw2: 'Light', ekw3: 'Mood', ekw4: 'Motion',
     logo: AI_LOGOS.piclumen,
+    address: '/piclumen-study',
   },
   {
     id: 234,
@@ -203,6 +218,7 @@ const AI_ART = makeRing([
     kw1: '구상', kw2: '설명', kw3: '연결', kw4: '확장',
     ekw1: 'Ideate', ekw2: 'Explain', ekw3: 'Connect', ekw4: 'Extend',
     logo: AI_LOGOS.gemini,
+    address: '/gemini-study',
   },
 ]);
 

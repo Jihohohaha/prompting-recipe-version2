@@ -25,9 +25,9 @@ const MainPage = () => {
 
   return (
     <div className="w-full h-screen overflow-hidden">
-      {/* 디버그용 페이지 전환 버튼
+      {/* 디버그용 페이지 전환 버튼 */}
       {process.env.NODE_ENV === 'development' && (
-        <div className="fixed top-4 left-4 z-[100] bg-white/90 p-4 rounded-lg shadow-lg border-2 border-green-500">
+        <div className="fixed top-40 left-4 z-[100] bg-white/90 p-4 rounded-lg shadow-lg border-2 border-green-500">
           <div className="text-sm font-bold mb-2 text-green-600">Page Navigator</div>
           <div className="flex flex-col gap-2">
             <button
@@ -65,7 +65,7 @@ const MainPage = () => {
             💡 ?page=closure 로 바로 이동
           </div>
         </div>
-      )} */}
+      )}
       
       {renderPage()}
     </div>

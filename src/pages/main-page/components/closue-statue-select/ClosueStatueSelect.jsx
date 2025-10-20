@@ -1,5 +1,6 @@
 // ClosueStatueSelect.jsx
 import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import DishContainer from './DishContainer';
 import FloatingImage from './FloatingImage';
 import KeywordText from './KeywordText';
@@ -27,6 +28,8 @@ const angleForFrontIndex = (index) => -(90 + 45 * index);
 
 // ───────────────────────── 컴포넌트 ─────────────────────────
 const ClosueStatueSelect = () => {
+  const navigate = useNavigate();
+
   // 뷰/회전 상태
   const [rotationAngle, setRotationAngle] = useState(0);
   const [orbitTiltDeg, setOrbitTiltDeg] = useState(0); // 0 ↔ -70 (틸트)
@@ -172,7 +175,12 @@ const ClosueStatueSelect = () => {
   // - 정면이면: 기존처럼 즉시 틸트
   const handleDishClick = useCallback((dish, index) => {
     if (!dish) return;
-    if (orbitTiltDeg !== 0) return; // 틸트 상태에선 무시(필요 시 확장)
+    if (orbitTiltDeg !== 0) {
+      if (dish.address) {
+        navigate(dish.address);
+      }
+      return;
+    }
 
     const baseFrontIndex = getFrontIndex(rotationAngle, dishesBase.length);
 
@@ -197,7 +205,7 @@ const ClosueStatueSelect = () => {
 
     setOrbitTiltDeg(-70);
     setPendingBaseIndex(null);
-  }, [orbitTiltDeg, rotationAngle, pushHistory, lockTitleWith]);
+  }, [orbitTiltDeg, rotationAngle, pushHistory, lockTitleWith, navigate]);
 
   // 오버레이(Integration) 클릭: 프리-틸트 → 기준 index로 틸트 / 틸트 → 해제
   const handleOverlayToggle = useCallback(() => {

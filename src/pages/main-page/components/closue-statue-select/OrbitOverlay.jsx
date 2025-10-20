@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { DISH_SIZE, RADIUS } from './dishesData';
 
 const TILT_MS = 800; // 기울기/상승 모션(ms)
@@ -47,6 +48,20 @@ const OrbitOverlay = React.memo(function OrbitOverlay({
   selectedDish,
   onCircleClick,
 }) {
+  const navigate = useNavigate();
+
+  const handleDishClick = (dish, index) => {
+    if (!dish) return;
+    if (orbitTiltDeg !== 0) {
+      if (dish.address) {
+        navigate(dish.address);
+      }
+      return;
+    }
+
+    onCircleClick();
+  };
+
   const n = items?.length ?? 0;
 
   // 기울었거나 선택 모드면 (11시,12시,1시)만 보이기
@@ -110,7 +125,7 @@ const OrbitOverlay = React.memo(function OrbitOverlay({
             <FadePresence key={`overlay-${index}`} show={shouldShow}>
               <div
                 className="absolute cursor-pointer pointer-events-auto"
-                onClick={onCircleClick}
+                onClick={() => handleDishClick(dish, index)}
                 style={{
                   left: `${x - size / 2}px`,
                   top: `${y - size / 2}px`,
