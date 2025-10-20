@@ -31,8 +31,9 @@
 
 @font-face {
   font-family: "Mortend";
-  src: url("/Mortend Bold.ttf") format("truetype");
-  font-weight: 700;  /* Bold */
+  /* Fixed path: file lives under public/fonts/Mortend-Bold.ttf (hyphen, not space) */
+  src: local('Mortend Bold'), url('/fonts/Mortend-Bold.ttf') format('truetype');
+  font-weight: 700; /* Bold */
   font-style: normal;
   font-display: swap;
 }

@@ -32,43 +32,53 @@ const GPTStudy = () => {
       navigate('/gpt-study/recipe1', { replace: true });
     }
   }, [slug, navigate]);
-
-  // URL 변경 시 activeSection 및 expandedContent 업데이트
+  // URL change -> activeSection / expandedContent handling
   useEffect(() => {
     if (!slug) return;
-    
     const recipe = getRecipeBySlug(slug);
-    if (recipe) {
-      // activeSection 업데이트
-      if (isInitialMount.current) {
-        console.log(`🔗 Initial URL: ${slug}, setting activeSection to ${recipe.id - 1}`);
-        setActiveSection(recipe.id - 1);
-        isInitialMount.current = false;
-      }
-      
-      // expandedContent 업데이트
-      if (tab) {
-        console.log(`📖 Tab detected: ${tab}${subTab ? `/${subTab}` : ''}`);
-        setExpandedContent({ 
-          recipeId: recipe.id, 
-          tabId: tab,
-          subTab: subTab || null
-        });
-      } else {
-        setExpandedContent(null);
-      }
+    if (!recipe) return;
+
+    // On initial mount, set the active section to match the URL.
+    if (isInitialMount.current) {
+      console.log(`🔗 Initial URL: ${slug}, setting activeSection to ${recipe.id - 1}`);
+      setActiveSection(recipe.id - 1);
+      isInitialMount.current = false;
     }
-  }, [slug, tab, subTab, setActiveSection, setExpandedContent]);
+
+    // NOTE: Content.jsx already performs the programmatic scroll and sets
+    // `expandedContent` during the open/center flow. Avoid setting
+    // expandedContent here to reduce duplicate updates and ScrollTrigger
+    // churn; Content will observe the URL and call setExpandedContent when
+    // appropriate.
+    if (tab) {
+      console.log(`📖 Tab detected: ${tab}${subTab ? `/${subTab}` : ''} (deferred to Content)`);
+    } else {
+      console.log('No tab in URL (Content will manage expanded state)');
+    }
+  }, [slug, tab, subTab, setActiveSection]);
 
   // activeSection 변경 시 URL 업데이트 (탭이 없을 때만)
   useEffect(() => {
     if (activeSection === null || activeSection === undefined) return;
     if (tab) return; // 탭이 펼쳐져 있으면 URL 변경 안 함
     
-    const recipe = gptStudyData[activeSection];
-    if (recipe && slug !== recipe.slug) {
-      console.log(`🔄 Active section changed to ${activeSection}, updating URL to ${recipe.slug}`);
-      navigate(`/gpt-study/${recipe.slug}`, { replace: true });
+      // if an expandedContent is open, skip activeSection -> URL navigation
+      try {
+        const store = useGPTStudyStore.getState();
+        if (store && store.expandedContent) {
+          console.debug('[GPTStudy] skipping URL update because expandedContent is open', store.expandedContent);
+          return;
+        }
+        // if global nav sync is suspended, skip to avoid racing with programmatic opens
+        if (store && store.isNavSyncSuspended && store.isNavSyncSuspended()) {
+          return;
+        }
+      } catch (e) {}
+
+      const recipe = gptStudyData[activeSection];
+      if (recipe && slug !== recipe.slug) {
+        console.log(`🔄 Active section changed to ${activeSection}, updating URL to ${recipe.slug}`);
+        navigate(`/gpt-study/${recipe.slug}`, { replace: true });
     }
   }, [activeSection, slug, tab, navigate]);
 

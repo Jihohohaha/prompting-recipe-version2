@@ -6,7 +6,7 @@ import useGPTStudyStore from '../../store';
 const TabInterface = ({ recipe }) => {
   const navigate = useNavigate();
   const { slug, tab: currentTab } = useParams();
-  const { expandedContent, setExpandedContent, setActiveSection } = useGPTStudyStore();
+  const { expandedContent, expandContent, setExpandedContent, collapseContent, setActiveSection } = useGPTStudyStore();
   
   // 활성 탭 결정 (URL 파라미터 기준)
   const activeTab = currentTab || null;
@@ -23,20 +23,18 @@ const TabInterface = ({ recipe }) => {
   const handleTabClick = (tabId) => {
     // 현재 Section의 현재 탭을 클릭한 경우 → 접기
     if (expandedContent?.recipeId === recipe.id && activeTab === tabId) {
-      setExpandedContent(null);
+      collapseContent && collapseContent();
       navigate(`/gpt-study/${recipe.slug}`);
-    } 
-    // 그 외 모든 경우 → 펼치기
-    else {
-      // activeSection 업데이트 (해당 Section으로 스크롤)
-      setActiveSection(recipe.id - 1);
-      
-      // expandedContent 업데이트
-      setExpandedContent({ recipeId: recipe.id, tabId });
-      
-      // URL 변경
-      navigate(`/gpt-study/${recipe.slug}/${tabId}`);
+      return;
     }
+
+    // 그 외 모든 경우 → 펼치기
+    // activeSection 업데이트 (해당 Section으로 스크롤)
+    setActiveSection(recipe.id - 1);
+    // Use expandContent helper so expandedAt is recorded.
+    expandContent && expandContent({ recipeId: recipe.id, tabId });
+    // Update URL after state to avoid ScrollTrigger churn
+    navigate(`/gpt-study/${recipe.slug}/${tabId}`);
   };
 
   // 방법론별 색상 가져오기
@@ -52,7 +50,41 @@ const TabInterface = ({ recipe }) => {
 
   return (
     <div className="w-full">
-      {/* 탭 헤더 */}
+      <div className='w-full rounded-full h-8 flex items-center justify-left px-6 mb-3'
+        style={{ backgroundColor: hexToRgba(primaryColor, 0.88) }}>
+        <div className="text-white font-bold text-sm">
+          {`section ${recipe.id}. ${recipe.displayTitle}`}
+        </div>
+      </div>
+
+      {/* 탭 내용 영역 - 고정 표시 */}
+      <div 
+        className="px-8 py-10 flex flex-col gap-4 mb-2"
+        style={{ backgroundColor: primaryColor }}
+      >
+        {/* 상단 흰색 밑줄 */}
+        <div className="flex justify-center">
+          <div 
+            className="h-[2px] bg-white"
+            style={{ width: 'calc(100% - 4rem)' }}
+          />
+        </div>
+
+        {/* 방법론 제목 텍스트 (좌측 정렬, 상단 여백 추가) */}
+        <div className="text-white font-bold mt-48 text-8xl font-pretendard whitespace-pre-line text-left mt-16">
+          {recipe.displayTitle}
+        </div>
+
+        {/* 하단 흰색 밑줄 */}
+        <div className="flex justify-center">
+          <div 
+            className="h-[2px] bg-white"
+            style={{ width: 'calc(100% - 4rem)' }}
+          />
+        </div>
+      </div>
+
+            {/* 탭 헤더 */}
       <div className="flex gap-0">
         {tabs.map((tab, index) => {
           const isActive = activeTab === tab.id;
@@ -75,33 +107,6 @@ const TabInterface = ({ recipe }) => {
             </button>
           );
         })}
-      </div>
-
-      {/* 탭 내용 영역 - 고정 표시 */}
-      <div 
-        className="px-8 py-10 flex flex-col gap-4"
-        style={{ backgroundColor: primaryColor }}
-      >
-        {/* 상단 흰색 밑줄 */}
-        <div className="flex justify-center">
-          <div 
-            className="h-[2px] bg-white"
-            style={{ width: 'calc(100% - 4rem)' }}
-          />
-        </div>
-
-        {/* 방법론 제목 텍스트 (좌측 정렬, 상단 여백 추가) */}
-        <div className="text-white font-bold mt-72 text-8xl font-pretendard whitespace-pre-line text-left mt-16">
-          {recipe.displayTitle}
-        </div>
-
-        {/* 하단 흰색 밑줄 */}
-        <div className="flex justify-center">
-          <div 
-            className="h-[2px] bg-white"
-            style={{ width: 'calc(100% - 4rem)' }}
-          />
-        </div>
       </div>
     </div>
   );

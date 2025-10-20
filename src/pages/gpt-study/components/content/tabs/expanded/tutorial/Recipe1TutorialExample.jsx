@@ -2,76 +2,195 @@
 import { motion } from "framer-motion";
 import { useNavigate, useParams } from "react-router-dom";
 import useGPTStudyStore from "../../../../../store";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
+import { useContentContext } from '../../../ContentContext';
 
 const Recipe1TutorialExample = ({ recipeId, index }) => {
+  const rootRef = useRef(null);
+  const { contentRef } = useContentContext();
+
+  useEffect(() => {
+    const root = rootRef.current;
+    if (!root) return;
+
+    // Aggregate mutation counts and filter out noisy style attribute changes
+    let aggCount = 0;
+    let flushTimer = null;
+    const MAX_MUTATIONS = 20000; // safety cap
+
+    const flush = () => {
+      try {
+        if (aggCount > 0) console.info('[Example] aggregated mutations count=', aggCount);
+      } catch (e) {}
+      aggCount = 0;
+      flushTimer = null;
+    };
+
+    const mo = new MutationObserver(muts => {
+      for (const m of muts) {
+        // ignore frequent inline style changes produced by animations
+        if (m.type === 'attributes' && m.attributeName === 'style') continue;
+        // also ignore attribute-only changes that are not meaningful
+        if (m.type === 'attributes' && m.attributeName && ['class'].includes(m.attributeName)) {
+          // class changes may be relevant sometimes; count them
+        }
+        aggCount += 1;
+        if (aggCount > MAX_MUTATIONS) {
+          try { console.warn('[Example] mutation flood exceeded cap, disconnecting observer'); } catch (e) {}
+          try { mo.disconnect(); } catch (e) {}
+          break;
+        }
+      }
+      if (!flushTimer) flushTimer = setTimeout(flush, 300);
+    });
+
+    // Observe child list and subtree changes; watch only meaningful attributes
+    mo.observe(root, { childList: true, subtree: true, attributes: true, attributeFilter: ['src', 'alt', 'class', 'id'] });
+
+    // Log image load events under this example (still useful)
+    const imgs = Array.from(root.querySelectorAll('img'));
+    const onLoad = (e) => {
+      try { console.info('[Example] image loaded', e.target && e.target.src); } catch (e) {}
+    };
+    imgs.forEach(img => img.addEventListener('load', onLoad));
+
+    return () => {
+      try { mo.disconnect(); } catch (e) {}
+      if (flushTimer) clearTimeout(flushTimer);
+      imgs.forEach(img => img.removeEventListener('load', onLoad));
+    };
+  }, []);
   return (
-    <div className="bg-white rounded-3xl">
+  <div className="bg-white rounded-3xl" ref={rootRef}>
       {/* Section 1 */}
-      <FadeSection>
+      <DebugFadeSection id="s1">
         <Section1 />
-      </FadeSection>
+      </DebugFadeSection>
 
       {/* Section 2 */}
-      <FadeSection>
+      <DebugFadeSection id="s2">
         <Section2 />
-      </FadeSection>
+      </DebugFadeSection>
 
       {/* Section 3 */}
-      <FadeSection>
+      <DebugFadeSection id="s3">
         <Section3 />
-      </FadeSection>
+      </DebugFadeSection>
 
       {/* Section 4 */}
-      <FadeSection>
+      <DebugFadeSection id="s4">
         <Section4 />
-      </FadeSection>
+      </DebugFadeSection>
 
       {/* Section 5 */}
-      <FadeSection>
+      <DebugFadeSection id="s5">
         <Section5 />
-      </FadeSection>
+      </DebugFadeSection>
 
       {/* Section 6 */}
-      <FadeSection>
+      <DebugFadeSection id="s6">
         <Section6 />
-      </FadeSection>
+      </DebugFadeSection>
 
       {/* Section 7 */}
-      <FadeSection>
+      <DebugFadeSection id="s7">
         <Section7 />
-      </FadeSection>
+      </DebugFadeSection>
 
       {/* Section 8 */}
-      <FadeSection>
+      <DebugFadeSection id="s8">
         <Section8 />
-      </FadeSection>
+      </DebugFadeSection>
 
       {/* Section 9 */}
-      <FadeSection>
+      <DebugFadeSection id="s9">
         <Section9 />
-      </FadeSection>
+      </DebugFadeSection>
 
       {/* Section 10 */}
-      <FadeSection>
+      <DebugFadeSection id="s10">
         <Section10 />
-      </FadeSection>
+      </DebugFadeSection>
 
       {/* Section 11 */}
-      <FadeSection>
+      <DebugFadeSection id="s11">
         <Section11 />
-      </FadeSection>
+      </DebugFadeSection>
 
       {/* Section 12 - 버튼 포함 */}
-      <FadeSection>
+      <DebugFadeSection id="s12">
         <Section12 />
-      </FadeSection>
+      </DebugFadeSection>
 
       {/* Section 13 */}
-      <FadeSection>
+      <DebugFadeSection id="s13">
         <Section13 recipeId={recipeId} index={index} />
-      </FadeSection>
+      </DebugFadeSection>
     </div>
+  );
+};
+
+// DebugFadeSection: wraps FadeSection and logs intersection/visibility
+const DebugFadeSection = ({ children, id }) => {
+  const ref = useRef(null);
+  const { isManualScrollRef, contentRef } = useContentContext();
+  const disableIO = typeof window !== 'undefined' && !!window.__GPT_STUDY_AB_disableIO;
+
+  useEffect(() => {
+    if (disableIO) {
+      try { console.info(`[Example] disableIO is true - skipping IntersectionObserver for ${id}`); } catch (e) {}
+      return;
+    }
+    if (!ref.current) return;
+    const el = ref.current;
+
+    const io = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        const now = Date.now();
+        const ratio = entry.intersectionRatio;
+        const rect = entry.boundingClientRect || {};
+        const elTop = el ? el.offsetTop : null;
+        const containerTop = contentRef && contentRef.current ? contentRef.current.scrollTop : null;
+        const containerH = contentRef && contentRef.current ? contentRef.current.clientHeight : null;
+        const containerScrollH = contentRef && contentRef.current ? contentRef.current.scrollHeight : null;
+
+        if (entry.isIntersecting) {
+          try {
+            console.info(`[Example] visible ${id} time=${now} ratio=${ratio.toFixed(3)} rectTop=${Math.round(rect.top)} rectH=${Math.round(rect.height)} elOffsetTop=${elTop} containerScrollTop=${containerTop} containerH=${containerH} containerScrollH=${containerScrollH} manual=${!!(isManualScrollRef && isManualScrollRef.current)}`);
+          } catch (e) {}
+        } else {
+          try {
+            console.debug(`[Example] hidden ${id} time=${now} ratio=${ratio.toFixed ? ratio.toFixed(3) : ratio} rectTop=${Math.round(rect.top || 0)} rectH=${Math.round(rect.height || 0)} elOffsetTop=${elTop} manual=${!!(isManualScrollRef && isManualScrollRef.current)}`);
+          } catch (e) {}
+        }
+      });
+    }, { root: contentRef ? contentRef.current : null, threshold: [0,0.25,0.5,0.75,1] });
+
+    io.observe(el);
+    return () => io.disconnect();
+  }, [id, isManualScrollRef, contentRef]);
+
+  // If AB variant requests disabling IO/animation, render a plain div wrapper.
+  if (disableIO) {
+    return (
+      <div ref={ref} className="w-full relative">
+        {children}
+      </div>
+    );
+  }
+
+  return (
+    <motion.div
+      ref={ref}
+      className="w-full relative"
+      initial={{ opacity: 0 }}
+      whileInView={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      viewport={{ once: false, amount: 0.5 }}
+      transition={{ duration: 1.2 }}
+    >
+      {children}
+    </motion.div>
   );
 };
 
@@ -267,41 +386,41 @@ const Section6 = () => {
         {/* 메인 박스 */}
         <div className="flex flex-col items-center justify-center leading-extra-loose bg-[#FE7525] py-20 px-2 rounded-b-2xl border-2 border-black shadow-lg font-pretendard">
           {/* 1. 예시 몇 개를 보여주고 문제를 풀게 하는 방법 부분 */}
-          <p className="text-3xl font-semibold mb-6">
+          <div className="text-3xl font-semibold mb-6">
             <div className="bg-white font-bold text-4xl p-1 inline-block mx-1">
               모델이 특정 인격이나 역할을 맡아 답변하도록
             </div>
-          </p>
+          </div>
           {/* 2. 장점은 / 규칙을 따르게 만들기 쉽고 부분 */}
-          <p className="text-3xl font-semibold mb-6">
+          <div className="text-3xl font-semibold mb-6">
             <div className="bg-white font-bold text-4xl p-1 inline-block mx-1">
               지시하는 방법
             </div>
             이에요. 이 방식을 사용하면 답변의
-          </p>
+          </div>
 
-          <p className="text-3xl font-semibold mb-6">
+          <div className="text-3xl font-semibold mb-6">
             <div className="bg-white font-bold text-4xl p-1 inline-block mx-1">
               스타일과 관점을 원하는 방향으로 조정
             </div>
             할 수 있지만,
-          </p>
+          </div>
 
           {/* 3. 대신, / 예시를 잘못 주면 부분 */}
-          <p className="text-3xl font-semibold mb-6">
+          <div className="text-3xl font-semibold mb-6">
             반대로{" "}
             <div className="bg-white font-bold text-4xl p-1 inline-block mx-1">
               역할을 너무 과하게 지정하면
             </div>
-          </p>
+          </div>
 
           {/* 4. 패턴을 그대로 따라가서 오답 부분 */}
-          <p className="text-3xl font-semibold">
+          <div className="text-3xl font-semibold">
             <div className="bg-white font-bold text-4xl p-1 inline-block mx-1">
               어색한 말투로 굳어질 수도{" "}
             </div>
             있습니다.
-          </p>
+          </div>
         </div>
       </div>
     </div>
@@ -466,50 +585,62 @@ const Section13 = ({ recipeId, index }) => {
   const navigate = useNavigate();
   const { slug } = useParams();
   const { collapseContent, setActiveSection } = useGPTStudyStore();
+  // Prefer using the ContentContext's contentRef to perform smooth, scoped
+  // scrolling. If the contentRef isn't available (edge cases), fall back to
+  // document.getElementById so the handler never throws.
+  let contentRefSafe = null;
+  try {
+    // require at runtime to avoid hook-call mistakes when this file is used
+    // in a non-React render context by tooling.
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    const { useContentContext } = require('../../../ContentContext');
+    try {
+      contentRefSafe = useContentContext().contentRef;
+    } catch (e) {
+      contentRefSafe = null;
+    }
+  } catch (e) {
+    contentRefSafe = null;
+  }
 
   const handleCloseTutorial = () => {
-    console.log("🔼 Closing Tutorial with smooth collapse");
+    console.info('🔼 Closing Tutorial with smooth collapse (safe handler)');
 
-    // 1. Section 시작점으로 스크롤
-    const sectionElement = document.getElementById(`section-${index}`);
-    if (sectionElement) {
-      sectionElement.scrollIntoView({ behavior: "smooth", block: "start" });
+    // 1. Section 시작점으로 스크롤 (prefer container-scoped query)
+    const container = contentRefSafe && contentRefSafe.current ? contentRefSafe.current : null;
+    const sectionElement = container ? container.querySelector(`#section-${index}`) : document.getElementById(`section-${index}`);
+    try {
+      if (sectionElement) {
+        // If we have the container, prefer scrolling that container so the
+        // smooth behavior is scoped and doesn't unexpectedly affect the
+        // top-level document scroll.
+        if (container && typeof container.scrollTo === 'function') {
+          const top = Math.max(0, sectionElement.offsetTop - (container === document.body ? 0 : 0));
+          container.scrollTo({ top, behavior: 'smooth' });
+        } else {
+          sectionElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }
+    } catch (e) {
+      console.warn('scroll-to-section failed, falling back to element.scrollIntoView', e);
+      try { sectionElement && sectionElement.scrollIntoView({ behavior: 'smooth', block: 'start' }); } catch (e) {}
     }
 
     // 2. 약간의 딜레이 후 접기
     setTimeout(() => {
-      collapseContent();
-      setActiveSection(recipeId - 1);
+      try { collapseContent(); } catch (e) { console.warn('collapseContent failed', e); }
+      try { setActiveSection(recipeId - 1); } catch (e) {}
 
       // 3. 애니메이션이 끝난 후 URL 변경 (1.2초 후)
       setTimeout(() => {
-        navigate(`/gpt-study/${slug}`);
+        try { navigate(`/gpt-study/${slug}`); } catch (e) { console.warn('navigate failed', e); }
       }, 1200);
     }, 300);
   };
 
   return (
     <div className="w-full flex flex-col items-center justify-center pt-72 pb-12">
-      {/* 버튼 영역 */}
-      <div className="flex flex-col items-center">
-        {/* Triangle 이미지 */}
-        <img
-          src="/images/gpt-study/role/Triangle.png"
-          alt="Triangle"
-          style={{
-            width: "40px",
-            height: "35px",
-          }}
-        />
-
-        {/* Tutorial 접기 버튼 */}
-        <button
-          onClick={handleCloseTutorial}
-          className="bg-[#FE7525] border-2 border-black text-white mt-2 py-4 px-96 text-3xl font-medium font-pretendard"
-        >
-          다른 레시피 더 알아보기
-        </button>
-      </div>
+      {/* 버튼 영역 제거: '다른 레시피 더 알아보기' 삭제 per request */}
     </div>
   );
 };

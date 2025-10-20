@@ -1,5 +1,6 @@
 // src/pages/gpt-study/components/sidebar/Sidebar.jsx
 import { useEffect, useRef } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import gsap from 'gsap';
 import { gptStudyData } from '../../data';
@@ -9,6 +10,34 @@ import useGPTStudyStore from '../../store';
 const Sidebar = () => {
   const sidebarRef = useRef(null);
   const { activeSection } = useGPTStudyStore();
+  const navigate = useNavigate();
+  const location = useLocation();
+  // Sync activeSection -> URL (safe): only navigate when pathname differs.
+  useEffect(() => {
+    if (activeSection === null || activeSection === undefined) return;
+    const recipe = gptStudyData[activeSection];
+    if (!recipe) return;
+    const targetPath = `/gpt-study/${recipe.slug}`;
+    try {
+      // If an expandedContent is open, skip navigating to avoid clobbering
+      // the user's open tab (for example recipe1/tutorial).
+      const store = useGPTStudyStore.getState();
+      if (store && store.expandedContent) {
+        console.debug('[Sidebar] skipping URL sync because expandedContent is open', store.expandedContent);
+        return;
+      }
+
+      // If the current pathname already begins with the target recipe path (for
+      // example `/gpt-study/recipe1/tutorial`), don't navigate — that would strip
+      // any tab/subpath. Only navigate when the user is on a different recipe.
+      if (location && !location.pathname.startsWith(targetPath)) {
+        // pass skipContentScroll so Content doesn't perform another programmatic scroll
+        navigate(targetPath, { state: { skipContentScroll: true } });
+      }
+    } catch (e) {
+      console.warn('Sidebar URL sync failed', e);
+    }
+  }, [activeSection, location && location.pathname]);
 
   // activeSection 변경 시 해당 항목으로 스크롤
   useEffect(() => {
@@ -51,7 +80,7 @@ const Sidebar = () => {
         ))}
       </motion.div>
       
-      <style jsx>{`
+      <style>{`
         aside::-webkit-scrollbar {
           width: 6px;
         }

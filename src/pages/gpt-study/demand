@@ -1,0 +1,298 @@
+1. 탭 클릭 (Tutorial/Quiz/Chat)
+Case 1-1: 접힌 상태에서 탭 클릭
+초기 상태: /recipe1 (탭 접혀있음)
+
+[사용자] Tutorial 탭 클릭
+    ↓
+[TabInterface] 
+    - setExpandedContent({ recipeId: 1, tabId: 'tutorial' })
+    - navigate('/recipe1/tutorial')
+    ↓
+[GPTStudy] URL 변경 감지 (/recipe1 → /recipe1/tutorial)
+    - expandedContent 업데이트 (store)
+    ↓
+[Content] URL 변경 감지
+    - tab이 있음 감지
+    - 탭 인터페이스 바로 아래로 스크롤 (0.8초)
+    ↓
+[Section] expandedContent 감지
+    - AnimatePresence 시작
+    - Tutorial 콘텐츠 slide down (1.2초)
+    ↓
+완료: Tutorial 펼쳐진 상태
+```
+
+#### **Case 1-2: 펼쳐진 상태에서 같은 탭 클릭 (토글)**
+```
+초기 상태: /recipe1/tutorial (Tutorial 펼쳐짐)
+
+[사용자] Tutorial 탭 다시 클릭
+    ↓
+[TabInterface] 
+    - setExpandedContent(null)
+    - navigate('/recipe1')
+    ↓
+[GPTStudy] URL 변경 감지 (/recipe1/tutorial → /recipe1)
+    - expandedContent = null (store)
+    ↓
+[Content] URL 변경 감지
+    - tab이 없음 감지
+    - Section 상단으로 스크롤 (0.8초)
+    ↓
+[Section] expandedContent = null 감지
+    - AnimatePresence exit
+    - Tutorial 콘텐츠 slide up (1.2초)
+    ↓
+완료: Tutorial 접힌 상태
+```
+
+---
+
+### **2. Sidebar 클릭**
+
+#### **Case 2-1: 탭 접힌 상태에서 다른 Recipe 클릭**
+```
+초기 상태: /recipe1 (탭 접혀있음)
+
+[사용자] Sidebar에서 Recipe2 클릭
+    ↓
+[SidebarItem]
+    - collapseContent() (아무 일도 안 일어남, 이미 접혀있으므로)
+    - setActiveSection(1)
+    - navigate('/recipe2')
+    ↓
+[GPTStudy] activeSection 변경 감지 (0 → 1)
+    - URL 업데이트 (/recipe1 → /recipe2)
+    ↓
+[Content] URL 변경 감지
+    - tab이 없음
+    - Recipe2 Section 상단으로 스크롤 (0.8초)
+    ↓
+[Sidebar] activeSection 감지
+    - Recipe2 이미지 selected 상태로 변경
+    ↓
+완료: Recipe2로 이동, 접힌 상태 유지
+```
+
+#### **Case 2-2: 탭 펼쳐진 상태에서 다른 Recipe 클릭**
+```
+초기 상태: /recipe1/tutorial (Recipe1 Tutorial 펼쳐짐)
+
+[사용자] Sidebar에서 Recipe2 클릭
+    ↓
+[SidebarItem]
+    - collapseContent() 실행
+        → expandedContent = null (store)
+    - setActiveSection(1)
+    - navigate('/recipe2')
+    ↓
+[Section] expandedContent = null 감지
+    - Tutorial slide up 시작 (1.2초)
+    ↓
+[GPTStudy] activeSection 변경 감지 (0 → 1)
+    - URL 업데이트 (/recipe1/tutorial → /recipe2)
+    ↓
+[Content] URL 변경 감지
+    - tab이 없음
+    - Recipe2 Section 상단으로 스크롤 (0.8초)
+    ↓
+완료: Recipe2로 이동, 접힌 상태
+```
+
+#### **Case 2-3: 탭 펼쳐진 상태에서 같은 Recipe 클릭**
+```
+초기 상태: /recipe1/tutorial (Recipe1 Tutorial 펼쳐짐)
+
+[사용자] Sidebar에서 Recipe1 다시 클릭
+    ↓
+[SidebarItem]
+    - collapseContent() 실행
+        → expandedContent = null
+    - setActiveSection(0) (변경 없음)
+    - navigate('/recipe1')
+    ↓
+[Section] expandedContent = null 감지
+    - Tutorial slide up (1.2초)
+    ↓
+[Content] URL 변경 감지 (/recipe1/tutorial → /recipe1)
+    - Recipe1 Section 상단으로 스크롤 (0.8초)
+    ↓
+완료: Recipe1, 접힌 상태
+```
+
+---
+
+### **3. 수동 스크롤 (휠)**
+
+#### **Case 3-1: 탭 접힌 상태에서 수동 스크롤**
+```
+초기 상태: /recipe1 (탭 접혀있음)
+
+[사용자] 마우스 휠로 스크롤 내림
+    ↓
+[Content - ScrollTrigger] Recipe2 영역 도달 감지
+    - onEnter 실행
+    - setActiveSection(1)
+    ↓
+[GPTStudy] activeSection 변경 감지 (0 → 1)
+    - tab 없으므로 URL 업데이트
+    - navigate('/recipe2', { replace: true })
+    ↓
+[Sidebar] activeSection 감지
+    - Recipe2 이미지 selected 상태로 변경
+    ↓
+완료: URL /recipe2, Sidebar Recipe2 활성화
+```
+
+#### **Case 3-2: 탭 펼쳐진 상태에서 수동 스크롤**
+```
+초기 상태: /recipe1/tutorial (Recipe1 Tutorial 펼쳐짐)
+
+[사용자] Tutorial 중간을 보다가 마우스 휠로 계속 스크롤 내림
+    ↓
+[Content - ScrollTrigger] Recipe2 영역 도달 감지
+    - onEnter 실행
+    - setActiveSection(1)
+    ↓
+[GPTStudy] activeSection 변경 감지 (0 → 1)
+    - tab이 있지만 무시하고 URL 업데이트
+    - navigate('/recipe2', { replace: true })
+    ↓
+[GPTStudy] URL 변경 감지 (/recipe1/tutorial → /recipe2)
+    - tab이 없어짐 감지
+    - expandedContent = null
+    ↓
+[Section] expandedContent = null 감지
+    - Tutorial slide up (1.2초)
+    ↓
+[Sidebar] activeSection 감지
+    - Recipe2 이미지 selected 상태로 변경
+    ↓
+완료: URL /recipe2, Tutorial 접힘, Recipe2로 이동
+```
+
+#### **Case 3-3: 바닥 감지 (탭 없을 때)**
+```
+초기 상태: /recipe6 (탭 접혀있음)
+
+[사용자] 마우스 휠로 끝까지 스크롤 내림
+    ↓
+[Content - handleScroll] 바닥 도달 감지
+    - tab 없음 확인
+    - scrollTop + clientHeight >= scrollHeight - 10
+    - setActiveSection(6) // 마지막 Section
+    ↓
+[GPTStudy] activeSection 변경 감지 (5 → 6)
+    - navigate('/recipe7', { replace: true })
+    ↓
+[Sidebar] activeSection 감지
+    - Recipe7 이미지 selected 상태로 변경
+    ↓
+완료: URL /recipe7, Recipe7 활성화
+```
+
+#### **Case 3-4: 바닥 감지 (탭 펼쳐진 상태 - 무시)**
+```
+초기 상태: /recipe6/tutorial (Recipe6 Tutorial 펼쳐짐)
+
+[사용자] Tutorial이 매우 길어서 끝까지 스크롤 내림
+    ↓
+[Content - handleScroll] 바닥 도달 감지
+    - tab이 있음 확인
+    - return (바닥 감지 비활성화)
+    ↓
+[Content - ScrollTrigger] Recipe7 영역이 보이면 감지
+    - Recipe7이 화면에 보일 때 onEnter 실행
+    - setActiveSection(6)
+    ↓
+[GPTStudy] activeSection 변경 감지 (5 → 6)
+    - navigate('/recipe7', { replace: true })
+    ↓
+완료: Tutorial 접히고 Recipe7로 이동
+```
+
+---
+
+### **4. URL 직접 입력**
+
+#### **Case 4-1: 기본 URL 입력**
+```
+[사용자] 주소창에 /recipe2 입력
+    ↓
+[GPTStudy] slug 변경 감지
+    - setActiveSection(1)
+    - expandedContent = null (tab 없으므로)
+    ↓
+[Content] URL 변경 감지
+    - tab 없음
+    - Recipe2 Section 상단으로 스크롤 (0.8초)
+    ↓
+완료: Recipe2 Section 상단 표시
+```
+
+#### **Case 4-2: 탭 URL 직접 입력**
+```
+[사용자] 주소창에 /recipe1/tutorial 입력
+    ↓
+[GPTStudy] slug, tab 변경 감지
+    - setActiveSection(0)
+    - expandedContent = { recipeId: 1, tabId: 'tutorial' }
+    ↓
+[Content] URL 변경 감지
+    - tab이 있음
+    - 탭 인터페이스 바로 아래로 스크롤 (0.8초)
+    ↓
+[Section] expandedContent 감지
+    - Tutorial slide down (1.2초)
+    ↓
+완료: Recipe1 탭 인터페이스 아래, Tutorial 펼쳐짐
+```
+
+---
+
+### **5. 퀴즈 제출**
+
+#### **Case 5: 객관식 제출 → Result 표시**
+```
+초기 상태: /recipe1/quiz (객관식 페이지)
+
+[사용자] 제출 버튼 클릭
+    ↓
+[Recipe1QuizMultiple]
+    - 채점 실행 (score 계산)
+    - navigate('/recipe1/quiz?step=result&score=3')
+    ↓
+[Content] URL 변경 감지
+    - tab은 여전히 'quiz'
+    - 탭 인터페이스 아래로 스크롤 (0.8초)
+    ↓
+[Recipe1QuizContainer] step 파라미터 감지
+    - Multiple slide up (1.2초)
+    - Result slide down (1.2초)
+    ↓
+완료: Result 표시 (score에 따라 Success/Fail)
+```
+
+---
+
+### **6. 접기 버튼 클릭**
+
+#### **Case 6: Tutorial/Quiz 접기 버튼**
+```
+초기 상태: /recipe2/tutorial (Tutorial 펼쳐짐)
+
+[사용자] 하단의 "다른 레시피 더 알아보기" 버튼 클릭
+    ↓
+[Recipe2TutorialExample]
+    - handleCollapse 실행
+    - Section 시작점으로 smooth 스크롤
+    - 300ms 후:
+        - collapseContent()
+        - setActiveSection(1)
+    - 1500ms 후 (1.2초 애니메이션 + 300ms):
+        - navigate('/recipe2')
+    ↓
+[Section] expandedContent = null 감지
+    - Tutorial slide up (1.2초)
+    ↓
+완료: Recipe2 Section 상단, 접힌 상태

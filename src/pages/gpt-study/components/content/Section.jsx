@@ -1,8 +1,12 @@
 // src/pages/gpt-study/components/content/Section.jsx
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { useParams, useNavigate } from "react-router-dom";
 import TabInterface from "./TabInterface";
 import useGPTStudyStore from "../../store";
+import { useRef, useState, useEffect } from 'react';
+import { useContentContext } from './ContentContext';
+import useSectionTriggers from './useSectionTriggers';
+import ScrollTrigger from 'gsap/ScrollTrigger';
 
 // Tutorial 컴포넌트 import
 import Recipe1TutorialExplain from "./tabs/expanded/tutorial/Recipe1TutorialExplain";
@@ -16,20 +20,85 @@ import Recipe4TutorialExample from "./tabs/expanded/tutorial/Recipe4TutorialExam
 import Recipe6TutorialExplain from "./tabs/expanded/tutorial/Recipe6TutorialExplain";
 import Recipe5TutorialExplain from "./tabs/expanded/tutorial/Recipe5TutorialExplain";
 
-// Quiz Container import (✅ 추가)
+// Quiz Container import
 import Recipe1QuizContainer from "./tabs/expanded/quiz/Recipe1QuizContainer";
 
 const Section = ({ recipe, index }) => {
   const navigate = useNavigate();
   const { tab } = useParams();
-  const { expandedContent, collapseContent, setActiveSection } =
-    useGPTStudyStore();
+  const { expandedContent, collapseContent, setActiveSection } = useGPTStudyStore();
+
+  // ref for this section DOM
+  const sectionRef = useRef(null);
+  
+  // ✅ Reference HTML 방식: expanded content의 높이 저장
+  const expandedContentRef = useRef(null);
+  const [expandedHeight, setExpandedHeight] = useState(0);
 
   // 현재 Section이 펼쳐져 있는지 확인
   const isExpanded = expandedContent?.recipeId === recipe.id && tab;
 
+  // use ContentContext for hooks
+  let contentCtx = null;
+  try { contentCtx = useContentContext(); } catch (e) { /* fallback */ }
+
+  // ✅ 콘텐츠 높이 측정 (expanded content 변경 시)
+  useEffect(() => {
+    if (expandedContentRef.current) {
+      // 이미지 로드 대기 후 높이 측정
+      const images = expandedContentRef.current.querySelectorAll('img');
+      
+      if (images.length > 0) {
+        Promise.all(
+          Array.from(images).map(img => {
+            if (img.complete) return Promise.resolve();
+            return new Promise(resolve => {
+              img.onload = resolve;
+              img.onerror = resolve; // 에러도 resolve
+            });
+          })
+        ).then(() => {
+          const height = expandedContentRef.current.scrollHeight;
+          setExpandedHeight(height);
+          console.info(`[Section] Measured expanded height for recipe ${recipe.id}: ${height}px`);
+        });
+      } else {
+        // 이미지 없으면 바로 측정
+        const height = expandedContentRef.current.scrollHeight;
+        setExpandedHeight(height);
+        console.info(`[Section] Measured expanded height for recipe ${recipe.id}: ${height}px (no images)`);
+      }
+    }
+  }, [expandedContent, tab, recipe.id]);
+
+  // ✅ 애니메이션 완료 시 처리
+  const handleAnimationComplete = () => {
+    console.info(`[Section] Animation complete for recipe ${recipe.id}, isExpanded=${isExpanded}`);
+    
+    // ScrollTrigger refresh
+    try {
+      ScrollTrigger.refresh();
+      console.info('[Section] ScrollTrigger refreshed');
+    } catch (e) {
+      console.warn('[Section] ScrollTrigger refresh failed', e);
+    }
+
+    // Operation token 처리
+    try {
+      const store = useGPTStudyStore.getState();
+      const token = (store.expandedContent?.opToken) || store.operationToken;
+      
+      if (token) {
+        console.info('[Section] Animation complete, signaling operation complete with token=', token);
+        store.completeOperation?.(token);
+      }
+    } catch (e) {
+      console.warn('[Section] Operation completion failed', e);
+    }
+  };
+
   const handleCollapse = () => {
-    console.log("🔼 Collapsing content");
+    console.info("[Section] Collapsing content for recipe", recipe.id);
 
     // 1. Section 시작점으로 스크롤
     const sectionElement = document.getElementById(`section-${index}`);
@@ -49,25 +118,33 @@ const Section = ({ recipe, index }) => {
     }, 300);
   };
 
+  // Apply per-section trigger for all sections when inside the provider
+  if (contentCtx) {
+    useSectionTriggers(sectionRef, {
+      index,
+      recipeId: recipe.id,
+      contentRef: contentCtx.contentRef,
+      isManualScrollRef: contentCtx.isManualScrollRef,
+      expandedContent,
+      setActiveSection,
+      collapseContent
+    });
+  }
+
   // 펼쳐진 콘텐츠 렌더링
   const renderExpandedContent = () => {
     // Recipe 1 - Tutorial
     if (recipe.id === 1 && tab === "tutorial") {
       return (
         <>
-          {/* Explain 컴포넌트 */}
           <Recipe1TutorialExplain />
-
-          {/* Gap - 검은색 배경이 보이는 구간 */}
           <div className="w-full h-12"></div>
-
-          {/* Example 컴포넌트 (버튼 포함) */}
           <Recipe1TutorialExample recipeId={recipe.id} index={index} />
         </>
       );
     }
 
-    // Recipe 1 - Quiz (✅ Container로 변경)
+    // Recipe 1 - Quiz
     if (recipe.id === 1 && tab === "quiz") {
       return <Recipe1QuizContainer />;
     }
@@ -76,13 +153,8 @@ const Section = ({ recipe, index }) => {
     if (recipe.id === 2 && tab === "tutorial") {
       return (
         <>
-          {/* Explain 컴포넌트 */}
           <Recipe2TutorialExplain />
-
-          {/* Gap - 검은색 배경이 보이는 구간 */}
           <div className="w-full h-12"></div>
-
-          {/* Example 컴포넌트 (버튼 포함) */}
           <Recipe2TutorialExample recipeId={recipe.id} index={index} />
         </>
       );
@@ -92,13 +164,8 @@ const Section = ({ recipe, index }) => {
     if (recipe.id === 3 && tab === "tutorial") {
       return (
         <>
-          {/* Explain 컴포넌트 */}
           <Recipe3TutorialExplain />
-
-          {/* Gap - 검은색 배경이 보이는 구간 */}
           <div className="w-full h-12"></div>
-
-          {/* Example 컴포넌트 (버튼 포함) */}
           <Recipe3TutorialExample recipeId={recipe.id} index={index} />
         </>
       );
@@ -109,11 +176,7 @@ const Section = ({ recipe, index }) => {
       return (
         <>
           <Recipe4TutorialExplain />
-
-          {/* Gap - 검은색 배경이 보이는 구간 */}
           <div className="w-full h-12"></div>
-
-          {/* Example 컴포넌트 (버튼 포함) */}
           <Recipe4TutorialExample recipeId={recipe.id} index={index} />
         </>
       );
@@ -121,20 +184,12 @@ const Section = ({ recipe, index }) => {
 
     // Recipe 5 - Tutorial
     if (recipe.id === 5 && tab === "tutorial") {
-      return (
-        <>
-          <Recipe5TutorialExplain />
-        </>
-      );
+      return <Recipe5TutorialExplain />;
     }
 
     // Recipe 6 - Tutorial
     if (recipe.id === 6 && tab === "tutorial") {
-      return (
-        <>
-          <Recipe6TutorialExplain />
-        </>
-      );
+      return <Recipe6TutorialExplain />;
     }
 
     // 기타 (임시 콘텐츠)
@@ -150,7 +205,6 @@ const Section = ({ recipe, index }) => {
           </p>
         </div>
 
-        {/* 접기 버튼 (검정 배경 위에) */}
         <div className="flex justify-center mt-8">
           <button
             onClick={handleCollapse}
@@ -166,31 +220,38 @@ const Section = ({ recipe, index }) => {
   return (
     <section
       id={`section-${index}`}
+      ref={sectionRef}
       className="flex flex-col px-12 py-8 snap-start"
     >
-      {/* 탭 인터페이스에 id 추가 (✅ 스크롤용) */}
+      {/* 탭 인터페이스에 id 추가 (스크롤용) */}
       <div id={`tab-interface-${recipe.id}`}>
         <TabInterface recipe={recipe} />
       </div>
 
-      {/* 펼쳐진 콘텐츠 영역 (애니메이션) */}
-      <AnimatePresence>
-        {isExpanded && (
-          <motion.div
-            id={`expanded-content-${recipe.id}`}
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: "auto", opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 1.2, ease: "easeInOut" }}
-            className="overflow-hidden"
-          >
-            <div className="bg-black py-8">
-              {/* 실제 콘텐츠 렌더링 */}
-              {renderExpandedContent()}
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {/* ✅ Reference HTML 방식: AnimatePresence 제거, 항상 DOM에 렌더링 */}
+      <motion.div
+        id={`expanded-content-${recipe.id}`}
+        style={{
+          overflow: 'hidden'
+        }}
+        animate={{
+          height: isExpanded ? expandedHeight : 0,
+          opacity: isExpanded ? 1 : 0
+        }}
+        initial={{
+          height: 0,
+          opacity: 0
+        }}
+        transition={{ duration: 1.2, ease: "easeInOut" }}
+        onAnimationComplete={handleAnimationComplete}
+      >
+        {/* ✅ 내부 콘텐츠는 항상 렌더링됨 (height: 0일 때도) */}
+        <div ref={expandedContentRef} className="bg-black py-8">
+          {renderExpandedContent()}
+          {/* sentinel for Content to detect end-of-expanded-content */}
+          <div id={`expanded-end-${recipe.id}`} style={{ height: 1, width: '100%', opacity: 0 }} />
+        </div>
+      </motion.div>
     </section>
   );
 };
