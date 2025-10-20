@@ -26,6 +26,26 @@ const getFrontIndex = (angleDeg, len) => {
 // 주어진 index가 12시(정면)에 오도록 만드는 각도
 const angleForFrontIndex = (index) => -(90 + 45 * index);
 
+// prev에 가장 가까운 동치각으로 스냅(항상 최단 경로 회전)
+const nearestAngle = (targetDeg, currentDeg) => {
+  const turns = Math.round((currentDeg - targetDeg) / 360);
+  return targetDeg + 360 * turns;
+};
+
+// 틸트 모드에서 기준 인덱스들(-45, -90, -135)
+const tiltedTriplet = (front, n) => ({
+  left : ((front - 5) + n) % n,   // -135°
+  center: ((front - 4) + n) % n,  // -90°
+  right: (front + 5) % n,         // -45°
+});
+
+// 프리-틸트에서 상단 3개(45, 90, 135)
+const browseTriplet = (front, n) => ({
+  left : ((front - 1) + n) % n,   // 135°
+  center: front,                  // 90°
+  right: (front + 1) % n,         // 45°
+});
+
 // ───────────────────────── 컴포넌트 ─────────────────────────
 const ClosueStatueSelect = () => {
   const navigate = useNavigate();
@@ -33,46 +53,44 @@ const ClosueStatueSelect = () => {
   // 뷰/회전 상태
   const [rotationAngle, setRotationAngle] = useState(0);
   const [orbitTiltDeg, setOrbitTiltDeg] = useState(0); // 0 ↔ -70 (틸트)
-  const [selectedDish, setSelectedDish] = useState(null);
   const [showMask, setShowMask] = useState(true);
 
   // 제목 락(틸트 상태에서 제목 고정)
   const [titleLock, setTitleLock] = useState({ active: false, text: null });
   const lockTitleWith = useCallback((text) => setTitleLock({ active: true, text }), []);
-  const unlockTitle = useCallback(() => setTitleLock({ active: false, text: null }), []);
+  const unlockTitle   = useCallback(() => setTitleLock({ active: false, text: null }), []);
 
   // 틸트 모드에서의 아이템 세트
   const [aiItems, setAiItems] = useState([]);
 
-  // 프리-틸트에서 마지막으로 클릭한(정면으로 스냅시킨) 접시 index
+  // 프리-틸트에서 마지막으로 클릭해 12시에 스냅시키려던 인덱스(필요 시)
   const [pendingBaseIndex, setPendingBaseIndex] = useState(null);
 
   const isTilt = orbitTiltDeg !== 0;
-  const items = isTilt ? aiItems : dishesBase;
+  const items  = isTilt ? aiItems : dishesBase;
+  const n      = items.length || 0;
 
-  // 프론트 계산
+  // 현재 12시에 온 인덱스
   const frontDishIndex = useMemo(
-    () => getFrontIndex(rotationAngle, items.length || 0),
-    [rotationAngle, items.length]
+    () => getFrontIndex(rotationAngle, n),
+    [rotationAngle, n]
   );
   const frontDish = useMemo(() => items[frontDishIndex] ?? items[0], [items, frontDishIndex]);
 
+  // 제목 텍스트
   const titleText = titleLock.active && titleLock.text ? titleLock.text : (frontDish?.title ?? '');
 
   // 틸트가 풀리면 제목 락 해제
-  useEffect(() => {
-    if (!isTilt) unlockTitle();
-  }, [isTilt, unlockTitle]);
+  useEffect(() => { if (!isTilt) unlockTitle(); }, [isTilt, unlockTitle]);
 
   // ───────────────────────── Back 히스토리 ─────────────────────────
-  // 이전 상태에 선택 당시의 정면 index(anchorFrontIndex)도 함께 저장
   const [history, setHistory] = useState([]);
   const pushHistory = useCallback((anchorFrontIndex = null) => {
     setHistory((prev) => [
       ...prev,
-      { rotationAngle, orbitTiltDeg, selectedDish, titleLock, aiItems, anchorFrontIndex }
+      { rotationAngle, orbitTiltDeg, titleLock, aiItems, anchorFrontIndex }
     ]);
-  }, [rotationAngle, orbitTiltDeg, selectedDish, titleLock, aiItems]);
+  }, [rotationAngle, orbitTiltDeg, titleLock, aiItems]);
 
   const popHistory = useCallback(() => {
     setHistory((prev) => {
@@ -80,19 +98,16 @@ const ClosueStatueSelect = () => {
       const next = prev.slice(0, -1);
       const last = prev[prev.length - 1];
 
-      // 주요 상태 복원
       setOrbitTiltDeg(last.orbitTiltDeg);
-      setSelectedDish(last.selectedDish);
       setTitleLock(last.titleLock || { active: false, text: null });
       setAiItems(last.aiItems || []);
 
-      // anchorFrontIndex가 있으면 그 index를 정면으로
       if (typeof last.anchorFrontIndex === 'number') {
-        setRotationAngle(angleForFrontIndex(last.anchorFrontIndex));
+        const target = angleForFrontIndex(last.anchorFrontIndex);
+        setRotationAngle((prevAngle) => nearestAngle(target, prevAngle));
       } else {
-        setRotationAngle(last.rotationAngle);
+        setRotationAngle((prevAngle) => nearestAngle(last.rotationAngle, prevAngle));
       }
-
       return next;
     });
   }, []);
@@ -100,7 +115,6 @@ const ClosueStatueSelect = () => {
 
   // ───────────────────────── 입력/회전 처리 ─────────────────────────
   const rootRef = useRef(null);
-  const containerRef = useRef(null);
   const stepLockRef = useRef(false);
   const wheelAccumRef = useRef(0);
   const lastTouchYRef = useRef(null);
@@ -122,7 +136,7 @@ const ClosueStatueSelect = () => {
       if (stepLockRef.current) return;
       wheelAccumRef.current += e.deltaY;
       if (Math.abs(wheelAccumRef.current) >= WHEEL_STEP) {
-        const dir = wheelAccumRef.current > 0 ? 1 : -1;
+        const dir = wheelAccumRef.current > 0 ? 1 : -1; // 1 = 아래 스크롤 → 반시계 45°
         wheelAccumRef.current = 0;
         doStep(dir);
       }
@@ -154,8 +168,7 @@ const ClosueStatueSelect = () => {
         doStep(dir);
       }
     };
-    const onEnd = (e) => {
-      if (!within(e.target)) return;
+    const onEnd = () => {
       lastTouchYRef.current = null;
       touchAccumRef.current = 0;
     };
@@ -169,82 +182,65 @@ const ClosueStatueSelect = () => {
     };
   }, [doStep]);
 
-  // ───────────────────────── 클릭 핸들러 ─────────────────────────
-  // 프리-틸트: 접시 클릭
-  // - 정면이 아니면: 정면으로 "스냅" + pendingBaseIndex 기억 (Integration 누르면 이 index로 틸트)
-  // - 정면이면: 기존처럼 즉시 틸트
-  const handleDishClick = useCallback((dish, index) => {
-    if (!dish) return;
-    if (orbitTiltDeg !== 0) {
-      if (dish.address) {
-        navigate(dish.address);
-      }
-      return;
-    }
+  // ───────────────────────── 틸트 진입 헬퍼 ─────────────────────────
+  const enterTiltWithCategoryAtFront = useCallback((baseIdx) => {
+    // 복귀를 위해 스냅샷
+    pushHistory(baseIdx);
 
-    const baseFrontIndex = getFrontIndex(rotationAngle, dishesBase.length);
+    // 틸트 직전 기준 인덱스를 현재 각도에 가장 가까운 동치각으로 스냅
+    setRotationAngle((prevAngle) => nearestAngle(angleForFrontIndex(baseIdx), prevAngle));
 
-    if (index !== baseFrontIndex) {
-      setPendingBaseIndex(index);
-      setRotationAngle(angleForFrontIndex(index));
-      return;
-    }
-
-    // 즉시 틸트 진입(정면 클릭)
-    pushHistory(baseFrontIndex);
-
-    const baseFront = dishesBase[baseFrontIndex] ?? dishesBase[0];
-    const nextMenu = getAIMenuFor(baseFront.title);
-
-    setSelectedDish(dish);
+    // 카테고리 세트 + 제목 락
+    const baseDish = dishesBase[baseIdx] ?? dishesBase[0];
+    const nextMenu = getAIMenuFor(baseDish.title);
     setAiItems(nextMenu);
+    lockTitleWith(baseDish.title);
 
-    // 틸트 진입 시 제목을 해당 메뉴로 락
-    const aiFront = nextMenu[getFrontIndex(rotationAngle, nextMenu.length)] ?? nextMenu[0];
-    lockTitleWith(aiFront.title);
-
+    // 틸트만 적용(회전 효과 없음)
     setOrbitTiltDeg(-70);
     setPendingBaseIndex(null);
-  }, [orbitTiltDeg, rotationAngle, pushHistory, lockTitleWith, navigate]);
+  }, [pushHistory, lockTitleWith]);
 
-  // 오버레이(Integration) 클릭: 프리-틸트 → 기준 index로 틸트 / 틸트 → 해제
-  const handleOverlayToggle = useCallback(() => {
-    if (orbitTiltDeg === 0) {
-      const baseIdx = (typeof pendingBaseIndex === 'number')
-        ? pendingBaseIndex
-        : getFrontIndex(rotationAngle, dishesBase.length);
+  // ───────────────────────── 클릭 핸들러 ─────────────────────────
+  const handleDishClick = useCallback((dish, index) => {
+    if (!dish) return;
 
-      // 히스토리에 현재 상태 + 기준 index 저장
-      pushHistory(baseIdx);
-
-      // 틸트 직전, 기준 index가 정면 오도록 보정
-      setRotationAngle(angleForFrontIndex(baseIdx));
-
-      // 기준 접시의 AI 메뉴로 전환
-      const baseDish = dishesBase[baseIdx] ?? dishesBase[0];
-      const nextMenu = getAIMenuFor(baseDish.title);
-      setAiItems(nextMenu);
-
-      // 제목 락
-      lockTitleWith(baseDish.title);
-
-      // 틸트 진입
-      setOrbitTiltDeg(-70);
-      setPendingBaseIndex(null);
+    // 틸트 상태
+    if (isTilt) {
+      const { left, center, right } = tiltedTriplet(frontDishIndex, n);
+      if (index === right) { doStep(1);  return; }   // -45° → 반시계 45°
+      if (index === left)  { doStep(-1); return; }   // -135° → 시계 45°
+      if (index === center){ if (dish.address) navigate(dish.address); return; } // -90° → 라우팅
       return;
     }
 
-    // 틸트 상태에서는 토글로 해제
-    pushHistory(getFrontIndex(rotationAngle, dishesBase.length));
-    setOrbitTiltDeg(0);
-    unlockTitle();
-  }, [orbitTiltDeg, rotationAngle, pendingBaseIndex, pushHistory, lockTitleWith, unlockTitle]);
+    // 프리-틸트 상태
+    const { left, center, right } = browseTriplet(frontDishIndex, dishesBase.length);
+    if (index === right) { doStep(1);  return; }     // 45° → 반시계 45°
+    if (index === left)  { doStep(-1); return; }     // 135° → 시계 45°
+    if (index === center) {
+      // 바로 틸트 진입(숨김/스핀 없음)
+      enterTiltWithCategoryAtFront(center);
+      return;
+    }
+  }, [isTilt, frontDishIndex, n, doStep, navigate, enterTiltWithCategoryAtFront]);
+
+  // 오버레이 원 클릭: 사용 안 함(클릭은 DishItem이 전담)
+  const handleOverlayToggle = useCallback(() => {}, []);
+
+  // ───────────────────────── 틸트 설명용 디테일 인덱스 ─────────────────────────
+  const [detailIndex, setDetailIndex] = useState(null);
+  useEffect(() => {
+    if (!isTilt || n === 0) { setDetailIndex(null); return; }
+    const { center } = tiltedTriplet(frontDishIndex, n); // -90°
+    setDetailIndex(center);
+  }, [isTilt, frontDishIndex, n]);
+
+  const detailDish = (isTilt && detailIndex != null) ? items[detailIndex] : frontDish;
 
   // ───────────────────────── 파생 UI 값 ─────────────────────────
   const titleScale = isTilt ? 2.5 : 1;
   const descriptionScale = isTilt ? 2 : 1;
-  const statueScale = isTilt ? 1.6 : 1;
-  const utensilStyle = { opacity: isTilt ? 0 : 1, transition: 'opacity 800ms cubic-bezier(0.2, 0.8, 0.2, 1)' };
   const floatingStyle = { opacity: isTilt ? 0 : 1, transition: 'opacity 800ms cubic-bezier(0.2, 0.8, 0.2, 1)' };
 
   const [dishScales, setDishScales] = useState(() => Array(items.length).fill(1));
@@ -266,12 +262,22 @@ const ClosueStatueSelect = () => {
         </div>
       )}
 
-      <div ref={rootRef} className="relative w-screen h-screen overflow-hidden bg-gradient-to-b from-orange-400 to-orange-500">
+      <div
+        ref={rootRef}
+        className="relative w-screen h-screen overflow-hidden bg-gradient-to-b from-orange-400 to-orange-500 select-none"
+        onDragStart={(e) => e.preventDefault()}
+        style={{
+          userSelect: 'none',
+          WebkitUserSelect: 'none',
+          MozUserSelect: 'none',
+          msUserSelect: 'none',
+        }}
+      >
         {/* 스크롤 프록시(휠/터치 스텝 회전용) */}
         <div
-          ref={containerRef}
           className="absolute inset-0 overflow-y-auto z-50 scrollbar-hide"
-          style={{ WebkitOverflowScrolling: 'touch' }}
+          style={{ WebkitOverflowScrolling: 'touch', pointerEvents: 'none' }}
+          aria-hidden="true"
         >
           <div className="h-[1000vh]" />
         </div>
@@ -320,14 +326,14 @@ const ClosueStatueSelect = () => {
             <div className="relative h-full w-[1000px] rounded-l-[24px] bg-white bg-opacity-[40%]"></div>
             <div className="absolute inset-0 flex items-center justify-center">
               <p className="text-black text-[18px] text-center leading-[1.7] font-pretendard font-medium whitespace-pre-line">
-                {frontDish?.description}
+                {detailDish?.description}
               </p>
             </div>
             <div className="relative flex flex-col items-center justify-center h-full w-[300px] rounded-r-[24px] bg-black bg-opacity-[70%]">
               <div className="text-[40px] font-koolegant mb-2">Ingredient</div>
               <div className="text-[16px] font-pretendard text-white">
-                {[frontDish?.kw1, frontDish?.kw2, frontDish?.kw3].filter(Boolean).join(', ')}
-                {frontDish?.kw4 ? `, ${frontDish.kw4}` : ''}
+                {[detailDish?.kw1, detailDish?.kw2, detailDish?.kw3].filter(Boolean).join(', ')}
+                {detailDish?.kw4 ? `, ${detailDish.kw4}` : ''}
               </div>
             </div>
           </div>
@@ -346,8 +352,9 @@ const ClosueStatueSelect = () => {
             src="/images/main-page/statue.png"
             alt="석상"
             className="w-96 h-[250px] object-contain"
+            draggable={false}
             style={{
-              transform: `scale(${statueScale})`,
+              transform: `scale(${isTilt ? 1.6 : 1})`,
               transformOrigin: 'bottom center',
               transition: 'transform 1000ms cubic-bezier(0.2, 0.8, 0.2, 1)'
             }}
@@ -370,8 +377,9 @@ const ClosueStatueSelect = () => {
             frontDishIndex={frontDishIndex}
             dishScales={dishScales}
             handleDishClick={handleDishClick}
-            selectedDish={selectedDish}
+            selectedDish={null}
             hideText={false}
+            isTiltMode={isTilt}
           />
 
           <OrbitOverlay
@@ -380,8 +388,9 @@ const ClosueStatueSelect = () => {
             orbitTiltDeg={orbitTiltDeg}
             frontDishIndex={frontDishIndex}
             dishScales={dishScales}
-            selectedDish={selectedDish}
+            selectedDish={null}
             onCircleClick={handleOverlayToggle}
+            isTiltMode={isTilt}
           />
         </div>
 

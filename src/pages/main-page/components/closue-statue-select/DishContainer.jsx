@@ -41,31 +41,40 @@ const DishContainer = React.memo(function DishContainer({
   frontDishIndex,
   dishScales,
   handleDishClick, // (dish, index)
-  selectedDish,
-  hideText = false, // 상단에서 false로 넘김(세부 제어는 아래에서)
+  selectedDish,    // 디자인 호환용
+  hideText = false,
+  isTiltMode = false,
 }) {
   const n = items?.length ?? 0;
-  const isTiltMode = orbitTiltDeg !== 0 || selectedDish !== null;
 
-  const isNarrow = isTiltMode;
+  // 표시할 인덱스 3개 계산
   let visibleIndexes = null;
-  if (isNarrow && n) {
-    visibleIndexes = [
-      ((frontDishIndex - 5) + n) % n,
-      ((frontDishIndex - 4) + n) % n,
-      (frontDishIndex + 5) % n,
-    ];
+  if (n) {
+    if (!isTiltMode) {
+      // 프리-틸트: 45°, 90°, 135°
+      visibleIndexes = [
+        ((frontDishIndex + 1) % n),          // 45°
+        frontDishIndex,                      // 90°
+        ((frontDishIndex - 1 + n) % n),      // 135°
+      ];
+    } else {
+      // 틸트: -45°, -90°, -135°
+      visibleIndexes = [
+        ((frontDishIndex + 5) % n),          // -45°
+        ((frontDishIndex - 4 + n) % n),      // -90°
+        ((frontDishIndex - 5 + n) % n),      // -135°
+      ];
+    }
   }
 
-  const orbitAngle = rotationAngle + (selectedDish ? 180 : 0);
-  const baseTilt = orbitTiltDeg + (selectedDish ? -60 : 0);
+  const baseTilt = orbitTiltDeg;
   const liftY = orbitTiltDeg !== 0 ? -600 : 0;
+  const outerTiltTransform =
+    `translateY(${liftY}px) rotateX(${baseTilt}deg)`;
 
-  const outerTiltTransform = selectedDish
-    ? `translateY(${ -600 + liftY }px) rotateX(${baseTilt}deg)`
-    : `translateY(${ liftY }px) rotateX(${baseTilt}deg)`;
-
-  const innerOrbitTransform = `rotate(${orbitAngle}deg)`;
+  // 180° 스핀 제거: rotationAngle만 사용
+  const innerOrbitTransform =
+    `rotate(${rotationAngle}deg)`;
 
   return (
     <div
@@ -82,28 +91,13 @@ const DishContainer = React.memo(function DishContainer({
         {items.map((dish, index) => {
           const shouldShow = !visibleIndexes || visibleIndexes.includes(index);
 
-          let tilt = 0;
-          let clickable = false;
+          // 클릭 가능: 현재 보여주는 3개만
+          const clickable = shouldShow;
+          const tilt = 0;
 
-          if (!isTiltMode) {
-            // 프리-틸트: 전 접시 클릭 가능(정면만 처리됨)
-            clickable = true;
-          } else {
-            // 틸트 중: center/좌/우만 클릭 가능(기존 유지)
-            if (selectedDish !== null) {
-              if (index === ((frontDishIndex - 1) + n) % n) { tilt = -60; clickable = true; }
-              else if (index === (frontDishIndex + 1) % n)   { tilt = 60;  clickable = true; }
-              else if (index === frontDishIndex)             { tilt = 0;   clickable = true; }
-            } else {
-              clickable = index === frontDishIndex;
-            }
-          }
-
-          // ── 표시 정책
-          // 프리-틸트: 텍스트(제목/부제)만 표시
-          // 틸트: 모든 접시 로고 표시, 정면 접시만 타이틀도 표시
+          // 프리-틸트: 텍스트 보임 / 틸트: 로고표시 및 -90° 타이틀
           const showLogo  = isTiltMode && !!dish.logo;
-          const showTitle = isTiltMode && index === frontDishIndex;
+          const showTitle = isTiltMode && index === ((frontDishIndex - 4 + n) % n); // -90°만 제목
 
           return (
             <FadePresence key={`dish-${index}`} show={shouldShow}>
@@ -112,11 +106,11 @@ const DishContainer = React.memo(function DishContainer({
                 index={index}
                 frontDishIndex={frontDishIndex}
                 scale={dishScales[index] ?? 1}
-                orbitAngle={orbitAngle}
+                orbitAngle={rotationAngle}
                 handleDishClick={handleDishClick}
                 tilt={tilt}
                 clickable={clickable}
-                hideText={!isTiltMode ? false : true}  // 틸트에선 텍스트 기본 숨김
+                hideText={!isTiltMode ? false : true}
                 showLogo={showLogo}
                 showTitle={showTitle}
               />
