@@ -3,13 +3,20 @@ import DishContainer from './DishContainer';
 import FloatingImage from './FloatingImage';
 import KeywordText from './KeywordText';
 import OrbitOverlay from './OrbitOverlay';
-import { dishes } from './dishesData';
+import { dishes as dishesBase, getAIMenuFor } from './dishesData';
 
-// 스냅/제스처 설정
-const STEP_DEG = 45;            // 한 칸 각도
-const WHEEL_STEP = 80;          // wheel 누적 임계치 (트랙패드 감도에 따라 조절)
-const TOUCH_STEP_PX = 40;       // 터치 스크롤 임계치
-const STEP_COOLDOWN_MS = 300;   // 한 스텝 후 쿨다운(궤도 280ms 모션과 맞춤)
+const STEP_DEG = 45;
+const WHEEL_STEP = 80;
+const TOUCH_STEP_PX = 40;
+const STEP_COOLDOWN_MS = 300;
+
+const normalize360 = (deg) => ((deg % 360) + 360) % 360;
+const getFrontIndex = (angleDeg, len) => {
+  if (!len) return 0;
+  const normalized = normalize360(-angleDeg);
+  const rawIndex = Math.round((normalized - 90) / 45);
+  return ((rawIndex % len) + len) % len;
+};
 
 const ClosueStatueSelect = () => {
   const [rotationAngle, setRotationAngle] = useState(0);
@@ -17,84 +24,69 @@ const ClosueStatueSelect = () => {
   const [selectedDish, setSelectedDish] = useState(null);
   const [orbitTiltDeg, setOrbitTiltDeg] = useState(0); // 0 ↔ -70
 
-  // 히스토리
+  // 제목 락
+  const [titleLock, setTitleLock] = useState({ active: false, text: null });
+  const lockTitleWith = useCallback((text) => setTitleLock({ active: true, text }), []);
+  const unlockTitle  = useCallback(() => setTitleLock({ active: false, text: null }), []);
+
+  // 틸트 모드에서 사용할 AI 메뉴 상태
+  const [aiItems, setAiItems] = useState([]);
+
+  const isTilt = orbitTiltDeg !== 0;
+  const items = isTilt ? aiItems : dishesBase;
+
+  const frontDishIndex = useMemo(
+    () => getFrontIndex(rotationAngle, items.length || 0),
+    [rotationAngle, items.length]
+  );
+  const frontDish = useMemo(() => items[frontDishIndex] ?? items[0], [items, frontDishIndex]);
+
+  const titleText = titleLock.active && titleLock.text ? titleLock.text : frontDish.title;
+
+  useEffect(() => {
+    if (!isTilt) unlockTitle();
+  }, [isTilt, unlockTitle]);
+
+  // Back 히스토리
   const [history, setHistory] = useState([]);
   const pushHistory = useCallback(() => {
-    setHistory(prev => [...prev, { rotationAngle, orbitTiltDeg, selectedDish }]);
-  }, [rotationAngle, orbitTiltDeg, selectedDish]);
+    setHistory((prev) => [...prev, { rotationAngle, orbitTiltDeg, selectedDish, titleLock, aiItems }]);
+  }, [rotationAngle, orbitTiltDeg, selectedDish, titleLock, aiItems]);
   const popHistory = useCallback(() => {
-    setHistory(prev => {
+    setHistory((prev) => {
       if (prev.length === 0) return prev;
       const next = prev.slice(0, -1);
       const last = prev[prev.length - 1];
       setRotationAngle(last.rotationAngle);
       setOrbitTiltDeg(last.orbitTiltDeg);
       setSelectedDish(last.selectedDish);
+      setTitleLock(last.titleLock || { active: false, text: null });
+      setAiItems(last.aiItems || []);
       return next;
     });
   }, []);
-
-  // 루트/스크롤 프록시 ref
-  const rootRef = useRef(null);
-  const containerRef = useRef(null);
-
-  // 스냅 제스처 제어
-  const stepLockRef = useRef(false);     // 한 스텝 처리 후 쿨다운 락
-  const wheelAccumRef = useRef(0);       // wheel 누적(deltaY)
-  const lastTouchYRef = useRef(null);    // 터치 시작 y
-  const touchAccumRef = useRef(0);       // 터치 누적
-
-  const frontDishIndex = useMemo(() => {
-    const normalized = ((-rotationAngle % 360) + 360) % 360;
-    const rawIndex = Math.round((normalized - 90) / 45); // 12시 기준
-    return ((rawIndex % dishes.length) + dishes.length) % dishes.length;
-  }, [rotationAngle]);
-
-  const frontDish = dishes[frontDishIndex] ?? dishes[0];
-
-  // UI 상태들
-  const hideText = orbitTiltDeg !== 0;
-  const titleScale = orbitTiltDeg !== 0 ? 2.5 : 1;
-  const descriptionScale = orbitTiltDeg !== 0 ? 2 : 1;
-  const statueScale = orbitTiltDeg !== 0 ? 1.6 : 1;
-  const utensilStyle = {
-    opacity: orbitTiltDeg !== 0 ? 0 : 1,
-    transition: 'opacity 800ms cubic-bezier(0.2, 0.8, 0.2, 1)',
-  };
-  const floatingStyle = {
-    opacity: orbitTiltDeg !== 0 ? 0 : 1,
-    transition: 'opacity 800ms cubic-bezier(0.2, 0.8, 0.2, 1)',
-  };
-  const statueLiftY = orbitTiltDeg !== 0 ? -250 : 0;
-  const statueZ = orbitTiltDeg !== 0 ? 20 : 30;
-
-  const [dishScales, setDishScales] = useState(Array(dishes.length).fill(1));
-  useEffect(() => {
-    setDishScales(prev => prev.map((_, i) => (i === frontDishIndex ? 1.1 : 1)));
-  }, [frontDishIndex]);
-
-  const handleDishClick = useCallback((dish) => {
-    pushHistory();
-    setSelectedDish(dish);
-  }, [pushHistory]);
-
   const canGoBack = history.length > 0;
 
-  // ✅ 한 스텝 회전 공통 함수 (방향: +1 아래/오른쪽, -1 위/왼쪽)
+  // refs & 스냅 회전(휠/터치) — 기존 유지
+  const rootRef = useRef(null);
+  const containerRef = useRef(null);
+  const stepLockRef = useRef(false);
+  const wheelAccumRef = useRef(0);
+  const lastTouchYRef = useRef(null);
+  const touchAccumRef = useRef(0);
+
   const doStep = useCallback((dir) => {
     if (stepLockRef.current) return;
-    setRotationAngle(prev => prev + STEP_DEG * dir * -1); // 기존 시계방향 설정 유지(ROTATION_DIR=-1)
+    setRotationAngle((prev) => prev + STEP_DEG * dir * -1);
     stepLockRef.current = true;
-    setTimeout(() => { stepLockRef.current = false; }, STEP_COOLDOWN_MS);
+    setTimeout(() => (stepLockRef.current = false), STEP_COOLDOWN_MS);
   }, []);
 
-  // ✅ 전역 wheel: 우리 컴포넌트 영역에서만 처리 + 그때만 preventDefault
   useEffect(() => {
     const onWheel = (e) => {
       const root = rootRef.current;
-      if (!root || !root.contains(e.target)) return; // 영역 밖이면 무시
-      e.preventDefault(); // 우리 영역일 때만 기본 스크롤 차단
-
+      if (!root || !root.contains(e.target)) return;
+      e.preventDefault();
       if (stepLockRef.current) return;
       wheelAccumRef.current += e.deltaY;
       if (Math.abs(wheelAccumRef.current) >= WHEEL_STEP) {
@@ -107,29 +99,21 @@ const ClosueStatueSelect = () => {
     return () => window.removeEventListener('wheel', onWheel);
   }, [doStep]);
 
-  // ✅ 전역 터치: 우리 영역에서만 스냅 처리(기본 스크롤은 유지)
   useEffect(() => {
-    const withinRoot = (target) => {
-      const root = rootRef.current;
-      return !!root && root.contains(target);
-    };
-
-    const onTouchStart = (e) => {
-      if (!withinRoot(e.target)) return;
-      if (!e.touches || e.touches.length === 0) return;
+    const within = (t) => rootRef.current && rootRef.current.contains(t);
+    const onStart = (e) => {
+      if (!within(e.target)) return;
+      if (!e.touches?.length) return;
       lastTouchYRef.current = e.touches[0].clientY;
       touchAccumRef.current = 0;
     };
-
-    const onTouchMove = (e) => {
-      if (!withinRoot(e.target)) return;
+    const onMove = (e) => {
+      if (!within(e.target)) return;
       if (stepLockRef.current || lastTouchYRef.current == null) return;
-      if (!e.touches || e.touches.length === 0) return;
-
+      if (!e.touches?.length) return;
       const y = e.touches[0].clientY;
-      const dy = lastTouchYRef.current - y; // 아래로 스와이프 = +dy
+      const dy = lastTouchYRef.current - y;
       lastTouchYRef.current = y;
-
       touchAccumRef.current += dy;
       if (Math.abs(touchAccumRef.current) >= TOUCH_STEP_PX) {
         const dir = touchAccumRef.current > 0 ? 1 : -1;
@@ -137,29 +121,69 @@ const ClosueStatueSelect = () => {
         doStep(dir);
       }
     };
-
-    const onTouchEnd = (e) => {
-      if (!withinRoot(e.target)) return;
+    const onEnd = (e) => {
+      if (!within(e.target)) return;
       lastTouchYRef.current = null;
       touchAccumRef.current = 0;
     };
-
-    window.addEventListener('touchstart', onTouchStart, { passive: true });
-    window.addEventListener('touchmove', onTouchMove, { passive: true });
-    window.addEventListener('touchend', onTouchEnd, { passive: true });
-
+    window.addEventListener('touchstart', onStart, { passive: true });
+    window.addEventListener('touchmove', onMove, { passive: true });
+    window.addEventListener('touchend', onEnd, { passive: true });
     return () => {
-      window.removeEventListener('touchstart', onTouchStart);
-      window.removeEventListener('touchmove', onTouchMove);
-      window.removeEventListener('touchend', onTouchEnd);
+      window.removeEventListener('touchstart', onStart);
+      window.removeEventListener('touchmove', onMove);
+      window.removeEventListener('touchend', onEnd);
     };
   }, [doStep]);
 
-  // 빨간 원 클릭: 상태 저장 후 궤도 기울기 토글
-  const handleOverlayClick = useCallback(() => {
+  // ── 오버레이(붉은 원) 클릭: 틸트 토글
+  const handleOverlayToggle = useCallback(() => {
     pushHistory();
-    setOrbitTiltDeg(prev => (prev === 0 ? -70 : 0));
-  }, [pushHistory]);
+    setOrbitTiltDeg((prev) => {
+      const next = prev === 0 ? -70 : 0;
+      if (prev === 0 && next === -70) {
+        // 진입 시 현재 프리-틸트 정면 카테고리로 AI 메뉴 선택
+        const baseFront = dishesBase[getFrontIndex(rotationAngle, dishesBase.length)] ?? dishesBase[0];
+        const nextMenu = getAIMenuFor(baseFront.title);
+        setAiItems(nextMenu);
+        const aiFront = nextMenu[getFrontIndex(rotationAngle, nextMenu.length)] ?? nextMenu[0];
+        lockTitleWith(frontDish.title);
+      }
+      return next;
+    });
+  }, [pushHistory, rotationAngle, lockTitleWith]);
+
+  // 프리-틸트: 정면 접시만 틸트 진입
+  const handleDishClick = useCallback((dish, index) => {
+    if (!dish) return;
+    if (orbitTiltDeg !== 0) return;
+    // 정면 클릭만 허용
+    const baseFrontIndex = getFrontIndex(rotationAngle, dishesBase.length);
+    if (index !== baseFrontIndex) return;
+
+    const baseFront = dishesBase[baseFrontIndex] ?? dishesBase[0];
+    const nextMenu = getAIMenuFor(baseFront.title);
+    pushHistory();
+    setSelectedDish(dish);
+    setAiItems(nextMenu);
+    const aiFront = nextMenu[getFrontIndex(rotationAngle, nextMenu.length)] ?? nextMenu[0];
+    lockTitleWith(aiFront.title);
+    setOrbitTiltDeg(-70);
+  }, [orbitTiltDeg, rotationAngle, pushHistory, lockTitleWith]);
+
+  // UI 파생(디자인 유지)
+  const titleScale = isTilt ? 2.5 : 1;
+  const descriptionScale = isTilt ? 2 : 1;
+  const statueScale = isTilt ? 1.6 : 1;
+  const utensilStyle  = { opacity: isTilt ? 0 : 1, transition: 'opacity 800ms cubic-bezier(0.2, 0.8, 0.2, 1)' };
+  const floatingStyle = { opacity: isTilt ? 0 : 1, transition: 'opacity 800ms cubic-bezier(0.2, 0.8, 0.2, 1)' };
+  const statueLiftY = isTilt ? -250 : 0;
+  const statueZ = isTilt ? 20 : 30;
+
+  const [dishScales, setDishScales] = useState(() => Array(items.length).fill(1));
+  useEffect(() => {
+    setDishScales(Array(items.length).fill(1).map((_, i) => (i === frontDishIndex ? 1.1 : 1)));
+  }, [items.length, frontDishIndex]);
 
   return (
     <>
@@ -175,7 +199,7 @@ const ClosueStatueSelect = () => {
       )}
 
       <div ref={rootRef} className="relative w-screen h-screen overflow-hidden bg-gradient-to-b from-orange-400 to-orange-500">
-        {/* Scroll proxy (실제 스크롤은 막고 wheel/touch로만 회전 제어) */}
+        {/* Scroll proxy */}
         <div
           ref={containerRef}
           className="absolute inset-0 overflow-y-auto z-50 scrollbar-hide"
@@ -184,32 +208,20 @@ const ClosueStatueSelect = () => {
           <div className="h-[1000vh]" />
         </div>
 
-        {/* Title / description */}
+        {/* Title / description (상단) */}
         <div className="absolute top-20 left-1/2 -translate-x-1/2 text-center z-20 pointer-events-none">
           <h1
             className="text-6xl font-bold text-black mb-4 font-koolegant"
-            style={{
-              transform: `scale(${titleScale})`,
-              transformOrigin: 'center bottom',
-              transition: 'transform 800ms cubic-bezier(0.2, 0.8, 0.2, 1)',
-            }}
+            style={{ transform: `scale(${titleScale})`, transformOrigin: 'center', transition: 'transform 800ms cubic-bezier(0.2, 0.8, 0.2, 1)' }}
           >
-            {frontDish.title}
+            {titleText}
           </h1>
-          <p
-            className="text-xl text-black"
-            style={{
-              transform: `scale(${descriptionScale})`,
-              transformOrigin: 'center bottom',
-              transition: 'opacity 0ms', // opacity 추가
-              opacity: descriptionScale === 1 ? 1 : 0, // descriptionScale에 따라 투명도 조정
-            }}
-          >
+          <p className="text-xl text-black" style={{ transform: `scale(${descriptionScale})`, transformOrigin: 'center', transition: 'opacity 0ms', opacity: descriptionScale === 1 ? 1 : 0 }}>
             {frontDish.description}
           </p>
         </div>
 
-        {/* Floating decor — 빨간 원 클릭 시 페이드아웃 */}
+        {/* Floating decor */}
         <div style={floatingStyle}>
           <FloatingImage src="/images/main-page/flower.png" alt="Flower" className="bottom-[392px] left-[160px] w-[300px] h-[300px] z-0" />
           <FloatingImage src="/images/main-page/cup.png" alt="Cup" className="bottom-[375px] left-[360px] w-[200px] h-[200px] z-0" />
@@ -217,8 +229,8 @@ const ClosueStatueSelect = () => {
           <FloatingImage src="/images/main-page/glass.png" alt="Glass" className="bottom-[392px] right-[160px] w-[300px] h-[300px] z-0" />
         </div>
 
-        {/* Keywords — 궤도 기울면 숨김 */}
-        {!hideText && (
+        {/* 프리-틸트 키워드 */}
+        {!isTilt && (
           <>
             <KeywordText className="bottom-[470px] left-[290px] -translate-x-1/2" fontSizeClass="text-lg">{frontDish.kw1}</KeywordText>
             <KeywordText className="bottom-[450px] left-[290px] -translate-x-1/2" fontSizeClass="text-sm">{frontDish.ekw1}</KeywordText>
@@ -231,30 +243,45 @@ const ClosueStatueSelect = () => {
           </>
         )}
 
-        {/* Utensils (포크/스푼 등) */}
-        <img src="/images/main-page/spoon.png" alt="Spoon" className="absolute bottom-[280px] right-[450px] w-[300px] h-[300px] object-contain z-20 pointer-events-none" style={utensilStyle} />
-        <img src="/images/main-page/knife.png" alt="Knife" className="absolute bottom-[150px] left-[400px] w-[300px] h-[300px] object-contain z-20 pointer-events-none" style={utensilStyle} />
-        <img src="/images/main-page/fork1.png" alt="Fork1" className="absolute bottom-[280px] right-[500px] w-[150px] h-[150px] object-contain z-20 pointer-events-none" style={utensilStyle} />
-        <img src="/images/main-page/fork2.png" alt="Fork2" className="absolute bottom-[280px] left-[450px] w-[300px] h-[300px] object-contain z-20 pointer-events-none" style={utensilStyle} />
+        {/* ── Tilt UI ───────────────── */}
+        {isTilt && (
+          <>
+            <div className='absolute flex left-1/2 -translate-x-1/2 bottom-[20px] h-[160px] rounded-[25px] z-[25] shadow-lg items-center'>
+              {/* 하단 설명 패널 */}
+              <div className="relative
+              h-full w-[1000px] rounded-l-[24px]
+              bg-white bg-opacity-[40%]">
+              </div>
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <p className="text-black text-[18px] text-center leading-[1.7] font-pretendard font-medium whitespace-pre-line">
+                    {frontDish.description}
+                  </p>
+                </div>
+
+              {/* 우측 Ingredient 박스 */}
+              <div className="relative flex flex-col items-center justify-center
+              h-full w-[300px] rounded-r-[24px]
+              bg-black bg-opacity-[70%]">
+                <div className="text-[40px] font-koolegant mb-2">Ingredient</div>
+                <div className="text-[16px] font-pretendard text-white">
+                  {[frontDish.kw1, frontDish.kw2, frontDish.kw3].filter(Boolean).join(', ')}
+                  {frontDish.kw4 ? `, ${frontDish.kw4}` : ''}
+                </div>
+              </div>
+            </div>
+          </>
+        )}
 
         {/* Statue */}
         <div
           className="absolute bottom-0 left-1/2 pointer-events-none"
-          style={{
-            zIndex: statueZ,
-            transform: `translateX(-50%) translateY(${statueLiftY}px)`,
-            transition: 'transform 2000ms cubic-bezier(0.2, 0.8, 0.2, 1)',
-          }}
+          style={{ zIndex: isTilt ? 20 : 30, transform: `translateX(-50%) translateY(${isTilt ? -250 : 0}px)`, transition: 'transform 2000ms cubic-bezier(0.2, 0.8, 0.2, 1)' }}
         >
           <img
             src="/images/main-page/statue.png"
             alt="석상"
             className="w-96 h-[250px] object-contain"
-            style={{
-              transform: `scale(${statueScale})`,
-              transformOrigin: 'bottom center',
-              transition: 'transform 1000ms cubic-bezier(0.2, 0.8, 0.2, 1)',
-            }}
+            style={{ transform: `scale(${isTilt ? 1.6 : 1})`, transformOrigin: 'bottom center', transition: 'transform 1000ms cubic-bezier(0.2, 0.8, 0.2, 1)' }}
           />
         </div>
 
@@ -268,26 +295,28 @@ const ClosueStatueSelect = () => {
           }}
         >
           <DishContainer
+            items={items}
             rotationAngle={rotationAngle}
             orbitTiltDeg={orbitTiltDeg}
             frontDishIndex={frontDishIndex}
             dishScales={dishScales}
             handleDishClick={handleDishClick}
             selectedDish={selectedDish}
-            hideText={hideText}
+            hideText={false}
           />
 
           <OrbitOverlay
+            items={items}
             rotationAngle={rotationAngle}
             orbitTiltDeg={orbitTiltDeg}
             frontDishIndex={frontDishIndex}
             dishScales={dishScales}
             selectedDish={selectedDish}
-            onCircleClick={handleOverlayClick}
+            onCircleClick={handleOverlayToggle}
           />
         </div>
 
-        {/* Back(Undo) 버튼 */}
+        {/* Back 버튼 */}
         <button
           onClick={() => canGoBack && popHistory()}
           disabled={!canGoBack}
