@@ -69,6 +69,103 @@ const FadeSection = ({ children }) => {
   );
 };
 
+const Highlight = ({ children }) => {
+  return (
+    <motion.span
+      className="relative font-extrabold text-5xl px-2 py-1 inline-block"
+      initial={{ backgroundSize: "0% 100%" }}
+      whileInView={{ backgroundSize: "100% 100%" }}
+      viewport={{ once: true }}
+      transition={{ duration: 1.3, ease: "easeInOut" }}
+      style={{
+        backgroundImage:
+          "linear-gradient(90deg, rgba(255,195,0,0.6) 0%, rgba(255,195,0,1) 50%, rgba(255,195,0,0.7) 100%)",
+        backgroundRepeat: "no-repeat",
+        backgroundPosition: "left center",
+        backgroundSize: "0% 100%",
+        filter: "blur(0.6px) brightness(1.1)",
+        // 🎨 아래 3줄이 '삐뚤한' 효과 핵심입니다.
+        transform: "rotate(-1.5deg) skewX(-3deg)",
+        borderRadius: "6px",
+        clipPath: "polygon(0% 10%, 100% 0%, 100% 90%, 0% 100%)", // 위아래가 약간 비틀림
+      }}
+    >
+      {children}
+    </motion.span>
+  );
+};
+
+const HighlightBox = ({ children, rotate = true }) => {
+  // 랜덤하게 살짝 기울이기 (자연스러움)
+  const randomTilt = rotate ? (Math.random() * 2 - 1.2).toFixed(1) : 0;
+
+  return (
+    <motion.div
+      className="relative inline-block group"
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.8, ease: "easeOut" }}
+    >
+      {/* 형광펜 질감 배경 */}
+      <div
+        className="absolute inset-0 rounded-2xl bg-gradient-to-r from-[#FFD60A]/80 to-[#FFC300]/90 blur-[3px]"
+        style={{
+          transform: `rotate(${randomTilt}deg)`,
+          clipPath: "polygon(0% 10%, 100% 0%, 100% 90%, 0% 100%)",
+        }}
+      ></div>
+
+      {/* 실제 카드 */}
+      <div
+        className="relative px-12 py-8 bg-white rounded-2xl border-[4px] border-[#FFC300]
+                   shadow-[0_6px_20px_rgba(0,0,0,0.1)] transition-transform duration-300
+                   hover:rotate-[1deg] hover:scale-[1.02]"
+      >
+        <p className="text-black font-pretendard text-5xl font-medium leading-snug text-center">
+          {children}
+        </p>
+      </div>
+    </motion.div>
+  );
+};
+
+const GPTAnswerBox = ({ children, title = "GPT의 답변" }) => {
+  return (
+    <div className="w-full flex flex-col items-center justify-center gap-8 py-[120px]">
+      {/* 🔹 제목 */}
+      <div className="text-black font-pretendard text-4xl font-bold">
+        {title}
+      </div>
+
+      {/* 💬 답변 박스 */}
+      <motion.div
+        initial={{ scale: 0.85, opacity: 0 }}
+        whileInView={{ scale: 1, opacity: 1 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.7, ease: "easeOut" }}
+        className="relative px-32 py-10 rounded-3xl text-black text-5xl font-semibold font-pretendard
+                   shadow-[0_10px_20px_rgba(0,0,0,0.15)] border border-[#e2b000]
+                   bg-gradient-to-r from-[#FFD60A] via-[#FFC300] to-[#FFB000]"
+      >
+        {/* ✨ 형광펜 질감 */}
+        <div
+          className="absolute inset-0 rounded-3xl"
+          style={{
+            backgroundImage:
+              "radial-gradient(rgba(255,255,255,0.25) 1px, transparent 1px)",
+            backgroundSize: "12px 12px",
+            mixBlendMode: "overlay",
+          }}
+        ></div>
+
+        {/* 🧠 GPT 텍스트 */}
+        <p className="relative z-10 text-center leading-snug">{children}</p>
+      </motion.div>
+    </div>
+  );
+};
+
 // Section 1: 헤더
 const SectionHeader = () => {
   return (
@@ -182,34 +279,18 @@ const SectionZeroExplain = () => {
     <div className="w-full flex items-center justify-center py-[0px]">
       <div className="text-black text-center font-pretendard text-4xl font-medium leading-relaxed">
         <p className="mb-4">
-          자 먼저 이건{" "}
-          <span className="bg-[#FFC300] px-2 py-1 text-5xl font-extrabold">
-            zero-shot
-          </span>{" "}
-          이에요.
+          자 먼저 이건 <Highlight>zero-shot</Highlight> 이에요.
         </p>
         <p className="mb-4">
-          보이는 것처럼{" "}
-          <span className="bg-[#FFC300] px-2 py-1 text-5xl font-extrabold">
-            비어있는 샷
-          </span>{" "}
+          보이는 것처럼 <Highlight>비어있는 샷</Highlight>
           이죠.
         </p>
         <p className="mb-4">
-          이{" "}
-          <span className="bg-[#FFC300] px-2 py-1 text-5xl font-extrabold">
-            zero-shot
-          </span>{" "}
-          은 다음과 같이{" "}
-          <span className="bg-[#FFC300] px-2 py-1 text-5xl font-extrabold">
-            예시를 제시하지 않고
-          </span>
+          이 <Highlight>zero-shot</Highlight> 은 다음과 같이{" "}
+          <Highlight>예시를 제시하지 않고</Highlight>
         </p>
         <p>
-          <span className="bg-[#FFC300] px-2 py-1 text-5xl font-extrabold">
-            명령어를 입력
-          </span>{" "}
-          하는 방식이에요.
+          <Highlight>명령어를 입력</Highlight> 하는 방식이에요.
         </p>
       </div>
     </div>
@@ -221,9 +302,9 @@ const SectionExample = () => {
   return (
     <div className="w-full flex flex-col items-center justify-center gap-8 py-[158px]">
       {/* 예시 박스 */}
-      <div className="text-black border-6 border-[#FFC300] px-1 py-4 font-pretendard text-5xl font-medium">
+      <HighlightBox>
         I love apples 라는 영어 문장을 한국어로 번역해줘
-      </div>
+      </HighlightBox>
 
       {/* 설명 텍스트 */}
       <div className="text-black font-pretendard text-4xl font-medium">
@@ -238,14 +319,9 @@ const SectionGPTAnswer = () => {
   return (
     <div className="w-full flex flex-col items-center justify-center gap-8 py-[0px]">
       {/* GPT의 답변 제목 */}
-      <div className="text-black font-pretendard text-4xl font-bold">
-        GPT의 답변
-      </div>
 
       {/* 답변 박스 */}
-      <div className="text-black bg-[#FFC300] border border-black px-64 py-6 font-pretendard text-5xl font-semibold">
-        나는 사과를 좋아한다
-      </div>
+      <GPTAnswerBox>나는 사과를 좋아한다</GPTAnswerBox>
     </div>
   );
 };
@@ -290,17 +366,34 @@ const SectionVStatue = () => {
       </div>
 
       {/* 밑줄 이미지 */}
-      <img
-        src="/images/gpt-study/few-shot/Underline.png"
-        alt="Underline"
-        className="absolute"
+      <motion.div
+        className="absolute overflow-hidden"
         style={{
           left: "0px",
           top: "705px",
           width: "1182px",
           height: "107px",
+          borderRadius: "4px",
         }}
-      />
+        initial={{ opacity: 0 }}
+        whileInView={{ opacity: 1 }}
+        viewport={{ once: false, amount: 0.5 }}
+        transition={{ duration: 0.3 }}
+      >
+        <motion.div
+          className="h-full w-full"
+          style={{
+            backgroundImage: "url('/images/gpt-study/few-shot/Underline.png')",
+            backgroundRepeat: "no-repeat",
+            backgroundSize: "100% 100%",
+            transformOrigin: "left center",
+          }}
+          initial={{ scaleX: 0 }}
+          whileInView={{ scaleX: 1 }}
+          viewport={{ once: false, amount: 0.5 }}
+          transition={{ duration: 1.8, ease: "easeInOut" }}
+        />
+      </motion.div>
     </div>
   );
 };
@@ -404,33 +497,20 @@ const SectionFewExplain = () => {
     <div className="text-black w-full flex items-center justify-center py-[0px] pb-[50px]">
       <div className="text-center font-pretendard text-4xl font-medium leading-relaxed">
         <p className="mb-4">
-          자, 이번엔{" "}
-          <span className="bg-[#FFC300] px-2 py-1 text-5xl font-extrabold">
-            few-shot
-          </span>{" "}
+          자, 이번엔 <Highlight>few-shot</Highlight>
           이에요.
         </p>
         <p className="mb-4">
-          이번엔 비어 있지 않은,{" "}
-          <span className="bg-[#FFC300] px-2 py-1 text-5xl font-extrabold">
-            조금 찬 샷
-          </span>{" "}
-          이라고 생각해볼게요.
+          이번엔 비어 있지 않은, <Highlight>조금 찬 샷</Highlight> 이라고
+          생각해볼게요.
         </p>
         <p className="mb-4">
-          <span className="bg-[#FFC300] px-2 py-1 text-5xl font-extrabold">
-            few-shot
-          </span>{" "}
-          은 다음과 같이{" "}
-          <span className="bg-[#FFC300] px-2 py-1 text-5xl font-extrabold">
-            예시를 먼저 제시한 뒤
-          </span>
+          <Highlight>few-shot</Highlight> 은 다음과 같이{" "}
+          <Highlight>예시를 먼저 제시한 뒤</Highlight>
         </p>
         <p>
-          <span className="bg-[#FFC300] px-2 py-1 text-5xl font-extrabold">
-            그 패턴을 따라
-          </span>{" "}
-          새로운 결과를 만들어내는 방식이에요.
+          <Highlight>그 패턴을 따라</Highlight> 새로운 결과를 만들어내는
+          방식이에요.
         </p>
       </div>
     </div>

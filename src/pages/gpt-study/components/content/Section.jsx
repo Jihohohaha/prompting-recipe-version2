@@ -13,8 +13,10 @@ import Recipe3TutorialExplain from "./tabs/expanded/tutorial/Recipe3TutorialExpl
 import Recipe3TutorialExample from "./tabs/expanded/tutorial/Recipe3TutorialExample";
 import Recipe4TutorialExplain from "./tabs/expanded/tutorial/Recipe4TutorialExplain";
 import Recipe4TutorialExample from "./tabs/expanded/tutorial/Recipe4TutorialExample";
-import Recipe6TutorialExplain from "./tabs/expanded/tutorial/Recipe6TutorialExplain";
 import Recipe5TutorialExplain from "./tabs/expanded/tutorial/Recipe5TutorialExplain";
+import Recipe5TutorialExample from "./tabs/expanded/tutorial/Recipe5TutorialExample";
+import Recipe6TutorialExplain from "./tabs/expanded/tutorial/Recipe6TutorialExplain";
+import Recipe6TutorialExample from "./tabs/expanded/tutorial/Recipe6TutorialExample";
 
 // Quiz Container import (✅ 추가)
 import Recipe1QuizContainer from "./tabs/expanded/quiz/Recipe1QuizContainer";
@@ -124,6 +126,12 @@ const Section = ({ recipe, index }) => {
       return (
         <>
           <Recipe5TutorialExplain />
+
+          {/* Gap - 검은색 배경이 보이는 구간 */}
+          <div className="w-full h-12"></div>
+
+          {/* Example 컴포넌트 (버튼 포함) */}
+          <Recipe5TutorialExample recipeId={recipe.id} index={index} />
         </>
       );
     }
@@ -133,6 +141,12 @@ const Section = ({ recipe, index }) => {
       return (
         <>
           <Recipe6TutorialExplain />
+
+          {/* Gap - 검은색 배경이 보이는 구간 */}
+          <div className="w-full h-12"></div>
+
+          {/* Example 컴포넌트 (버튼 포함) */}
+          <Recipe6TutorialExample recipeId={recipe.id} index={index} />
         </>
       );
     }
