@@ -47,7 +47,7 @@ const Section = ({ recipe, index }) => {
       <div
         className="overflow-hidden transition-all duration-1200 ease-in-out"
         style={{
-          maxHeight: isTutorialExpanded ? '10000px' : '0',
+          maxHeight: isTutorialExpanded ? '90000px' : '0',
           opacity: isTutorialExpanded ? 1 : 0,
         }}
       >
