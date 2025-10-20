@@ -155,7 +155,7 @@ const OpenedClosue = ({ onComplete }) => {
               <div 
                 className='font-stretch'
                 style={{
-                  background: 'linear-gradient(to bottom, #f97316, #ea580c, #dc2626)',
+                  background: 'linear-gradient(to bottom, #FF6C43, #FF6C43, #ffffff)',
                   WebkitBackgroundClip: 'text',
                   WebkitTextFillColor: 'transparent',
                   backgroundClip: 'text'
@@ -166,7 +166,7 @@ const OpenedClosue = ({ onComplete }) => {
               <div 
                 className='font-desira'
                 style={{
-                  background: 'linear-gradient(to bottom, #f97316, #ea580c, #dc2626)',
+                  background: 'linear-gradient(to bottom, #FF6C43, #FF6C43, #ffffff)',
                   WebkitBackgroundClip: 'text',
                   WebkitTextFillColor: 'transparent',
                   backgroundClip: 'text'

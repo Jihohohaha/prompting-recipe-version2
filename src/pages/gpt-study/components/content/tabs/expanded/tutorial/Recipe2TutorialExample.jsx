@@ -90,19 +90,30 @@ const FadeSection = ({ children }) => {
 const Section1 = () => {
   return (
     <div className="text-black w-full flex items-center justify-center">
-      <div className="bg-[#FFC300] rounded-b-full w-[1200px] h-[400px] pt-16">
-        <div className="text-center text-3xl font-pretendard leading-loose">
+      {/* 🟡 노른자 느낌 배경 */}
+      <div
+        className="w-[1200px] h-[400px] pt-16 flex flex-col justify-center items-center text-center rounded-b-[180px]"
+        style={{
+          background: "radial-gradient(circle at 50% 30%, #FFE88C, #FFD84D)",
+          borderBottom: "5px solid #E5A33C",
+          boxShadow:
+            "inset 0 -8px 15px rgba(180,120,30,0.25), 0 10px 20px rgba(255,180,50,0.4)",
+        }}
+      >
+        <div className="font-semibold text-4xl font-pretendard leading-loose mt-[-20px]">
           <p>사람에게 "문제를 풀어봐"라고 할 때, 문제만 던지면 헷갈리잖아요.</p>
           <p>
             그런데{" "}
-            <span className="text-4xl font-extrabold">
+            <span className="text-4xl font-extrabold text-[#E5A33C]">
               비슷한 문제 몇 개와 그 답
             </span>{" "}
             을 같이 보여주면?
           </p>
           <p>"아 이런 식으로 풀면 되는구나" 하고 감을 잡을 수 있죠.</p>
           <p>
-            <span className="text-4xl font-extrabold">모델도 똑같습니다.</span>
+            <span className="text-4xl font-extrabold text-[#E5A33C]">
+              모델도 똑같습니다.
+            </span>
           </p>
         </div>
       </div>
