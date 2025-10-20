@@ -4,7 +4,7 @@ import { DISH_SIZE, RADIUS } from './dishesData';
 const TILT_MS = 800;
 const FADE_MS = 280;
 
-function FadePresence({ show, children, style = {}, className = '' }) {
+function FadePresence({ show, children, style = {}, className = '', instant = false }) {
   const [render, setRender] = useState(show);
   const [visible, setVisible] = useState(false);
 
@@ -13,11 +13,16 @@ function FadePresence({ show, children, style = {}, className = '' }) {
       if (!render) setRender(true);
       requestAnimationFrame(() => setVisible(true));
     } else {
+      if (instant) {
+        setRender(false);
+        setVisible(false);
+        return;
+      }
       setVisible(false);
       const t = setTimeout(() => setRender(false), FADE_MS);
       return () => clearTimeout(t);
     }
-  }, [show, render]);
+  }, [show, render, instant]);
 
   if (!render) return null;
 
@@ -27,7 +32,7 @@ function FadePresence({ show, children, style = {}, className = '' }) {
       style={{
         opacity: visible ? 1 : 0,
         transform: visible ? 'scale(1)' : 'scale(0.92)',
-        transition: `opacity ${FADE_MS}ms ease, transform ${FADE_MS}ms ease`,
+        transition: instant ? 'none' : `opacity ${FADE_MS}ms ease, transform ${FADE_MS}ms ease`,
         willChange: 'opacity, transform',
         transformOrigin: '50% 0%',
         ...style,
@@ -47,6 +52,7 @@ const OrbitOverlay = React.memo(function OrbitOverlay({
   selectedDish,
   onCircleClick, // 호환용(미사용)
   isTiltMode = false,
+  instant = false, // ⬅️ 틸트 진입 프레임에 즉시 숨김
 }) {
   const n = items?.length ?? 0;
 
@@ -99,7 +105,7 @@ const OrbitOverlay = React.memo(function OrbitOverlay({
           const size = Math.max(0, DISH_SIZE - 40); // 디자인 유지
 
           return (
-            <FadePresence key={`overlay-${index}`} show={shouldShow}>
+            <FadePresence key={`overlay-${index}`} show={shouldShow} instant={instant}>
               <div
                 className="absolute"
                 style={{

@@ -4,27 +4,37 @@ import DishItem from './DishItem';
 const TILT_MS = 800;
 const FADE_MS = 280;
 
-function FadePresence({ show, children, style = {}, className = '' }) {
+function FadePresence({ show, children, style = {}, className = '', instant = false }) {
   const [render, setRender] = useState(show);
   const [visible, setVisible] = useState(false);
+
   useEffect(() => {
     if (show) {
       if (!render) setRender(true);
+      // 등장 시에는 기존 페이드 유지
       requestAnimationFrame(() => setVisible(true));
     } else {
+      if (instant) {
+        // 즉시 언마운트(사라짐 모션 없음)
+        setRender(false);
+        setVisible(false);
+        return;
+      }
       setVisible(false);
       const t = setTimeout(() => setRender(false), FADE_MS);
       return () => clearTimeout(t);
     }
-  }, [show, render]);
+  }, [show, render, instant]);
+
   if (!render) return null;
+
   return (
     <div
       className={className}
       style={{
         opacity: visible ? 1 : 0,
         transform: visible ? 'scale(1)' : 'scale(0.92)',
-        transition: `opacity ${FADE_MS}ms ease, transform ${FADE_MS}ms ease`,
+        transition: instant ? 'none' : `opacity ${FADE_MS}ms ease, transform ${FADE_MS}ms ease`,
         willChange: 'opacity, transform',
         ...style,
       }}
@@ -44,6 +54,7 @@ const DishContainer = React.memo(function DishContainer({
   selectedDish,    // 디자인 호환용
   hideText = false,
   isTiltMode = false,
+  instant = false, // ⬅️ 틸트 진입 프레임에 즉시 숨김
 }) {
   const n = items?.length ?? 0;
 
@@ -53,28 +64,26 @@ const DishContainer = React.memo(function DishContainer({
     if (!isTiltMode) {
       // 프리-틸트: 45°, 90°, 135°
       visibleIndexes = [
-        ((frontDishIndex + 1) % n),          // 45°
-        frontDishIndex,                      // 90°
-        ((frontDishIndex - 1 + n) % n),      // 135°
+        ((frontDishIndex + 1) % n),
+        frontDishIndex,
+        ((frontDishIndex - 1 + n) % n),
       ];
     } else {
       // 틸트: -45°, -90°, -135°
       visibleIndexes = [
-        ((frontDishIndex + 5) % n),          // -45°
-        ((frontDishIndex - 4 + n) % n),      // -90°
-        ((frontDishIndex - 5 + n) % n),      // -135°
+        ((frontDishIndex + 5) % n),
+        ((frontDishIndex - 4 + n) % n),
+        ((frontDishIndex - 5 + n) % n),
       ];
     }
   }
 
   const baseTilt = orbitTiltDeg;
   const liftY = orbitTiltDeg !== 0 ? -600 : 0;
-  const outerTiltTransform =
-    `translateY(${liftY}px) rotateX(${baseTilt}deg)`;
+  const outerTiltTransform = `translateY(${liftY}px) rotateX(${baseTilt}deg)`;
 
   // 180° 스핀 제거: rotationAngle만 사용
-  const innerOrbitTransform =
-    `rotate(${rotationAngle}deg)`;
+  const innerOrbitTransform = `rotate(${rotationAngle}deg)`;
 
   return (
     <div
@@ -100,7 +109,7 @@ const DishContainer = React.memo(function DishContainer({
           const showTitle = isTiltMode && index === ((frontDishIndex - 4 + n) % n); // -90°만 제목
 
           return (
-            <FadePresence key={`dish-${index}`} show={shouldShow}>
+            <FadePresence key={`dish-${index}`} show={shouldShow} instant={instant}>
               <DishItem
                 dish={dish}
                 index={index}

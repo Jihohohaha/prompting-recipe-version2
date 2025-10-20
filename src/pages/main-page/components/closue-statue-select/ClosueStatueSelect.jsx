@@ -63,8 +63,8 @@ const ClosueStatueSelect = () => {
   // 틸트 모드에서의 아이템 세트
   const [aiItems, setAiItems] = useState([]);
 
-  // 프리-틸트에서 마지막으로 클릭해 12시에 스냅시키려던 인덱스(필요 시)
-  const [pendingBaseIndex, setPendingBaseIndex] = useState(null);
+  // 틸트 진입 프레임에서만 즉시 숨김 플래그
+  const [instantHide, setInstantHide] = useState(false);
 
   const isTilt = orbitTiltDeg !== 0;
   const items  = isTilt ? aiItems : dishesBase;
@@ -196,8 +196,12 @@ const ClosueStatueSelect = () => {
     setAiItems(nextMenu);
     lockTitleWith(baseDish.title);
 
-    // 틸트만 적용(회전 효과 없음)
+    // ⬇️ 틸트 진입 프레임: 사라질 접시들 즉시 언마운트
+    setInstantHide(true);
     setOrbitTiltDeg(-70);
+    // 다음 틱에 해제(다음부터는 기존 페이드 동작 유지)
+    setTimeout(() => setInstantHide(false), 0);
+
     setPendingBaseIndex(null);
   }, [pushHistory, lockTitleWith]);
 
@@ -219,7 +223,7 @@ const ClosueStatueSelect = () => {
     if (index === right) { doStep(1);  return; }     // 45° → 반시계 45°
     if (index === left)  { doStep(-1); return; }     // 135° → 시계 45°
     if (index === center) {
-      // 바로 틸트 진입(숨김/스핀 없음)
+      // 바로 틸트 진입(숨김/스핀 없음, 틸트 프레임에 즉시 언마운트)
       enterTiltWithCategoryAtFront(center);
       return;
     }
@@ -320,7 +324,7 @@ const ClosueStatueSelect = () => {
           </>
         )}
 
-        {/* 하단 틸트 UI(설명+재료) */}
+        {/* 하단 틸트 UI(설명+재료) : 틸트 시 -90° 위치의 접시 기준으로 표시 */}
         {isTilt && (
           <div className='absolute flex left-1/2 -translate-x-1/2 bottom-[20px] h-[160px] rounded-[25px] z-[25] shadow-lg items-center'>
             <div className="relative h-full w-[1000px] rounded-l-[24px] bg-white bg-opacity-[40%]"></div>
@@ -380,6 +384,7 @@ const ClosueStatueSelect = () => {
             selectedDish={null}
             hideText={false}
             isTiltMode={isTilt}
+            instant={instantHide}           // ⬅️ 틸트 프레임에만 즉시 언마운트
           />
 
           <OrbitOverlay
@@ -391,6 +396,7 @@ const ClosueStatueSelect = () => {
             selectedDish={null}
             onCircleClick={handleOverlayToggle}
             isTiltMode={isTilt}
+            instant={instantHide}           // ⬅️ 동일
           />
         </div>
 
