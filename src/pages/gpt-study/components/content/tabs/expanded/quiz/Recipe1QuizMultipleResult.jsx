@@ -1,20 +1,13 @@
 // src/pages/gpt-study/components/content/tabs/expanded/quiz/Recipe1QuizMultipleResult.jsx
-import { useSearchParams } from 'react-router-dom';
 import { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 
 const Recipe1QuizMultipleResult = ({ score, onRetry, onNext }) => {
-  const [searchParams] = useSearchParams();
-  const urlScore = searchParams.get('score');
-  const finalScore = score ?? parseInt(urlScore) ?? 0;
+  const isSuccess = score === 3;
   
-  const isSuccess = finalScore === 3;
-  
-  console.log('finalScore:', finalScore);
-  console.log('isSuccess:', isSuccess);
+  console.log('Result rendered:', { score, isSuccess });
   
   return (
-    <div className="overflow-hidden">
+    <div className="w-full">
       {isSuccess ? (
         <SuccessResult onNext={onNext} />
       ) : (
@@ -24,35 +17,22 @@ const Recipe1QuizMultipleResult = ({ score, onRetry, onNext }) => {
   );
 }
 
+// ✅ Reference 패턴: GSAP Timeline으로 제어
 const SuccessResult = ({ onNext }) => {
   const [showEssayIntro, setShowEssayIntro] = useState(false);
 
-  const handleNext = () => {
+  const handleShowIntro = () => {
     setShowEssayIntro(true);
   };
 
   return (
-    <AnimatePresence mode="wait">
+    <div className="relative w-full">
       {!showEssayIntro ? (
-        <motion.div
-          key="success"
-          initial={{ opacity: 1 }}
-          exit={{ opacity: 1 }}
-          transition={{ duration: 0.5 }}
-        >
-          <SuccessScreen onNext={handleNext} />
-        </motion.div>
+        <SuccessScreen onNext={handleShowIntro} />
       ) : (
-        <motion.div
-          key="essay-intro"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 1.5 }}
-        >
-          <EssayIntroScreen onNext={onNext} />
-        </motion.div>
+        <EssayIntroScreen onNext={onNext} />
       )}
-    </AnimatePresence>
+    </div>
   );
 };
 
@@ -150,7 +130,6 @@ const EssayIntroScreen = ({ onNext }) => {
           이 레시피가 완성되면, 석상이는 드디어 말하고 생각하는 존재로 깨어날 거예요.
         </p>
 
-      {/* ✅ 클릭 시 Essay로 이동하는 버튼 추가 */}
       <button
         onClick={onNext}
         className="absolute bottom-[20px] right-12 bg-[#FE7525] text-white text-xl font-pretendard px-8 py-3 rounded-full hover:bg-[#FF8C42] transition-colors"
