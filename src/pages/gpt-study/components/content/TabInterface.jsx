@@ -38,7 +38,7 @@ const TabInterface = ({ recipe }) => {
   };
 
   return (
-    <div className="w-full">
+    <div id={`tab-interface-${recipe.id}`} className="w-full">
       <div className='w-full rounded-full h-8 flex items-center justify-left px-6 mb-3'
         style={{ backgroundColor: hexToRgba(primaryColor, 0.88) }}>
         <div className="text-white font-bold text-sm">

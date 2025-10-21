@@ -8,6 +8,9 @@ const useGPTStudyStore = create((set) => ({
   // 펼쳐진 탭 정보 { recipeId: number, tabId: string }
   expandedContent: null,
   
+  // ✅ 프로그래매틱 스크롤 플래그
+  isProgrammaticScroll: false,
+  
   // 액션들
   setActiveSection: (index) => set({ activeSection: index }),
   
@@ -26,6 +29,9 @@ const useGPTStudyStore = create((set) => ({
   
   // 접기
   collapseContent: () => set({ expandedContent: null }),
+  
+  // ✅ 프로그래매틱 스크롤 플래그 설정
+  setProgrammaticScroll: (value) => set({ isProgrammaticScroll: value }),
 }));
 
 export default useGPTStudyStore;

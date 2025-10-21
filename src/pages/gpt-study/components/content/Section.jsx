@@ -27,7 +27,7 @@ gsap.registerPlugin(ScrollTrigger);
 
 const Section = ({ recipe, index }) => {
   const { tab } = useParams();
-  const { expandedContent } = useGPTStudyStore();
+  const { expandedContent, setProgrammaticScroll } = useGPTStudyStore();
   
   const timelineRef = useRef(null);
   const tutorialRef = useRef(null);
@@ -39,7 +39,7 @@ const Section = ({ recipe, index }) => {
   const isQuizExpanded = expandedContent?.recipeId === recipe.id && tab === "quiz";
   const isChatExpanded = expandedContent?.recipeId === recipe.id && tab === "chat";
 
-  // ✅ Reference 패턴: GSAP Timeline으로 열림/닫힘 관리
+  // ✅ Reference 패턴: GSAP Timeline으로 열림/닫힘 + 스크롤 관리
   useEffect(() => {
     // 기존 timeline 정리
     if (timelineRef.current) {
@@ -55,14 +55,14 @@ const Section = ({ recipe, index }) => {
       }
     });
 
-    const container = document.querySelector('main'); // Content의 스크롤 컨테이너
+    const container = document.querySelector('main');
 
     // Tutorial 처리
     if (tutorialRef.current && container) {
       if (isTutorialExpanded) {
         console.log(`📖 Opening Tutorial for Recipe ${recipe.id}`);
         
-        // ✅ Reference: 즉시 열림
+        // 1. 즉시 열림
         timelineRef.current.to(tutorialRef.current, {
           height: "auto",
           overflow: "unset",
@@ -70,21 +70,40 @@ const Section = ({ recipe, index }) => {
           duration: 0
         }, 0);
 
-        // ✅ Reference: 스크롤 위치 조정 (optional, 필요시)
-        // timelineRef.current.to(container, {
-        //   duration: 0,
-        //   scrollTo: tutorialRef.current.offsetTop - window.innerHeight / 100 * 10,
-        //   ease: "Power1.easeInOut"
-        // }, 0);
+        // 2. ✅ 스크롤 전에 플래그 ON
+        timelineRef.current.call(() => {
+          setProgrammaticScroll(true);
+          console.log('🚫 Programmatic scroll started - ScrollTrigger disabled');
+        }, null, 0.1);
+
+        // 3. 스크롤 애니메이션
+        const sectionElement = containerRef.current;
+        const tabInterface = sectionElement?.querySelector(`#tab-interface-${recipe.id}`);
+        
+        if (tabInterface) {
+          const targetScrollTop = tabInterface.offsetTop + tabInterface.offsetHeight;
+          
+          console.log(`📜 Scrolling to TabInterface bottom (${targetScrollTop}px)`);
+          
+          timelineRef.current.to(container, {
+            scrollTop: targetScrollTop,
+            duration: 0.8,
+            ease: "power2.inOut"
+          }, 0.1);
+        }
+        
+        // 4. ✅ 스크롤 완료 후 플래그 OFF
+        timelineRef.current.call(() => {
+          setProgrammaticScroll(false);
+          console.log('✅ Programmatic scroll ended - ScrollTrigger enabled');
+        }, null, 0.9); // 0.1 + 0.8 = 0.9초
         
       } else if (tutorialRef.current.offsetHeight > 0) {
-        // ✅ Reference 닫힘 조건: 현재 열려있고
         const shouldCloseImmediately = container.scrollTop > tutorialRef.current.offsetTop;
         
         if (shouldCloseImmediately) {
           console.log(`🔽 Closing Tutorial immediately (scrolled past) for Recipe ${recipe.id}`);
           
-          // ✅ Reference: 스크롤 위치 보정 + 즉시 닫기
           timelineRef.current.set(container, {
             scrollTop: container.scrollTop - tutorialRef.current.offsetHeight
           }, 0);
@@ -97,7 +116,6 @@ const Section = ({ recipe, index }) => {
         } else {
           console.log(`🔽 Closing Tutorial with animation for Recipe ${recipe.id}`);
           
-          // ✅ Reference: 0.5초 애니메이션으로 닫기
           timelineRef.current.to(tutorialRef.current, {
             height: 0,
             ease: "circ.out",
@@ -108,17 +126,46 @@ const Section = ({ recipe, index }) => {
       }
     }
 
-    // Quiz 처리 (동일한 패턴)
+    // Quiz 처리
     if (quizRef.current && container) {
       if (isQuizExpanded) {
         console.log(`📝 Opening Quiz for Recipe ${recipe.id}`);
         
+        // 1. 열기
         timelineRef.current.to(quizRef.current, {
           height: "auto",
           overflow: "unset",
           ease: "circ.in",
           duration: 0
         }, 0);
+        
+        // 2. ✅ 스크롤 전에 플래그 ON
+        timelineRef.current.call(() => {
+          setProgrammaticScroll(true);
+          console.log('🚫 Programmatic scroll started (Quiz)');
+        }, null, 0.1);
+        
+        // 3. 스크롤 애니메이션
+        const sectionElement = containerRef.current;
+        const tabInterface = sectionElement?.querySelector(`#tab-interface-${recipe.id}`);
+        
+        if (tabInterface) {
+          const targetScrollTop = tabInterface.offsetTop + tabInterface.offsetHeight;
+          
+          console.log(`📜 Scrolling to TabInterface bottom for Quiz (${targetScrollTop}px)`);
+          
+          timelineRef.current.to(container, {
+            scrollTop: targetScrollTop,
+            duration: 0.8,
+            ease: "power2.inOut"
+          }, 0.1);
+        }
+        
+        // 4. ✅ 스크롤 완료 후 플래그 OFF
+        timelineRef.current.call(() => {
+          setProgrammaticScroll(false);
+          console.log('✅ Programmatic scroll ended (Quiz)');
+        }, null, 0.9);
         
       } else if (quizRef.current.offsetHeight > 0) {
         const shouldCloseImmediately = container.scrollTop > quizRef.current.offsetTop;
@@ -148,17 +195,46 @@ const Section = ({ recipe, index }) => {
       }
     }
 
-    // Chat 처리 (동일한 패턴)
+    // Chat 처리
     if (chatRef.current && container) {
       if (isChatExpanded) {
         console.log(`💬 Opening Chat for Recipe ${recipe.id}`);
         
+        // 1. 열기
         timelineRef.current.to(chatRef.current, {
           height: "auto",
           overflow: "unset",
           ease: "circ.in",
           duration: 0
         }, 0);
+        
+        // 2. ✅ 스크롤 전에 플래그 ON
+        timelineRef.current.call(() => {
+          setProgrammaticScroll(true);
+          console.log('🚫 Programmatic scroll started (Chat)');
+        }, null, 0.1);
+        
+        // 3. 스크롤 애니메이션
+        const sectionElement = containerRef.current;
+        const tabInterface = sectionElement?.querySelector(`#tab-interface-${recipe.id}`);
+        
+        if (tabInterface) {
+          const targetScrollTop = tabInterface.offsetTop + tabInterface.offsetHeight;
+          
+          console.log(`📜 Scrolling to TabInterface bottom for Chat (${targetScrollTop}px)`);
+          
+          timelineRef.current.to(container, {
+            scrollTop: targetScrollTop,
+            duration: 0.8,
+            ease: "power2.inOut"
+          }, 0.1);
+        }
+        
+        // 4. ✅ 스크롤 완료 후 플래그 OFF
+        timelineRef.current.call(() => {
+          setProgrammaticScroll(false);
+          console.log('✅ Programmatic scroll ended (Chat)');
+        }, null, 0.9);
         
       } else if (chatRef.current.offsetHeight > 0) {
         const shouldCloseImmediately = container.scrollTop > chatRef.current.offsetTop;
@@ -193,7 +269,7 @@ const Section = ({ recipe, index }) => {
         timelineRef.current.kill();
       }
     };
-  }, [isTutorialExpanded, isQuizExpanded, isChatExpanded, recipe.id, index]);
+  }, [isTutorialExpanded, isQuizExpanded, isChatExpanded, recipe.id, index, setProgrammaticScroll]);
 
   return (
     <section

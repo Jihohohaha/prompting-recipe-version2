@@ -12,7 +12,7 @@ gsap.registerPlugin(ScrollTrigger);
 const Content = () => {
   const contentRef = useRef(null);
   const { slug, tab } = useParams();
-  const { setActiveSection, setExpandedContent } = useGPTStudyStore();
+  const { setActiveSection, setExpandedContent, isProgrammaticScroll } = useGPTStudyStore();
   const triggersRef = useRef([]);
 
   // URL 변경 시 expandedContent 업데이트
@@ -46,7 +46,6 @@ const Content = () => {
       const endAnchor = container.querySelector(`#section-end-${index}`);
 
       if (startAnchor && endAnchor) {
-        // ✅ Reference: start와 end 모두 사용
         const trigger = ScrollTrigger.create({
           scroller: container,
           trigger: startAnchor,
@@ -55,8 +54,14 @@ const Content = () => {
           end: 'bottom 30%',
           invalidateOnRefresh: true,
           onToggle: (self) => {
+            // ✅ 프로그래매틱 스크롤 중이면 무시!
+            if (isProgrammaticScroll) {
+              console.log(`🚫 ScrollTrigger ignored for section ${index} (programmatic scroll)`);
+              return;
+            }
+            
             if (self.isActive) {
-              console.log(`📍 Section ${index} activated (Reference pattern)`);
+              console.log(`📍 Section ${index} activated (manual scroll)`);
               setActiveSection(index);
             }
           },
@@ -70,7 +75,7 @@ const Content = () => {
       triggersRef.current.forEach(trigger => trigger.kill());
       triggersRef.current = [];
     };
-  }, [setActiveSection]);
+  }, [setActiveSection, isProgrammaticScroll]);
 
   return (
     <main 
