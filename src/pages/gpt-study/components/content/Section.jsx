@@ -1,5 +1,8 @@
 // src/pages/gpt-study/components/content/Section.jsx
+import { useEffect, useRef } from "react";
 import { useParams } from "react-router-dom";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import TabInterface from "./TabInterface";
 import useGPTStudyStore from "../../store";
 
@@ -20,16 +23,181 @@ import Recipe6TutorialExample from "./tabs/expanded/tutorial/Recipe6TutorialExam
 // Quiz Container import
 import Recipe1QuizContainer from "./tabs/expanded/quiz/Recipe1QuizContainer";
 
+gsap.registerPlugin(ScrollTrigger);
+
 const Section = ({ recipe, index }) => {
   const { tab } = useParams();
   const { expandedContent } = useGPTStudyStore();
+  
+  const timelineRef = useRef(null);
+  const tutorialRef = useRef(null);
+  const quizRef = useRef(null);
+  const chatRef = useRef(null);
+  const containerRef = useRef(null);
 
   const isTutorialExpanded = expandedContent?.recipeId === recipe.id && tab === "tutorial";
   const isQuizExpanded = expandedContent?.recipeId === recipe.id && tab === "quiz";
   const isChatExpanded = expandedContent?.recipeId === recipe.id && tab === "chat";
 
+  // ✅ Reference 패턴: GSAP Timeline으로 열림/닫힘 관리
+  useEffect(() => {
+    // 기존 timeline 정리
+    if (timelineRef.current) {
+      timelineRef.current.pause();
+      timelineRef.current.kill();
+    }
+
+    // 새 timeline 생성
+    timelineRef.current = gsap.timeline({
+      onComplete: () => {
+        ScrollTrigger.refresh();
+        console.log(`✅ Section ${index} animation complete, ScrollTrigger refreshed`);
+      }
+    });
+
+    const container = document.querySelector('main'); // Content의 스크롤 컨테이너
+
+    // Tutorial 처리
+    if (tutorialRef.current && container) {
+      if (isTutorialExpanded) {
+        console.log(`📖 Opening Tutorial for Recipe ${recipe.id}`);
+        
+        // ✅ Reference: 즉시 열림
+        timelineRef.current.to(tutorialRef.current, {
+          height: "auto",
+          overflow: "unset",
+          ease: "circ.in",
+          duration: 0
+        }, 0);
+
+        // ✅ Reference: 스크롤 위치 조정 (optional, 필요시)
+        // timelineRef.current.to(container, {
+        //   duration: 0,
+        //   scrollTo: tutorialRef.current.offsetTop - window.innerHeight / 100 * 10,
+        //   ease: "Power1.easeInOut"
+        // }, 0);
+        
+      } else if (tutorialRef.current.offsetHeight > 0) {
+        // ✅ Reference 닫힘 조건: 현재 열려있고
+        const shouldCloseImmediately = container.scrollTop > tutorialRef.current.offsetTop;
+        
+        if (shouldCloseImmediately) {
+          console.log(`🔽 Closing Tutorial immediately (scrolled past) for Recipe ${recipe.id}`);
+          
+          // ✅ Reference: 스크롤 위치 보정 + 즉시 닫기
+          timelineRef.current.set(container, {
+            scrollTop: container.scrollTop - tutorialRef.current.offsetHeight
+          }, 0);
+          
+          timelineRef.current.set(tutorialRef.current, {
+            height: 0,
+            overflow: "hidden"
+          }, 0);
+          
+        } else {
+          console.log(`🔽 Closing Tutorial with animation for Recipe ${recipe.id}`);
+          
+          // ✅ Reference: 0.5초 애니메이션으로 닫기
+          timelineRef.current.to(tutorialRef.current, {
+            height: 0,
+            ease: "circ.out",
+            duration: 0.5,
+            overflow: "hidden"
+          }, 0);
+        }
+      }
+    }
+
+    // Quiz 처리 (동일한 패턴)
+    if (quizRef.current && container) {
+      if (isQuizExpanded) {
+        console.log(`📝 Opening Quiz for Recipe ${recipe.id}`);
+        
+        timelineRef.current.to(quizRef.current, {
+          height: "auto",
+          overflow: "unset",
+          ease: "circ.in",
+          duration: 0
+        }, 0);
+        
+      } else if (quizRef.current.offsetHeight > 0) {
+        const shouldCloseImmediately = container.scrollTop > quizRef.current.offsetTop;
+        
+        if (shouldCloseImmediately) {
+          console.log(`🔽 Closing Quiz immediately for Recipe ${recipe.id}`);
+          
+          timelineRef.current.set(container, {
+            scrollTop: container.scrollTop - quizRef.current.offsetHeight
+          }, 0);
+          
+          timelineRef.current.set(quizRef.current, {
+            height: 0,
+            overflow: "hidden"
+          }, 0);
+          
+        } else {
+          console.log(`🔽 Closing Quiz with animation for Recipe ${recipe.id}`);
+          
+          timelineRef.current.to(quizRef.current, {
+            height: 0,
+            ease: "circ.out",
+            duration: 0.5,
+            overflow: "hidden"
+          }, 0);
+        }
+      }
+    }
+
+    // Chat 처리 (동일한 패턴)
+    if (chatRef.current && container) {
+      if (isChatExpanded) {
+        console.log(`💬 Opening Chat for Recipe ${recipe.id}`);
+        
+        timelineRef.current.to(chatRef.current, {
+          height: "auto",
+          overflow: "unset",
+          ease: "circ.in",
+          duration: 0
+        }, 0);
+        
+      } else if (chatRef.current.offsetHeight > 0) {
+        const shouldCloseImmediately = container.scrollTop > chatRef.current.offsetTop;
+        
+        if (shouldCloseImmediately) {
+          console.log(`🔽 Closing Chat immediately for Recipe ${recipe.id}`);
+          
+          timelineRef.current.set(container, {
+            scrollTop: container.scrollTop - chatRef.current.offsetHeight
+          }, 0);
+          
+          timelineRef.current.set(chatRef.current, {
+            height: 0,
+            overflow: "hidden"
+          }, 0);
+          
+        } else {
+          console.log(`🔽 Closing Chat with animation for Recipe ${recipe.id}`);
+          
+          timelineRef.current.to(chatRef.current, {
+            height: 0,
+            ease: "circ.out",
+            duration: 0.5,
+            overflow: "hidden"
+          }, 0);
+        }
+      }
+    }
+
+    return () => {
+      if (timelineRef.current) {
+        timelineRef.current.kill();
+      }
+    };
+  }, [isTutorialExpanded, isQuizExpanded, isChatExpanded, recipe.id, index]);
+
   return (
     <section
+      ref={containerRef}
       id={`section-${index}`}
       className="flex flex-col px-12 py-8"
     >
@@ -45,64 +213,46 @@ const Section = ({ recipe, index }) => {
 
       {/* Tutorial 컨텐츠 */}
       <div
-        className="overflow-hidden transition-all duration-1200 ease-in-out"
+        ref={tutorialRef}
+        className="bg-black"
         style={{
-          maxHeight: isTutorialExpanded ? '90000px' : '0',
-          opacity: isTutorialExpanded ? 1 : 0,
+          height: 0,
+          overflow: "hidden"
         }}
       >
-        <div className="bg-black py-8">
+        <div className="py-8">
           {renderTutorialContent(recipe.id, index)}
-          {/* ✅ Expanded Content 끝 감지용 Sentinel */}
-          <div 
-            id={`expanded-end-${index}`}
-            data-section-index={index}
-            data-expanded-type="tutorial"
-            className="h-0"
-          />
         </div>
       </div>
 
       {/* Quiz 컨텐츠 */}
       <div
-        className="overflow-hidden transition-all duration-1200 ease-in-out"
+        ref={quizRef}
+        className="bg-black"
         style={{
-          maxHeight: isQuizExpanded ? '10000px' : '0',
-          opacity: isQuizExpanded ? 1 : 0,
+          height: 0,
+          overflow: "hidden"
         }}
       >
-        <div className="bg-black py-8">
+        <div className="py-8">
           {recipe.id === 1 && <Recipe1QuizContainer />}
-          {/* ✅ Expanded Content 끝 감지용 Sentinel */}
-          <div 
-            id={`expanded-end-${index}`}
-            data-section-index={index}
-            data-expanded-type="quiz"
-            className="h-0"
-          />
         </div>
       </div>
 
       {/* Chat 컨텐츠 */}
       <div
-        className="overflow-hidden transition-all duration-1200 ease-in-out"
+        ref={chatRef}
+        className="bg-black"
         style={{
-          maxHeight: isChatExpanded ? '10000px' : '0',
-          opacity: isChatExpanded ? 1 : 0,
+          height: 0,
+          overflow: "hidden"
         }}
       >
-        <div className="bg-black py-8">
+        <div className="py-8">
           <div className="text-white text-center py-20">
             <h2 className="text-4xl font-bold mb-4">CHAT</h2>
             <p className="text-xl text-gray-400">채팅 기능 준비 중입니다.</p>
           </div>
-          {/* ✅ Expanded Content 끝 감지용 Sentinel */}
-          <div 
-            id={`expanded-end-${index}`}
-            data-section-index={index}
-            data-expanded-type="chat"
-            className="h-0"
-          />
         </div>
       </div>
 
@@ -115,7 +265,6 @@ const Section = ({ recipe, index }) => {
     </section>
   );
 };
-
 
 // Tutorial 컨텐츠 렌더링 헬퍼 함수
 const renderTutorialContent = (recipeId, index) => {

@@ -14,7 +14,6 @@ const Content = () => {
   const { slug, tab } = useParams();
   const { setActiveSection, setExpandedContent } = useGPTStudyStore();
   const triggersRef = useRef([]);
-  const isUpdatingRef = useRef(false);
 
   // URL 변경 시 expandedContent 업데이트
   useEffect(() => {
@@ -30,7 +29,7 @@ const Content = () => {
     }
   }, [slug, tab, setExpandedContent]);
 
-  // ScrollTrigger로 anchor 감지
+  // ✅ Reference 방식: ScrollTrigger 생성
   useEffect(() => {
     if (!contentRef.current) return;
 
@@ -40,92 +39,30 @@ const Content = () => {
     triggersRef.current.forEach(trigger => trigger.kill());
     triggersRef.current = [];
 
-    const updateSection = (index, direction, shouldCloseTabs = false) => {
-      if (isUpdatingRef.current) return;
-      
-      isUpdatingRef.current = true;
-      console.log(`📍 Section ${index} activated (${direction}${shouldCloseTabs ? ' - closing tabs' : ''})`);
-      
-      // ✅ 탭 접기 요청이 있으면 먼저 접기
-      if (shouldCloseTabs) {
-        setExpandedContent(null);
-      }
-      
-      setActiveSection(index);
-      
-      setTimeout(() => {
-        isUpdatingRef.current = false;
-      }, 100);
-    };
+    console.log('🎯 Creating ScrollTriggers (Reference pattern)');
 
     gptStudyData.forEach((recipe, index) => {
       const startAnchor = container.querySelector(`#section-start-${index}`);
       const endAnchor = container.querySelector(`#section-end-${index}`);
-      const expandedEndAnchor = container.querySelector(`#expanded-end-${index}`);
 
-      // ✅ Start Anchor (펼쳐지지 않았을 때만)
-      if (startAnchor) {
-        const startTrigger = ScrollTrigger.create({
+      if (startAnchor && endAnchor) {
+        // ✅ Reference: start와 end 모두 사용
+        const trigger = ScrollTrigger.create({
+          scroller: container,
           trigger: startAnchor,
-          scroller: container,
           start: 'top 30%',
-          end: 'top 30%',
-          onEnter: () => {
-            const store = useGPTStudyStore.getState();
-            // 아무것도 안 펼쳐져 있을 때만 동작
-            if (!store.expandedContent) {
-              updateSection(index, 'scrolling down');
+          endTrigger: endAnchor,
+          end: 'bottom 30%',
+          invalidateOnRefresh: true,
+          onToggle: (self) => {
+            if (self.isActive) {
+              console.log(`📍 Section ${index} activated (Reference pattern)`);
+              setActiveSection(index);
             }
           },
         });
-        triggersRef.current.push(startTrigger);
-      }
-
-      // ✅ Expanded End Anchor (펼쳐졌을 때 컨텐츠 끝 감지)
-      if (expandedEndAnchor) {
-        const expandedEndTrigger = ScrollTrigger.create({
-          trigger: expandedEndAnchor,
-          scroller: container,
-          start: 'top 30%',
-          end: 'top 30%',
-          onEnter: () => {
-            const store = useGPTStudyStore.getState();
-            // 현재 section이 펼쳐져 있을 때만 동작
-            if (store.expandedContent?.recipeId === recipe.id) {
-              // ✅ 다음 section으로 이동하면서 탭 접기
-              const nextIndex = Math.min(index + 1, gptStudyData.length - 1);
-              if (nextIndex !== index) {
-                updateSection(nextIndex, 'scrolling down', true); // ← 탭 접기!
-              }
-            }
-          },
-          onEnterBack: () => {
-            const store = useGPTStudyStore.getState();
-            // 펼쳐진 상태에서 위로 스크롤 → 현재 section 유지하면서 탭 접기
-            if (store.expandedContent) {
-              updateSection(index, 'scrolling up', true); // ← 탭 접기!
-            }
-          },
-        });
-        triggersRef.current.push(expandedEndTrigger);
-      }
-
-      // ✅ End Anchor (펼쳐지지 않았을 때만)
-      if (endAnchor) {
-        const endTrigger = ScrollTrigger.create({
-          trigger: endAnchor,
-          scroller: container,
-          start: 'top 30%',
-          end: 'top 30%',
-          onEnterBack: () => {
-            const store = useGPTStudyStore.getState();
-            // 아무것도 안 펼쳐져 있을 때만 동작
-            if (!store.expandedContent) {
-              updateSection(index, 'scrolling up');
-            }
-          },
-        });
-        triggersRef.current.push(endTrigger);
+        
+        triggersRef.current.push(trigger);
       }
     });
 
@@ -133,7 +70,7 @@ const Content = () => {
       triggersRef.current.forEach(trigger => trigger.kill());
       triggersRef.current = [];
     };
-  }, [setActiveSection, setExpandedContent]);
+  }, [setActiveSection]);
 
   return (
     <main 

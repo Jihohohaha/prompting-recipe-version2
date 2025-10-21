@@ -1,6 +1,7 @@
 // src/pages/gpt-study/components/sidebar/SidebarItem.jsx
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import gsap from 'gsap';
 import useGPTStudyStore from '../../store';
 import ImageSwitcher from '../image-switcher/ImageSwitcher';
 
@@ -24,13 +25,21 @@ const SidebarItem = ({ recipe, index }) => {
     // 3. URL을 recipe root로 변경
     navigate(`/gpt-study/${recipe.slug}`);
     
-    // 4. anchor div로 스크롤
+    // 4. ✅ Reference 방식: double setTimeout + gsap.set
     setTimeout(() => {
-      const anchor = document.getElementById(`section-anchor-${index}`);
-      if (anchor) {
-        anchor.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }
-    }, 100);
+      setTimeout(() => {
+        const container = document.querySelector('main');
+        const targetSection = document.querySelector(`#section-${index}`);
+        
+        if (container && targetSection) {
+          // ✅ gsap.set: 즉시 스크롤 (애니메이션 없음)
+          gsap.set(container, {
+            scrollTop: targetSection.offsetTop
+          });
+          console.log(`✅ Instant scroll to section ${index} (Reference pattern)`);
+        }
+      }, 500); // ✅ Reference: 500ms 지연
+    }, 0); // ✅ Reference: 다음 이벤트 루프로
   };
 
   return (

@@ -10,8 +10,8 @@ import { gptStudyData, getRecipeBySlug } from './data';
 const GPTStudy = () => {
   const { slug, tab } = useParams();
   const navigate = useNavigate();
-  const { activeSection, setActiveSection } = useGPTStudyStore();
-  const isNavigatingRef = useRef(false); // ✅ 프로그래매틱 네비게이션 플래그
+  const { activeSection, setActiveSection, expandedContent, collapseContent } = useGPTStudyStore();
+  const isInitialMount = useRef(true);
 
   // 초기 진입 시 recipe1로 리다이렉트
   useEffect(() => {
@@ -21,7 +21,7 @@ const GPTStudy = () => {
     }
   }, [slug, navigate]);
 
-  // ✅ URL → activeSection (단방향만)
+  // ✅ URL → activeSection
   useEffect(() => {
     if (!slug) return;
     
@@ -30,35 +30,40 @@ const GPTStudy = () => {
 
     const newIndex = recipe.id - 1;
     
-    if (activeSection !== newIndex) {
-      console.log(`🔗 URL changed: ${slug}, updating activeSection to ${newIndex}`);
+    // 초기 마운트 시에만 activeSection 설정
+    if (isInitialMount.current) {
+      console.log(`🔗 Initial URL: ${slug}, setting activeSection to ${newIndex}`);
       setActiveSection(newIndex);
+      isInitialMount.current = false;
     }
-  }, [slug, setActiveSection]); // ✅ activeSection 제거!
+  }, [slug, setActiveSection]);
 
-  // ✅ activeSection 변경 시 URL 업데이트 (ScrollTrigger에서 온 경우만)
+  // ✅ activeSection → URL (Reference 패턴!)
   useEffect(() => {
     if (activeSection === null || activeSection === undefined) return;
-    if (tab) return; // 탭이 펼쳐져 있으면 URL 변경 안 함
     
     const recipe = gptStudyData[activeSection];
     if (!recipe) return;
     
-    // ✅ 이미 해당 URL이면 무시 (무한 루프 방지)
-    if (slug === recipe.slug) return;
+    // ✅ Reference 로직: expandedContent가 현재 activeSection과 일치하고 tab이 있으면 URL 유지
+    if (expandedContent && expandedContent.recipeId - 1 === activeSection && tab) {
+      console.log(`📌 Keeping URL: expandedContent matches activeSection ${activeSection} with tab ${tab}`);
+      return;
+    }
     
-    // ✅ 네비게이션 중이면 무시
-    if (isNavigatingRef.current) return;
-    
-    console.log(`📄 Active section changed to ${activeSection}, updating URL to ${recipe.slug}`);
-    isNavigatingRef.current = true;
-    navigate(`/gpt-study/${recipe.slug}`, { replace: true });
-    
-    // 플래그 해제
-    setTimeout(() => {
-      isNavigatingRef.current = false;
-    }, 100);
-  }, [activeSection, slug, tab, navigate]);
+    // ✅ 그 외에는 activeSection 기반으로 URL 업데이트
+    if (slug !== recipe.slug) {
+      console.log(`📄 Active section changed to ${activeSection}, updating URL to ${recipe.slug}`);
+      
+      // 탭이 열려있었다면 접기
+      if (expandedContent) {
+        console.log(`🔽 Collapsing tab because activeSection changed`);
+        collapseContent();
+      }
+      
+      navigate(`/gpt-study/${recipe.slug}`, { replace: true });
+    }
+  }, [activeSection, slug, tab, expandedContent, navigate, collapseContent]);
 
   const currentRecipe = slug ? getRecipeBySlug(slug) : gptStudyData[0];
 
