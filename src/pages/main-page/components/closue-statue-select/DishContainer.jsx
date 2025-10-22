@@ -55,6 +55,7 @@ const DishContainer = React.memo(function DishContainer({
   hideText = false,
   isTiltMode = false,
   instant = false, // ⬅️ 틸트 진입 프레임에 즉시 숨김
+  showTiltLogos = true,
 }) {
   const n = items?.length ?? 0;
 
@@ -105,9 +106,9 @@ const DishContainer = React.memo(function DishContainer({
           const tilt = 0;
 
           // 프리-틸트: 텍스트 보임 / 틸트: 로고표시 및 -90° 타이틀
-          const showLogo  = isTiltMode && !!dish.logo;
+          const showLogo  = isTiltMode && showTiltLogos && !!dish.logo;
           const showTitle = isTiltMode && index === ((frontDishIndex - 4 + n) % n); // -90°만 제목
-
+          
           return (
             <FadePresence key={`dish-${index}`} show={shouldShow} instant={instant}>
               <DishItem

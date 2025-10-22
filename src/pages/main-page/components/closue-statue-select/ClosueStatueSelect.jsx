@@ -49,6 +49,10 @@ const browseTriplet = (front, n) => ({
 // ───────────────────────── 컴포넌트 ─────────────────────────
 const ClosueStatueSelect = () => {
   const navigate = useNavigate();
+  const ROUTE_WIPE_MS = 1500;                 // ⬅️ 원형 와이프 재생 시간
+  const [routeWipe, setRouteWipe] = useState(false); // ⬅️ 와이프 on/off
+  const [cornerLogoVisible, setCornerLogoVisible] = useState(false);
+  const cornerTimerRef = useRef(null);
 
   // 뷰/회전 상태
   const [rotationAngle, setRotationAngle] = useState(0);
@@ -82,6 +86,26 @@ const ClosueStatueSelect = () => {
 
   // 틸트가 풀리면 제목 락 해제
   useEffect(() => { if (!isTilt) unlockTitle(); }, [isTilt, unlockTitle]);
+  // 틸트 진입 시 1000ms 뒤 우상단 로고 표시, 해제 시 즉시 숨김
+  useEffect(() => {
+    if (cornerTimerRef.current) {
+      clearTimeout(cornerTimerRef.current);
+      cornerTimerRef.current = null;
+    }
+    if (isTilt) {
+      cornerTimerRef.current = setTimeout(() => {
+        setCornerLogoVisible(true);
+      }, 1200);
+    } else {
+      setCornerLogoVisible(false);
+    }
+    return () => {
+      if (cornerTimerRef.current) {
+        clearTimeout(cornerTimerRef.current);
+        cornerTimerRef.current = null;
+      }
+    };
+  }, [isTilt]);
 
   // ───────────────────────── Back 히스토리 ─────────────────────────
   const [history, setHistory] = useState([]);
@@ -214,7 +238,16 @@ const ClosueStatueSelect = () => {
       const { left, center, right } = tiltedTriplet(frontDishIndex, n);
       if (index === right) { doStep(1);  return; }   // -45° → 반시계 45°
       if (index === left)  { doStep(-1); return; }   // -135° → 시계 45°
-      if (index === center){ if (dish.address) navigate(dish.address); return; } // -90° → 라우팅
+      if (index === center){
+        if (dish.address) {
+          // ⬇️ 검은 원 와이프 → 완료 후 라우팅
+          setRouteWipe(true);
+          setTimeout(() => {
+            navigate(dish.address);
+          }, ROUTE_WIPE_MS);
+        }
+        return;
+      } // -90° → 라우팅(원형 와이프)
       return;
     }
 
@@ -255,14 +288,21 @@ const ClosueStatueSelect = () => {
   // ───────────────────────── 렌더 ─────────────────────────
   return (
     <>
+      {/* 틸트 모드일 때 현재(-90°) 아이템 로고를 우상단에 표시 */}
+      <CornerLogo show={cornerLogoVisible && !!detailDish?.logo} src={detailDish?.logo} title={detailDish?.title} />
+      {/* ⬇️ 원형 와이프 오버레이 */}
+      <CircleWipe show={routeWipe} durationMs={ROUTE_WIPE_MS} />
+
       {showMask && (
         <div
-          className="fixed inset-0 bg-black/85 z-[100] flex flex-col items-center justify-center cursor-pointer transition-opacity duration-500"
+          className="fixed inset-0 bg-black/90 z-[100]"
           onClick={() => setShowMask(false)}
         >
-          <h1 className="text-6xl font-bold text-white mb-8 font-koolegant">Choose Your Dish</h1>
-          <p className="text-xl text-white mb-12">오늘의 메뉴를 선택하세요.</p>
-          <div className="text-white text-lg">Click</div>
+          <div className='absolute inset-0 flex flex-col items-center justify-center cursor-pointer transition-opacity duration-500'>
+            <h1 className="text-6xl font-bold text-white mb-8 font-koolegant">Choose Your Dish</h1>
+            <p className="text-xl text-white mb-12">오늘의 메뉴를 선택하세요.</p>
+          </div>
+          <div className="absolute left-1/2 -translate-x-1/2 bottom-[200px] text-white text-lg">Click</div>
         </div>
       )}
 
@@ -404,14 +444,76 @@ const ClosueStatueSelect = () => {
         <button
           onClick={() => canGoBack && popHistory()}
           disabled={!canGoBack}
-          className={`fixed top-6 left-6 z-[80] px-4 py-2 rounded-xl ${canGoBack ? 'bg-black/70 hover:bg-black/80 cursor-pointer' : 'bg-black/30 cursor-not-allowed'} text-white transition-colors`}
+          className={`fixed top-6 left-6 z-[80] px-4 py-2 rounded-xl ${canGoBack ? 'bg-black/70 hover:bg-black/80 cursor-pointer text-white' : 'bg-transparent cursor-not-allowed text-transparent pointer-events-none'} transition-colors`}
           title={canGoBack ? '뒤로' : '되돌릴 상태 없음'}
         >
-          Back
+          {'<-' }
         </button>
       </div>
     </>
   );
 };
+
+function CornerLogo({ show, src, title }) {
+  const baseStyle = {
+    position: 'fixed',
+    top: '290px',
+    right: '700px',
+    zIndex: 85,          // 타이틀/뒤로가기보다 위, 와이프(9999)보단 아래
+    width: '40px',      // 필요하면 96~128px 사이로 조정
+    height: '40px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    pointerEvents: 'none', // 클릭 방해 없음
+    transition: 'opacity 200ms ease, transform 200ms ease',
+    opacity: show ? 1 : 0,
+    transform: `${show ? 'scale(1)' : 'scale(0.92)'} rotate(15deg)`,
+    filter: 'drop-shadow(0 4px 12px rgba(0,0,0,0.25))',
+  };
+
+  const imgStyle = {
+    width: '100%',
+    height: '100%',
+    objectFit: 'contain',
+    userSelect: 'none',
+  };
+
+  if (!src) return null;
+  return (
+    <div style={baseStyle} aria-hidden={!show}>
+      <img src={src} alt={`${title ?? 'logo'} logo`} draggable={false} style={imgStyle} />
+    </div>
+  );
+}
+/** 원형 와이프 오버레이: clip-path로 원을 확장해 화면을 덮음 */
+function CircleWipe({ show, durationMs = 1500, origin = 'center' }) {
+  const cx = typeof window !== 'undefined' ? window.innerWidth / 2 : 0;
+  const cy = typeof window !== 'undefined' ? window.innerHeight / 2 : 0;
+  const at = origin === 'center' ? `${cx}px ${cy}px` : origin;
+  const maxR = '200vh'; // 화면 전체 덮는 충분히 큰 반경
+
+  return (
+    <div
+      style={{
+        position: 'fixed',
+        inset: 0,
+        zIndex: 9999,
+        pointerEvents: show ? 'auto' : 'none', // 재생 중 입력 차단
+      }}
+      aria-hidden="true"
+    >
+      <div
+        style={{
+          position: 'absolute',
+          inset: 0,
+          background: 'black',
+          clipPath: show ? `circle(${maxR} at ${at})` : `circle(0 at ${at})`,
+          transition: `clip-path ${durationMs}ms cubic-bezier(0.2, 0.8, 0.2, 1)`,
+        }}
+      />
+    </div>
+  );
+}
 
 export default ClosueStatueSelect;
