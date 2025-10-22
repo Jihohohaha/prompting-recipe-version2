@@ -2,7 +2,6 @@
 import { motion } from "framer-motion";
 import { useNavigate, useParams } from "react-router-dom";
 import useGPTStudyStore from "../../../../../store";
-import { useState, useEffect } from "react";
 
 const Recipe1TutorialExample = ({ recipeId, index }) => {
   return (
@@ -62,7 +61,7 @@ const Recipe1TutorialExample = ({ recipeId, index }) => {
         <Section11 />
       </FadeSection>
 
-      {/* Section 12 - 버튼 포함 */}
+      {/* Section 12 */}
       <FadeSection>
         <Section12 />
       </FadeSection>
@@ -112,7 +111,7 @@ const Section2 = () => {
     <div className="pt-[100px] w-full flex items-center justify-center">
       <img
         src="/images/gpt-study/role/teacher.png"
-        alt="선생석상"
+        alt="선생님상"
         style={{
           left: "0px",
           top: "0px",
@@ -213,7 +212,7 @@ const Section5 = () => {
         <span className="text-4xl font-extrabold">
           정답률이 높고, 결과의 일관성
         </span>{" "}
-        이 유지돼요.
+        이 유지래요.
       </div>
 
       {/* 2. Underline */}
@@ -267,41 +266,41 @@ const Section6 = () => {
         {/* 메인 박스 */}
         <div className="flex flex-col items-center justify-center leading-extra-loose bg-[#FE7525] py-20 px-2 rounded-b-2xl border-2 border-black shadow-lg font-pretendard">
           {/* 1. 예시 몇 개를 보여주고 문제를 풀게 하는 방법 부분 */}
-          <p className="text-3xl font-semibold mb-6">
+          <div className="text-3xl font-semibold mb-6">
             <div className="bg-white font-bold text-4xl p-1 inline-block mx-1">
               모델이 특정 인격이나 역할을 맡아 답변하도록
             </div>
-          </p>
+          </div>
           {/* 2. 장점은 / 규칙을 따르게 만들기 쉽고 부분 */}
-          <p className="text-3xl font-semibold mb-6">
+          <div className="text-3xl font-semibold mb-6">
             <div className="bg-white font-bold text-4xl p-1 inline-block mx-1">
               지시하는 방법
             </div>
             이에요. 이 방식을 사용하면 답변의
-          </p>
+          </div>
 
-          <p className="text-3xl font-semibold mb-6">
+          <div className="text-3xl font-semibold mb-6">
             <div className="bg-white font-bold text-4xl p-1 inline-block mx-1">
               스타일과 관점을 원하는 방향으로 조정
             </div>
             할 수 있지만,
-          </p>
+          </div>
 
           {/* 3. 대신, / 예시를 잘못 주면 부분 */}
-          <p className="text-3xl font-semibold mb-6">
+          <div className="text-3xl font-semibold mb-6">
             반대로{" "}
             <div className="bg-white font-bold text-4xl p-1 inline-block mx-1">
               역할을 너무 과하게 지정하면
             </div>
-          </p>
+          </div>
 
           {/* 4. 패턴을 그대로 따라가서 오답 부분 */}
-          <p className="text-3xl font-semibold">
+          <div className="text-3xl font-semibold">
             <div className="bg-white font-bold text-4xl p-1 inline-block mx-1">
               어색한 말투로 굳어질 수도{" "}
             </div>
             있습니다.
-          </p>
+          </div>
         </div>
       </div>
     </div>
@@ -468,12 +467,12 @@ const Section13 = ({ recipeId, index }) => {
   const { collapseContent, setActiveSection } = useGPTStudyStore();
 
   const handleCloseTutorial = () => {
-    console.log("🔼 Closing Tutorial with smooth collapse");
+    console.info('🔼 Closing Tutorial');
 
     // 1. Section 시작점으로 스크롤
     const sectionElement = document.getElementById(`section-${index}`);
     if (sectionElement) {
-      sectionElement.scrollIntoView({ behavior: "smooth", block: "start" });
+      sectionElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
 
     // 2. 약간의 딜레이 후 접기
@@ -490,26 +489,7 @@ const Section13 = ({ recipeId, index }) => {
 
   return (
     <div className="w-full flex flex-col items-center justify-center pt-72 pb-12">
-      {/* 버튼 영역 */}
-      <div className="flex flex-col items-center">
-        {/* Triangle 이미지 */}
-        <img
-          src="/images/gpt-study/role/Triangle.png"
-          alt="Triangle"
-          style={{
-            width: "40px",
-            height: "35px",
-          }}
-        />
-
-        {/* Tutorial 접기 버튼 */}
-        <button
-          onClick={handleCloseTutorial}
-          className="bg-[#FE7525] border-2 border-black text-white mt-2 py-4 px-96 text-3xl font-medium font-pretendard"
-        >
-          다른 레시피 더 알아보기
-        </button>
-      </div>
+      {/* 버튼 영역 제거 per request */}
     </div>
   );
 };

@@ -1,7 +1,5 @@
 // src/pages/gpt-study/components/sidebar/Sidebar.jsx
 import { useEffect, useRef } from 'react';
-import { motion } from 'framer-motion';
-import gsap from 'gsap';
 import { gptStudyData } from '../../data';
 import SidebarItem from './SidebarItem';
 import useGPTStudyStore from '../../store';
@@ -15,20 +13,12 @@ const Sidebar = () => {
     if (activeSection === null || activeSection === undefined) return;
     if (!sidebarRef.current) return;
 
-    // 해당 SidebarItem 찾기
     const targetItem = sidebarRef.current.querySelector(`[data-index="${activeSection}"]`);
     
     if (targetItem) {
-      console.log(`📍 Sidebar scrolling to item ${activeSection}`);
-
-      // 부드러운 스크롤 애니메이션
-      gsap.to(sidebarRef.current, {
-        scrollTo: {
-          y: targetItem,
-          offsetY: 150 // 상단에서 100px 여유 공간
-        },
-        duration: 0.6,
-        ease: "power2.out"
+      targetItem.scrollIntoView({ 
+        behavior: 'smooth', 
+        block: 'center'
       });
     }
   }, [activeSection]);
@@ -38,10 +28,7 @@ const Sidebar = () => {
       ref={sidebarRef}
       className="w-1/6 h-screen bg-black overflow-y-auto py-10"
     >
-      <motion.div 
-        className="flex flex-col gap-6 px-4"
-        layout
-      >
+      <div className="flex flex-col gap-6 px-4">
         {gptStudyData.map((recipe, index) => (
           <SidebarItem 
             key={recipe.id} 
@@ -49,9 +36,9 @@ const Sidebar = () => {
             index={index}
           />
         ))}
-      </motion.div>
+      </div>
       
-      <style jsx>{`
+      <style>{`
         aside::-webkit-scrollbar {
           width: 6px;
         }

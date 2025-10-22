@@ -492,26 +492,7 @@ const Section12 = ({ recipeId, index }) => {
 
   return (
     <div className="w-full flex flex-col items-center justify-center pt-72 pb-12">
-      {/* 버튼 영역 */}
-      <div className="flex flex-col items-center">
-        {/* Triangle 이미지 */}
-        <img
-          src="/images/gpt-study/markdown/mtriangle.png"
-          alt="Triangle"
-          style={{
-            width: "40px",
-            height: "35px",
-          }}
-        />
-
-        {/* Tutorial 접기 버튼 */}
-        <button
-          onClick={handleCloseTutorial}
-          className="bg-[#29D069] border-2 border-black text-black mt-2 py-4 px-96 text-3xl font-medium font-pretendard"
-        >
-          다른 레시피 더 알아보기
-        </button>
-      </div>
+      {/* 버튼 영역 제거: '다른 레시피 더 알아보기' 삭제 per request */}
     </div>
   );
 };

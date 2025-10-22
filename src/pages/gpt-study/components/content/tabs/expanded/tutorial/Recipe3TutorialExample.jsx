@@ -151,28 +151,7 @@ const Section3 = () => {
           </span>
         </div>
       </div>
-      {/* 노란색 이중선 */}
-      <div className="w-full flex flex-col gap-8">
-        <div className="w-full h-0.5 bg-[#87CA34]"></div>
-        <div className="w-full h-0.5 bg-[#87CA34]"></div>
-      </div>
-      {/* Example 2 */}
-      <div className="w-full flex flex-col items-center gap-6 py-8">
-        <h3 className="text-4xl font-semibold font-pretendard pb-8">
-          Instruction 2
-        </h3>
-        <div className="flex items-center gap-4">
-          <span className="text-4xl font-pretendard">
-            답변과 함께 반드시 출처(URL 또는 문헌명)를 제시해.
-          </span>
-        </div>
-      </div>
-      {/* 하단 노란색 선 */}
-      <div className="w-full h-0.5 bg-[#87CA34]"></div>
-      <div className="text-3xl font-semibold pt-20">
-        {" "}
-        이런식으로요! 그러면 GPT는 아래와 같이 답변합니다.
-      </div>
+      {/* 버튼 영역 제거: '다른 레시피 더 알아보기' 삭제 per request */}
     </div>
   );
 };
@@ -492,26 +471,7 @@ const Section12 = ({ recipeId, index }) => {
 
   return (
     <div className="w-full flex flex-col items-center justify-center pt-72 pb-12">
-      {/* 버튼 영역 */}
-      <div className="flex flex-col items-center">
-        {/* Triangle 이미지 */}
-        <img
-          src="/images/gpt-study/hallucination/Triangle.png"
-          alt="Triangle"
-          style={{
-            width: "40px",
-            height: "35px",
-          }}
-        />
-
-        {/* Tutorial 접기 버튼 */}
-        <button
-          onClick={handleCloseTutorial}
-          className="bg-[#87CA34] border-2 border-black text-black mt-2 py-4 px-96 text-3xl font-medium font-pretendard"
-        >
-          다른 레시피 더 알아보기
-        </button>
-      </div>
+      {/* 버튼 영역 제거: '다른 레시피 더 알아보기' 삭제 per request */}
     </div>
   );
 };

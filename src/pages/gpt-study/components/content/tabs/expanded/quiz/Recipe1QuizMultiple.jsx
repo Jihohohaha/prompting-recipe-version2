@@ -1,10 +1,7 @@
-import { motion, useInView } from "framer-motion";
-import { useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
+// src/pages/gpt-study/components/content/tabs/expanded/quiz/Recipe1QuizMultiple.jsx
+import { useState } from "react";
 
-const Recipe1QuizMultiple = () => {
-  const navigate = useNavigate();
-  
+const Recipe1QuizMultiple = ({ onSubmit }) => {
   // 선택한 답변 상태 (1~4)
   const [answers, setAnswers] = useState({
     q1: null,
@@ -27,7 +24,7 @@ const Recipe1QuizMultiple = () => {
     }));
   };
 
-  // 채점 및 제출
+  // ✅ 채점 및 제출 (navigate 제거)
   const handleSubmit = () => {
     // 모든 문제에 답했는지 확인
     if (!answers.q1 || !answers.q2 || !answers.q3) {
@@ -43,36 +40,8 @@ const Recipe1QuizMultiple = () => {
 
     console.log('📊 채점 결과:', { answers, score });
 
-    // 1. 스크롤 먼저 (탭 인터페이스 아래로)
-    scrollToTabInterface();
-
-    // 2. 스크롤 완료 후 페이지 전환 (1.5초 후)
-    setTimeout(() => {
-      navigate(`/gpt-study/recipe1/quiz?step=result&score=${score}`);
-    }, 1500);
-  };
-
-  // 탭 인터페이스 아래로 스크롤
-  const scrollToTabInterface = () => {
-    // Recipe1의 탭 인터페이스를 찾기 (Section.jsx에서 id 부여 필요)
-    const tabElement = document.querySelector('[id^="tab-interface"]');
-    
-    if (tabElement) {
-      // 1. 목표: 탭 인터페이스 바로 아래
-      const targetTop = tabElement.offsetTop + tabElement.offsetHeight;
-      
-      // 2. 최대 스크롤 가능 위치
-      const maxScrollTop = document.documentElement.scrollHeight - window.innerHeight;
-      
-      // 3. 비교 후 결정
-      const finalScrollTop = Math.min(targetTop, maxScrollTop);
-      
-      // 4. 스크롤 실행
-      window.scrollTo({
-        top: finalScrollTop,
-        behavior: 'smooth'
-      });
-    }
+    // ✅ Reference 패턴: 즉시 전환 (콜백 호출)
+    onSubmit(score);
   };
 
   return (
