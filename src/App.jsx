@@ -1,5 +1,6 @@
 // src/App.jsx
 import { BrowserRouter as Router } from 'react-router-dom'
+
 import AppRouter from './AppRouter'
 import './styles/App.css'
 
@@ -23,6 +24,8 @@ const AppContent = () => {
 } */
 
 function App() {
+  
+
   return (
     <Router>
       <AppRouter />
