@@ -363,6 +363,33 @@ const ClosueStatueSelect = () => {
             <KeywordText className="bottom-[580px] right-[290px] translate-x-1/2" fontSizeClass="text-sm">{frontDish.ekw4}</KeywordText>
           </>
         )}
+        
+        {/* 웨이터 석상 */}
+        {isTilt && (
+          <div className="absolute bottom-0 left-[290px] -translate-x-1/2 z-50 pointer-events-none">
+            <style>
+              {`
+                @keyframes waiter-slide-in {
+                  0%   { transform: translateX(-160px); opacity: 0; }
+                  100% { transform: translateX(0);      opacity: 1; }
+                }
+              `}
+            </style>
+
+            <img
+              src="/images/main-page/waiterstatue.png"
+              alt="waiter"
+              className="h-[260px] select-none"
+              draggable={false}
+              style={{
+                // name | duration | timing | delay | fill-mode
+                animation: 'waiter-slide-in 1500ms cubic-bezier(0.2, 0.8, 0.2, 1) 1000ms both',
+                willChange: 'transform, opacity',
+                filter: 'drop-shadow(0 6px 18px rgba(0,0,0,0.25))',
+              }}
+            />
+          </div>
+        )}
 
         {/* 하단 틸트 UI(설명+재료) : 틸트 시 -90° 위치의 접시 기준으로 표시 */}
         {isTilt && (
@@ -389,7 +416,7 @@ const ClosueStatueSelect = () => {
           style={{
             zIndex: isTilt ? 20 : 30,
             transform: `translateX(-50%) translateY(${isTilt ? -250 : 0}px)`,
-            transition: 'transform 2000ms cubic-bezier(0.2, 0.8, 0.2, 1)'
+            transition: `transform ${isTilt ? 1600 : 700}ms ${isTilt ? 'cubic-bezier(0.2, 1, 0.5, 1)' : 'cubic-bezier(0.3, 1, 0.5, 1)'}`
           }}
         >
           <img
@@ -400,7 +427,7 @@ const ClosueStatueSelect = () => {
             style={{
               transform: `scale(${isTilt ? 1.6 : 1})`,
               transformOrigin: 'bottom center',
-              transition: 'transform 1000ms cubic-bezier(0.2, 0.8, 0.2, 1)'
+              transition: `transform ${isTilt ? 1000 : 500}ms ${isTilt ? 'cubic-bezier(0.2, 0.8, 0.2, 1)' : 'cubic-bezier(0.2, 0.8, 0.2, 1)'}`
             }}
           />
         </div>
