@@ -4,6 +4,10 @@ import DishItem from './DishItem';
 const TILT_MS = 800;
 const FADE_MS = 280;
 
+// ★ 공통 회전 애니메이션(모든 궤도에서 사용)
+export const ORBIT_ROTATE_MS = 1000;
+export const ORBIT_EASE = 'cubic-bezier(0.2, 0.8, 0.2, 1)';
+
 function FadePresence({ show, children, style = {}, className = '', instant = false }) {
   const [render, setRender] = useState(show);
   const [visible, setVisible] = useState(false);
@@ -11,15 +15,9 @@ function FadePresence({ show, children, style = {}, className = '', instant = fa
   useEffect(() => {
     if (show) {
       if (!render) setRender(true);
-      // 등장 시에는 기존 페이드 유지
       requestAnimationFrame(() => setVisible(true));
     } else {
-      if (instant) {
-        // 즉시 언마운트(사라짐 모션 없음)
-        setRender(false);
-        setVisible(false);
-        return;
-      }
+      if (instant) { setRender(false); setVisible(false); return; }
       setVisible(false);
       const t = setTimeout(() => setRender(false), FADE_MS);
       return () => clearTimeout(t);
@@ -50,40 +48,28 @@ const DishContainer = React.memo(function DishContainer({
   orbitTiltDeg = 0,
   frontDishIndex,
   dishScales,
-  handleDishClick, // (dish, index)
-  selectedDish,    // 디자인 호환용
+  handleDishClick,
+  selectedDish,     // (호환용)
   hideText = false,
   isTiltMode = false,
-  instant = false, // ⬅️ 틸트 진입 프레임에 즉시 숨김
-  showTiltLogos = true,
+  instant = false,
+  showTiltLogos = true, // 틸트 시 접시 위 로고 표시 여부
 }) {
   const n = items?.length ?? 0;
 
-  // 표시할 인덱스 3개 계산
+  // 보일 인덱스: 프리틸트(45/90/135) vs 틸트(-45/-90/-135)
   let visibleIndexes = null;
   if (n) {
     if (!isTiltMode) {
-      // 프리-틸트: 45°, 90°, 135°
-      visibleIndexes = [
-        ((frontDishIndex + 1) % n),
-        frontDishIndex,
-        ((frontDishIndex - 1 + n) % n),
-      ];
+      visibleIndexes = [((frontDishIndex + 1) % n), frontDishIndex, ((frontDishIndex - 1 + n) % n)];
     } else {
-      // 틸트: -45°, -90°, -135°
-      visibleIndexes = [
-        ((frontDishIndex + 5) % n),
-        ((frontDishIndex - 4 + n) % n),
-        ((frontDishIndex - 5 + n) % n),
-      ];
+      visibleIndexes = [((frontDishIndex + 5) % n), ((frontDishIndex - 4 + n) % n), ((frontDishIndex - 5 + n) % n)];
     }
   }
 
   const baseTilt = orbitTiltDeg;
   const liftY = orbitTiltDeg !== 0 ? -600 : 0;
   const outerTiltTransform = `translateY(${liftY}px) rotateX(${baseTilt}deg)`;
-
-  // 180° 스핀 제거: rotationAngle만 사용
   const innerOrbitTransform = `rotate(${rotationAngle}deg)`;
 
   return (
@@ -97,18 +83,15 @@ const DishContainer = React.memo(function DishContainer({
         transition: `transform ${TILT_MS}ms cubic-bezier(0.2, 0.8, 0.2, 1)`,
       }}
     >
-      <div style={{ transform: innerOrbitTransform, transition: 'transform 1000ms cubic-bezier(0.2, 0.8, 0.2, 1)' }}>
+      <div style={{ transform: innerOrbitTransform, transition: `transform ${ORBIT_ROTATE_MS}ms ${ORBIT_EASE}` }}>
         {items.map((dish, index) => {
           const shouldShow = !visibleIndexes || visibleIndexes.includes(index);
-
-          // 클릭 가능: 현재 보여주는 3개만
           const clickable = shouldShow;
           const tilt = 0;
 
-          // 프리-틸트: 텍스트 보임 / 틸트: 로고표시 및 -90° 타이틀
           const showLogo  = isTiltMode && showTiltLogos && !!dish.logo;
           const showTitle = isTiltMode && index === ((frontDishIndex - 4 + n) % n); // -90°만 제목
-          
+
           return (
             <FadePresence key={`dish-${index}`} show={shouldShow} instant={instant}>
               <DishItem
