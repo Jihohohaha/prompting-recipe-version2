@@ -1,6 +1,6 @@
 // src/App.jsx
 import { BrowserRouter as Router } from 'react-router-dom'
-
+import Header from './components/common/Header'
 import AppRouter from './AppRouter'
 import './styles/App.css'
 
@@ -28,6 +28,7 @@ function App() {
 
   return (
     <Router>
+      <Header />
       <AppRouter />
     </Router>
   )
