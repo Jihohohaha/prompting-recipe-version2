@@ -228,8 +228,8 @@ const Chatbot = () => {
       {/* FAB */}
       <div>
         <img
-          src="/images/main-page/waiterstatue.png"
-          className="absolute bottom-2 right-2 z-[9999] h-[200px] flex items-center justify-center text-white transition-colors cursor-pointer scale-x-[-1]"
+          src="/images/gpt-study/waiter.gif"
+          className="absolute bottom-2 -right-[100px] z-[9999] h-[200px] flex items-center justify-center text-white transition-colors cursor-pointer"
           onClick={() => setOpen((o) => !o)}
           aria-label="Open Chatbot"
         />
