@@ -48,7 +48,7 @@ const AIGallery = () => {
   const transformBackendData = (backendData) => {
     return backendData.map(item => ({
       id: item.gallery_board_id,
-      title: generateTitleFromPrompt(item.prompt),
+      title: item.title || generateTitleFromPrompt(item.prompt),
       artist: item.user?.name || '익명',
       image: item.images && item.images.length > 0 ? item.images[0].image_url : null,
       prompt: item.prompt || '프롬프트 정보가 없습니다.',

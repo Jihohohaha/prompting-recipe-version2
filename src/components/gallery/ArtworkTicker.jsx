@@ -2,110 +2,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion, useAnimation } from 'framer-motion';
 
-// 더미 데이터 - 실제 프로젝트의 src/assets/images 폴더 이미지들 사용
-const DUMMY_ARTWORKS = [
-  {
-    id: 1,
-    title: 'DIGITAL DREAM',
-    artist: 'AIArtist',
-    image: '/src/assets/images/ai-art-gallery.png',
-    style: 'Digital Art',
-    prompt: 'A futuristic cityscape with neon lights and floating buildings',
-    usedAI: ['ChatGPT', 'DALL-E'],
-    createdAt: new Date('2024-03-15')
-  },
-  {
-    id: 2,
-    title: 'ANCIENT WISDOM',
-    artist: 'CreativeBot',
-    image: '/src/assets/images/statue.png',
-    style: 'Classical',
-    prompt: 'Ancient Greek statue with modern artistic interpretation',
-    usedAI: ['ChatGPT', 'Midjourney'],
-    createdAt: new Date('2024-03-10')
-  },
-  {
-    id: 3,
-    title: 'MOSAIC VISION',
-    artist: 'PixelMaster',
-    image: '/src/assets/images/mosaic.png',
-    style: 'Abstract',
-    prompt: 'Colorful mosaic pattern with geometric shapes and vibrant colors',
-    usedAI: ['Kling AI'],
-    createdAt: new Date('2024-03-12')
-  },
-  {
-    id: 4,
-    title: 'NATURAL FLOW',
-    artist: 'EcoArt',
-    image: '/src/assets/images/basil.png',
-    style: 'Nature',
-    prompt: 'Organic patterns inspired by plant structures and natural forms',
-    usedAI: ['ChatGPT', 'Stable Diffusion'],
-    createdAt: new Date('2024-03-08')
-  },
-  {
-    id: 5,
-    title: 'COSMIC ENERGY',
-    artist: 'StarGazer',
-    image: '/src/assets/images/background.png',
-    style: 'Space Art',
-    prompt: 'Galactic nebula with swirling colors and cosmic dust particles',
-    usedAI: ['ChatGPT', 'Kling AI'],
-    createdAt: new Date('2024-03-14')
-  },
-  {
-    id: 6,
-    title: 'FOOD FUSION',
-    artist: 'CulinaryVision',
-    image: '/src/assets/images/tomato-halftone.png',
-    style: 'Pop Art',
-    prompt: 'Pop art style food illustration with halftone patterns',
-    usedAI: ['ChatGPT', 'Kling AI'],
-    createdAt: new Date('2024-03-11')
-  },
-  {
-    id: 7,
-    title: 'CHEESE DREAMS',
-    artist: 'DairyArt',
-    image: '/src/assets/images/cheese.png',
-    style: 'Surreal',
-    prompt: 'Surreal interpretation of dairy products in dreamlike setting',
-    usedAI: ['ChatGPT', 'Kling AI'],
-    createdAt: new Date('2024-03-09')
-  },
-  {
-    id: 8,
-    title: 'ORGANIC MESH',
-    artist: 'BioDesign',
-    image: '/src/assets/images/broccoli.png',
-    style: 'Bio Art',
-    prompt: 'Organic structures and natural textures with scientific precision',
-    usedAI: ['ChatGPT', 'Kling AI'],
-    createdAt: new Date('2024-03-13')
-  },
-  {
-    id: 9,
-    title: 'CULINARY ART',
-    artist: 'FoodieBot',
-    image: '/src/assets/images/olive.png',
-    style: 'Still Life',
-    prompt: 'Mediterranean inspired olive branches with artistic flair',
-    usedAI: ['ChatGPT', 'Kling AI'],
-    createdAt: new Date('2024-03-07')
-  },
-  {
-    id: 10,
-    title: 'SPICE WORLD',
-    artist: 'FlavorAI',
-    image: '/src/assets/images/pepperoni.png',
-    style: 'Food Art',
-    prompt: 'Vibrant spices and ingredients in dynamic composition',
-    usedAI: ['ChatGPT', 'Kling AI'],
-    createdAt: new Date('2024-03-06')
-  }
-];
-
 // 개별 작품 카드 컴포넌트 - 23:18 비율 적용
 const ArtworkCard = ({ artwork, onClick }) => {
   // 제목의 첫 번째 글자와 나머지를 분리하는 함수
@@ -116,7 +12,7 @@ const ArtworkCard = ({ artwork, onClick }) => {
     
     return (
       <>
-        <span className="text-red-600">{firstChar}</span>
+        <span className="text-[#FF6C43]">{firstChar}</span>
         <span className="text-white">{restChars}</span>
       </>
     );
