@@ -8,6 +8,7 @@ import star from "../../TutorialScroll/star.png";
 import lightbulb from "../../TutorialScroll/lightbulb.png";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
+import { g } from "framer-motion/client";
 
 export default function ScrollPage() {
   const navigate = useNavigate();
@@ -174,7 +175,7 @@ export default function ScrollPage() {
         className={`fade-section ${activeIndex === 4 ? "active" : ""}`}
       >
         <div className="step-intro">
-          <p className="step-title">누구나 따라 할 수 있도록</p>
+          <p>누구나 따라 할 수 있도록</p>
           <p>
             읽고, 만들고, 평가받고, 나누는{" "}
             <span className="highlight">4단계</span>로 구성되어 있습니다.
@@ -203,7 +204,17 @@ export default function ScrollPage() {
       >
         <div className="step-row">
           <p>두번째, 학습한 프롬프팅 기법을</p>
-          <img src={gookja} alt="국자 아이콘" className="step-icon" />
+          <motion.img
+            src={gookja}
+            alt="국자"
+            className="w-[150px] origin-top"
+            animate={{ rotate: [0, 15, 0, -15, 0] }}
+            transition={{
+              duration: 2.5,
+              repeat: Infinity,
+              ease: "easeInOut",
+            }}
+          />
           <p>
             간단한 <span className="highlight">객관식</span>으로 복습해요.
           </p>
@@ -219,7 +230,20 @@ export default function ScrollPage() {
           <p>
             세번째, <span className="highlight">직접</span> 프롬프트를 써봐요!
           </p>
-          <img src={star} alt="별 아이콘" className="step-icon" />
+          <motion.img
+            src={star}
+            alt="별 아이콘"
+            className="w-[110px] origin-center"
+            animate={{
+              x: [0, 20, 0, -20, 0], // 좌우로 이동
+              rotate: [0, 12, 0, -12, 0], // 이동에 따라 회전
+            }}
+            transition={{
+              duration: 2.5, // 한 주기 2.5초
+              ease: "easeInOut",
+              repeat: Infinity,
+            }}
+          />
           <p>AI가 결과를 평가해줍니다.</p>
         </div>
       </section>
@@ -231,7 +255,20 @@ export default function ScrollPage() {
       >
         <div className="step-row">
           <p>마지막, 다른 학습자들과 함께</p>
-          <img src={lightbulb} alt="전구 아이콘" className="step-icon" />
+          <motion.img
+            src={lightbulb}
+            alt="전구 아이콘"
+            className="w-[180px] origin-top"
+            animate={{
+              rotate: [0, 5, -5, 4, -4, 2, -2, 0], // 좌우 진동
+              scale: [1, 1.02, 0.98, 1.01, 0.99, 1], // 살짝 확대/축소 진동
+            }}
+            transition={{
+              duration: 2, // 빠른 진동 속도
+              ease: "easeInOut",
+              repeat: Infinity, // 무한 반복
+            }}
+          />
           <p>
             내 프롬프트를 <span className="highlight">공유</span>해봐요.
           </p>
