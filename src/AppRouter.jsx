@@ -18,6 +18,7 @@ import AIArticles from "./pages/community/AIArticles";
 import AIGallery from "./pages/community/AIGallery";
 import Information from "./pages/community/Information";
 import Creation from "./pages/community/Creation";
+import WriteArticle from "./pages/community/WriteArticle";
 
 const AppRouter = () => {
   const location = useLocation();
@@ -64,6 +65,14 @@ const AppRouter = () => {
           element={
             <PrivateRoute>
               <AIGallery />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/community/new"
+          element={
+            <PrivateRoute>
+              <WriteArticle />
             </PrivateRoute>
           }
         />

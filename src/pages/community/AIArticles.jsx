@@ -1,56 +1,84 @@
-// src/pages/community/AIArticles.jsx
-import { motion } from 'framer-motion'
-import { Link } from 'react-router-dom'
+import { useEffect, useState } from 'react';
+import { motion } from 'framer-motion';
+import { Link } from 'react-router-dom';
+import aiInfoBgImage from '../../assets/images/ai_info_bgg.png';
+import apiService from '../../services/apiService'; // ApiService 인스턴스 임포트
 
 const AIArticles = () => {
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50">
-      
-      <div className="pt-20 px-8">
-        <div className="max-w-4xl mx-auto">
-          {/* 헤더 */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="mb-8"
-          >
-            <Link 
-              to="/community" 
-              className="text-blue-600 hover:text-blue-700 mb-4 inline-block font-pretendard"
-            >
-              ← 커뮤니티로 돌아가기
-            </Link>
-            <h1 className="text-4xl font-bold text-gray-800 mb-4 font-pretendard">
-              📚 AI에 관한 글
-            </h1>
-            <p className="text-xl text-gray-600 font-pretendard">
-              AI 기술과 프롬프트 엔지니어링에 대한 깊이 있는 이야기
-            </p>
-          </motion.div>
+  const [articles, setArticles] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-          {/* 콘텐츠 영역 */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            className="bg-white rounded-2xl shadow-xl p-8"
-          >
-            <div className="text-center py-16">
-              <div className="text-6xl mb-6">📝</div>
-              <h2 className="text-2xl font-bold text-gray-800 mb-4 font-pretendard">
-                곧 공개됩니다!
-              </h2>
-              <p className="text-gray-600 font-pretendard">
-                AI에 관한 글 페이지가 준비 중입니다.<br/>
-                전문가들의 인사이트와 유용한 정보로 찾아뵙겠습니다.
-              </p>
-            </div>
-          </motion.div>
+  useEffect(() => {
+    // 실제 API 호출 - 게시글 목록 조회
+    const fetchArticles = async () => {
+      try {
+        const response = await apiService.get('/info-boards', {
+          params: { page: 1, limit: 10 },
+        });
+        setArticles(response.data.data.data || []);
+      } catch (error) {
+        console.error('정보 게시글 불러오기 실패:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchArticles();
+  }, []);
+
+  return (
+    <div className="relative h-screen bg-black">
+      <img
+        src={aiInfoBgImage}
+        alt=""
+        className="fixed top-1/2 left-1/2 w-2/3 max-w-2xl opacity-40 pointer-events-none select-none"
+        style={{ transform: 'translate(-50%, -50%)', zIndex: 0 }}
+      />
+      <div className="relative pt-20 px-8 z-10 bg-black">
+        <div className="max-w-4xl mx-auto bg-black">
+          <div className="flex items-center justify-between mb-4">
+            <h1 className="text-4xl font-bold text-white text-center font-pretendard flex-1">
+              AI 정보 공유
+            </h1>
+            <Link
+              to="/community/new"
+              className="ml-6 px-5 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-lg shadow font-semibold transition"
+            >
+              글 생성
+            </Link>
+          </div>
+
+          <div className="text-white bg-black">
+            <div className="mb-8" />
+            {loading ? (
+              <div className="text-center text-gray-400">로딩 중...</div>
+            ) : articles.length === 0 ? (
+              <div className="text-center text-gray-400">게시글이 없습니다.</div>
+            ) : (
+              articles.map((post, i) => (
+                <div key={post.info_board_id}>
+                  <div className="mb-2">
+                    <div className="text-2xl font-bold mb-3">{post.title}</div>
+                    <div className="flex items-center">
+                      <span className="text-gray-400 text-sm mr-12">{post.user?.name || '운영자'}</span>
+                      <span className="text-gray-500 text-sm ml-auto">
+                        {new Date(post.created_at).toLocaleDateString('ko-KR', {
+                          year: '2-digit',
+                          month: '2-digit',
+                          day: '2-digit',
+                        })}
+                      </span>
+                    </div>
+                  </div>
+                  {i !== articles.length - 1 && <hr className="my-5 border-gray-700" />}
+                </div>
+              ))
+            )}
+            <div className="pb-12 bg-black" />
+          </div>
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default AIArticles
+export default AIArticles;
