@@ -634,7 +634,7 @@ const ClosueStatueSelect = () => {
           <button
             onClick={() => canGoBack && popHistory()}
             disabled={!canGoBack}
-            className={`fixed top-6 left-6 z-[80] px-4 py-2 rounded-xl ${
+            className={`fixed top-20 left-6 z-[80] px-4 py-2 rounded-xl ${
               canGoBack
                 ? "bg-black/70 hover:bg-black/80 cursor-pointer text-white"
                 : "bg-transparent cursor-not-allowed text-transparent pointer-events-none"
