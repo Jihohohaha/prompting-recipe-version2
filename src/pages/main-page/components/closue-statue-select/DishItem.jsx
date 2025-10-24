@@ -61,11 +61,6 @@ const DishItem = React.memo(function DishItem({
             }}
           />
         )}
-        {showTitle && (
-          <div className="text-black text-3xl font-pretendard font-bold leading-none select-none">
-            {dish.title}
-          </div>
-        )}
 
         {/* 프리-틸트: 제목/부제 */}
         {!showLogo && !hideText && (
