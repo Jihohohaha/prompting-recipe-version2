@@ -39,37 +39,6 @@ const TabInterface = ({ recipe }) => {
 
   return (
     <div id={`tab-interface-${recipe.id}`} className="w-full">
-      <div className='w-full rounded-full h-8 flex items-center justify-left px-6 mb-3'
-        style={{ backgroundColor: hexToRgba(primaryColor, 0.88) }}>
-        <div className="text-white font-bold text-sm">
-          {`section ${recipe.id}. ${recipe.displayTitle}`}
-        </div>
-      </div>
-
-      {/* 탭 내용 영역 */}
-      <div 
-        className="px-8 py-10 flex flex-col gap-4 mb-2"
-        style={{ backgroundColor: primaryColor }}
-      >
-        <div className="flex justify-center">
-          <div 
-            className="h-[2px] bg-white"
-            style={{ width: 'calc(100% - 4rem)' }}
-          />
-        </div>
-
-        <div className="text-white font-bold mt-48 text-8xl font-pretendard whitespace-pre-line text-left mt-16">
-          {recipe.displayTitle}
-        </div>
-
-        <div className="flex justify-center">
-          <div 
-            className="h-[2px] bg-white"
-            style={{ width: 'calc(100% - 4rem)' }}
-          />
-        </div>
-      </div>
-
       {/* 탭 헤더 */}
       <div className="flex gap-0">
         {tabs.map((tab, index) => {
@@ -93,6 +62,37 @@ const TabInterface = ({ recipe }) => {
             </button>
           );
         })}
+      </div>
+
+      {/* 탭 내용 영역 */}
+      <div 
+        className="px-8 py-12 flex flex-col gap-4 mb-2"
+        style={{ backgroundColor: primaryColor }}
+      >
+        <div className="flex justify-center">
+          <div 
+            className="h-[2px] bg-white"
+            style={{ width: 'calc(100% - 4rem)' }}
+          />
+        </div>
+
+        <div className="text-white font-bold mt-48 text-8xl font-pretendard whitespace-pre-line text-left mt-16">
+          {recipe.displayTitle}
+        </div>
+
+        <div className="flex justify-center">
+          <div 
+            className="h-[2px] bg-white"
+            style={{ width: 'calc(100% - 4rem)' }}
+          />
+        </div>
+      </div>
+
+      <div className='w-full rounded-full h-8 flex items-center justify-left px-6 mb-3'
+        style={{ backgroundColor: hexToRgba(primaryColor, 0.88) }}>
+        <div className="text-white font-bold text-sm">
+          {`section ${recipe.id}. ${recipe.displayTitle}`}
+        </div>
       </div>
     </div>
   );

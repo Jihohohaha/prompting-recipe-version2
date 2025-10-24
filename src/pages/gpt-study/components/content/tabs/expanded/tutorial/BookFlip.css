@@ -1,0 +1,154 @@
+/* 책 컨테이너 */
+.book-wrapper {
+  position: relative;
+}
+
+.book-container {
+  position: relative;
+  display: flex;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+}
+
+/* ===== 왼쪽 페이지 ===== */
+
+/* 왼쪽 페이지 컨테이너 */
+.page-left-container {
+  position: relative;
+  flex: 1;
+  cursor: pointer;
+  overflow: visible;
+  transform-style: preserve-3d;
+}
+
+/* 왼쪽 페이지 - 앞면 */
+.page-left-front {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: transparent;
+  box-shadow: none;
+  
+  /* 3D 설정 */
+  transform-style: preserve-3d;
+  transform-origin: right center;
+  backface-visibility: hidden;
+  
+  /* 초기 상태 - 항상 0deg */
+  transform: rotateY(0deg);
+  
+  /* transition 없음 - 즉시 초기화 */
+  transition: none;
+  
+  z-index: 2;
+}
+
+/* 왼쪽 페이지 넘어가는 애니메이션 (장식용) */
+.page-left-front.flipping-left {
+  transform: rotateY(180deg);
+  /* 플립할 때만 transition 적용 */
+  transition: transform 0.8s cubic-bezier(0.645, 0.045, 0.355, 1);
+}
+
+/* ===== 오른쪽 페이지 ===== */
+
+/* 오른쪽 페이지 컨테이너 */
+.page-right-container {
+  position: relative;
+  flex: 1;
+  cursor: pointer;
+  overflow: visible;
+  transform-style: preserve-3d;
+}
+
+/* 오른쪽 페이지 - 앞면 */
+.page-right-front {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: transparent;
+  box-shadow: none;
+  
+  /* 3D 설정 */
+  transform-style: preserve-3d;
+  transform-origin: left center;
+  backface-visibility: hidden;
+  
+  /* 초기 상태 - 항상 0deg */
+  transform: rotateY(0deg);
+  
+  /* transition 없음 - 즉시 초기화 */
+  transition: none;
+  
+  z-index: 2;
+}
+
+/* 오른쪽 페이지 넘어가는 애니메이션 (장식용) */
+.page-right-front.flipping-right {
+  transform: rotateY(-180deg);
+  /* 플립할 때만 transition 적용 */
+  transition: transform 0.8s cubic-bezier(0.645, 0.045, 0.355, 1);
+}
+
+/* ===== 가운데 구분선 ===== */
+.book-spine {
+  width: 4px;
+  background: transparent;
+  box-shadow: none;
+  position: relative;
+  z-index: 10;
+}
+
+/* ===== 페이지 래퍼 (패딩 + Fade In/Out) ===== */
+.page-wrapper {
+  width: 100%;
+  height: 100%;
+  padding: 40px;
+  
+  /* 기본 상태 - 새 페이지는 fade in으로 나타남 */
+  opacity: 1;
+  animation: pageAppear 0.5s ease-in-out;
+}
+
+/* 새 페이지가 나타나는 애니메이션 */
+@keyframes pageAppear {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Fade out 애니메이션 (페이지가 넘어갈 때) */
+.page-wrapper.fading-out {
+  opacity: 0;
+  transition: opacity 0.5s ease-out;
+  animation: none; /* fade out 중에는 fade in 애니메이션 제거 */
+}
+
+/* ===== 페이지 콘텐츠 ===== */
+.page-content {
+  width: 100%;
+  height: 100%;
+  background: transparent;
+}
+
+/* ===== 호버 효과 ===== */
+.page-left-container:hover .page-left-front:not(.flipping-left),
+.page-right-container:hover .page-right-front:not(.flipping-right) {
+  /* 호버 시 약간 그림자 효과 (선택사항) */
+  /* box-shadow: 0 0 20px rgba(0, 0, 0, 0.1); */
+}
+
+/* ===== 애니메이션 중 커서 ===== */
+.page-left-front.flipping-left,
+.page-right-front.flipping-right {
+  cursor: wait;
+  pointer-events: none;
+}

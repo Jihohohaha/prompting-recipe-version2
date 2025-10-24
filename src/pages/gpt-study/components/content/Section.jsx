@@ -6,7 +6,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import TabInterface from "./TabInterface";
 import useGPTStudyStore from "../../store";
 
-// Tutorial 컴포넌트 import
+// Tutorial ì»´í¬ë„ŒíŠ¸ import
 import Recipe1TutorialExplain from "./tabs/expanded/tutorial/Recipe1TutorialExplain";
 import Recipe1TutorialExample from "./tabs/expanded/tutorial/Recipe1TutorialExample";
 import Recipe2TutorialExplain from "./tabs/expanded/tutorial/Recipe2TutorialExplain";
@@ -39,30 +39,30 @@ const Section = ({ recipe, index }) => {
   const isQuizExpanded = expandedContent?.recipeId === recipe.id && tab === "quiz";
   const isChatExpanded = expandedContent?.recipeId === recipe.id && tab === "chat";
 
-  // ✅ Reference 패턴: GSAP Timeline으로 열림/닫힘 + 스크롤 관리
+  // âœ… Reference íŒ¨í„´: GSAP Timelineìœ¼ë¡œ ì—´ë¦¼/ë‹«íž˜ + ìŠ¤í¬ë¡¤ ê´€ë¦¬
   useEffect(() => {
-    // 기존 timeline 정리
+    // ê¸°ì¡´ timeline ì •ë¦¬
     if (timelineRef.current) {
       timelineRef.current.pause();
       timelineRef.current.kill();
     }
 
-    // 새 timeline 생성
+    // ìƒˆ timeline ìƒì„±
     timelineRef.current = gsap.timeline({
       onComplete: () => {
         ScrollTrigger.refresh();
-        console.log(`✅ Section ${index} animation complete, ScrollTrigger refreshed`);
+        console.log(`âœ… Section ${index} animation complete, ScrollTrigger refreshed`);
       }
     });
 
     const container = document.querySelector('main');
 
-    // Tutorial 처리
+    // Tutorial ì²˜ë¦¬
     if (tutorialRef.current && container) {
       if (isTutorialExpanded) {
-        console.log(`📖 Opening Tutorial for Recipe ${recipe.id}`);
+        console.log(`ðŸ“– Opening Tutorial for Recipe ${recipe.id}`);
         
-        // 1. 즉시 열림
+        // 1. ì¦‰ì‹œ ì—´ë¦¼
         timelineRef.current.to(tutorialRef.current, {
           height: "auto",
           overflow: "unset",
@@ -70,20 +70,20 @@ const Section = ({ recipe, index }) => {
           duration: 0
         }, 0);
 
-        // 2. ✅ 스크롤 전에 플래그 ON
+        // 2. âœ… ìŠ¤í¬ë¡¤ ì „ì— í”Œëž˜ê·¸ ON
         timelineRef.current.call(() => {
           setProgrammaticScroll(true);
-          console.log('🚫 Programmatic scroll started - ScrollTrigger disabled');
+          console.log('ðŸš« Programmatic scroll started - ScrollTrigger disabled');
         }, null, 0.1);
 
-        // 3. 스크롤 애니메이션
+        // 3. ìŠ¤í¬ë¡¤ ì• ë‹ˆë©”ì´ì…˜
         const sectionElement = containerRef.current;
         const tabInterface = sectionElement?.querySelector(`#tab-interface-${recipe.id}`);
         
         if (tabInterface) {
           const targetScrollTop = tabInterface.offsetTop + tabInterface.offsetHeight;
           
-          console.log(`📜 Scrolling to TabInterface bottom (${targetScrollTop}px)`);
+          console.log(`ðŸ“œ Scrolling to TabInterface bottom (${targetScrollTop}px)`);
           
           timelineRef.current.to(container, {
             scrollTop: targetScrollTop,
@@ -92,17 +92,17 @@ const Section = ({ recipe, index }) => {
           }, 0.1);
         }
         
-        // 4. ✅ 스크롤 완료 후 플래그 OFF
+        // 4. âœ… ìŠ¤í¬ë¡¤ ì™„ë£Œ í›„ í”Œëž˜ê·¸ OFF
         timelineRef.current.call(() => {
           setProgrammaticScroll(false);
-          console.log('✅ Programmatic scroll ended - ScrollTrigger enabled');
-        }, null, 0.9); // 0.1 + 0.8 = 0.9초
+          console.log('âœ… Programmatic scroll ended - ScrollTrigger enabled');
+        }, null, 0.9); // 0.1 + 0.8 = 0.9ì´ˆ
         
       } else if (tutorialRef.current.offsetHeight > 0) {
         const shouldCloseImmediately = container.scrollTop > tutorialRef.current.offsetTop;
         
         if (shouldCloseImmediately) {
-          console.log(`🔽 Closing Tutorial immediately (scrolled past) for Recipe ${recipe.id}`);
+          console.log(`ðŸ”½ Closing Tutorial immediately (scrolled past) for Recipe ${recipe.id}`);
           
           timelineRef.current.set(container, {
             scrollTop: container.scrollTop - tutorialRef.current.offsetHeight
@@ -114,7 +114,7 @@ const Section = ({ recipe, index }) => {
           }, 0);
           
         } else {
-          console.log(`🔽 Closing Tutorial with animation for Recipe ${recipe.id}`);
+          console.log(`ðŸ”½ Closing Tutorial with animation for Recipe ${recipe.id}`);
           
           timelineRef.current.to(tutorialRef.current, {
             height: 0,
@@ -126,12 +126,12 @@ const Section = ({ recipe, index }) => {
       }
     }
 
-    // Quiz 처리
+    // Quiz ì²˜ë¦¬
     if (quizRef.current && container) {
       if (isQuizExpanded) {
-        console.log(`📝 Opening Quiz for Recipe ${recipe.id}`);
+        console.log(`ðŸ“ Opening Quiz for Recipe ${recipe.id}`);
         
-        // 1. 열기
+        // 1. ì—´ê¸°
         timelineRef.current.to(quizRef.current, {
           height: "auto",
           overflow: "unset",
@@ -139,20 +139,20 @@ const Section = ({ recipe, index }) => {
           duration: 0
         }, 0);
         
-        // 2. ✅ 스크롤 전에 플래그 ON
+        // 2. âœ… ìŠ¤í¬ë¡¤ ì „ì— í”Œëž˜ê·¸ ON
         timelineRef.current.call(() => {
           setProgrammaticScroll(true);
-          console.log('🚫 Programmatic scroll started (Quiz)');
+          console.log('ðŸš« Programmatic scroll started (Quiz)');
         }, null, 0.1);
         
-        // 3. 스크롤 애니메이션
+        // 3. ìŠ¤í¬ë¡¤ ì• ë‹ˆë©”ì´ì…˜
         const sectionElement = containerRef.current;
         const tabInterface = sectionElement?.querySelector(`#tab-interface-${recipe.id}`);
         
         if (tabInterface) {
           const targetScrollTop = tabInterface.offsetTop + tabInterface.offsetHeight;
           
-          console.log(`📜 Scrolling to TabInterface bottom for Quiz (${targetScrollTop}px)`);
+          console.log(`ðŸ“œ Scrolling to TabInterface bottom for Quiz (${targetScrollTop}px)`);
           
           timelineRef.current.to(container, {
             scrollTop: targetScrollTop,
@@ -161,17 +161,17 @@ const Section = ({ recipe, index }) => {
           }, 0.1);
         }
         
-        // 4. ✅ 스크롤 완료 후 플래그 OFF
+        // 4. âœ… ìŠ¤í¬ë¡¤ ì™„ë£Œ í›„ í”Œëž˜ê·¸ OFF
         timelineRef.current.call(() => {
           setProgrammaticScroll(false);
-          console.log('✅ Programmatic scroll ended (Quiz)');
+          console.log('âœ… Programmatic scroll ended (Quiz)');
         }, null, 0.9);
         
       } else if (quizRef.current.offsetHeight > 0) {
         const shouldCloseImmediately = container.scrollTop > quizRef.current.offsetTop;
         
         if (shouldCloseImmediately) {
-          console.log(`🔽 Closing Quiz immediately for Recipe ${recipe.id}`);
+          console.log(`ðŸ”½ Closing Quiz immediately for Recipe ${recipe.id}`);
           
           timelineRef.current.set(container, {
             scrollTop: container.scrollTop - quizRef.current.offsetHeight
@@ -183,7 +183,7 @@ const Section = ({ recipe, index }) => {
           }, 0);
           
         } else {
-          console.log(`🔽 Closing Quiz with animation for Recipe ${recipe.id}`);
+          console.log(`ðŸ”½ Closing Quiz with animation for Recipe ${recipe.id}`);
           
           timelineRef.current.to(quizRef.current, {
             height: 0,
@@ -195,12 +195,12 @@ const Section = ({ recipe, index }) => {
       }
     }
 
-    // Chat 처리
+    // Chat ì²˜ë¦¬
     if (chatRef.current && container) {
       if (isChatExpanded) {
-        console.log(`💬 Opening Chat for Recipe ${recipe.id}`);
+        console.log(`ðŸ’¬ Opening Chat for Recipe ${recipe.id}`);
         
-        // 1. 열기
+        // 1. ì—´ê¸°
         timelineRef.current.to(chatRef.current, {
           height: "auto",
           overflow: "unset",
@@ -208,20 +208,20 @@ const Section = ({ recipe, index }) => {
           duration: 0
         }, 0);
         
-        // 2. ✅ 스크롤 전에 플래그 ON
+        // 2. âœ… ìŠ¤í¬ë¡¤ ì „ì— í”Œëž˜ê·¸ ON
         timelineRef.current.call(() => {
           setProgrammaticScroll(true);
-          console.log('🚫 Programmatic scroll started (Chat)');
+          console.log('ðŸš« Programmatic scroll started (Chat)');
         }, null, 0.1);
         
-        // 3. 스크롤 애니메이션
+        // 3. ìŠ¤í¬ë¡¤ ì• ë‹ˆë©”ì´ì…˜
         const sectionElement = containerRef.current;
         const tabInterface = sectionElement?.querySelector(`#tab-interface-${recipe.id}`);
         
         if (tabInterface) {
           const targetScrollTop = tabInterface.offsetTop + tabInterface.offsetHeight;
           
-          console.log(`📜 Scrolling to TabInterface bottom for Chat (${targetScrollTop}px)`);
+          console.log(`ðŸ“œ Scrolling to TabInterface bottom for Chat (${targetScrollTop}px)`);
           
           timelineRef.current.to(container, {
             scrollTop: targetScrollTop,
@@ -230,17 +230,17 @@ const Section = ({ recipe, index }) => {
           }, 0.1);
         }
         
-        // 4. ✅ 스크롤 완료 후 플래그 OFF
+        // 4. âœ… ìŠ¤í¬ë¡¤ ì™„ë£Œ í›„ í”Œëž˜ê·¸ OFF
         timelineRef.current.call(() => {
           setProgrammaticScroll(false);
-          console.log('✅ Programmatic scroll ended (Chat)');
+          console.log('âœ… Programmatic scroll ended (Chat)');
         }, null, 0.9);
         
       } else if (chatRef.current.offsetHeight > 0) {
         const shouldCloseImmediately = container.scrollTop > chatRef.current.offsetTop;
         
         if (shouldCloseImmediately) {
-          console.log(`🔽 Closing Chat immediately for Recipe ${recipe.id}`);
+          console.log(`ðŸ”½ Closing Chat immediately for Recipe ${recipe.id}`);
           
           timelineRef.current.set(container, {
             scrollTop: container.scrollTop - chatRef.current.offsetHeight
@@ -252,7 +252,7 @@ const Section = ({ recipe, index }) => {
           }, 0);
           
         } else {
-          console.log(`🔽 Closing Chat with animation for Recipe ${recipe.id}`);
+          console.log(`ðŸ”½ Closing Chat with animation for Recipe ${recipe.id}`);
           
           timelineRef.current.to(chatRef.current, {
             height: 0,
@@ -275,7 +275,7 @@ const Section = ({ recipe, index }) => {
     <section
       ref={containerRef}
       id={`section-${index}`}
-      className="flex flex-col px-12 py-8"
+      className="flex flex-col px-12"
     >
       {/* Start Anchor */}
       <div 
@@ -284,10 +284,10 @@ const Section = ({ recipe, index }) => {
         className="h-0" 
       />
 
-      {/* 탭 인터페이스 */}
+      {/* íƒ­ ì¸í„°íŽ˜ì´ìŠ¤ */}
       <TabInterface recipe={recipe} />
 
-      {/* Tutorial 컨텐츠 */}
+      {/* Tutorial ì»¨í…ì¸  */}
       <div
         ref={tutorialRef}
         className="bg-black"
@@ -296,12 +296,12 @@ const Section = ({ recipe, index }) => {
           overflow: "hidden"
         }}
       >
-        <div className="py-8">
+        <div className="py-4">
           {renderTutorialContent(recipe.id, index)}
         </div>
       </div>
 
-      {/* Quiz 컨텐츠 */}
+      {/* Quiz ì»¨í…ì¸  */}
       <div
         ref={quizRef}
         className="bg-black"
@@ -315,7 +315,7 @@ const Section = ({ recipe, index }) => {
         </div>
       </div>
 
-      {/* Chat 컨텐츠 */}
+      {/* Chat ì»¨í…ì¸  */}
       <div
         ref={chatRef}
         className="bg-black"
@@ -327,7 +327,7 @@ const Section = ({ recipe, index }) => {
         <div className="py-8">
           <div className="text-white text-center py-20">
             <h2 className="text-4xl font-bold mb-4">CHAT</h2>
-            <p className="text-xl text-gray-400">채팅 기능 준비 중입니다.</p>
+            <p className="text-xl text-gray-400">ì±„íŒ… ê¸°ëŠ¥ ì¤€ë¹„ ì¤‘ìž…ë‹ˆë‹¤.</p>
           </div>
         </div>
       </div>
@@ -342,17 +342,11 @@ const Section = ({ recipe, index }) => {
   );
 };
 
-// Tutorial 컨텐츠 렌더링 헬퍼 함수
+// Tutorial ì»¨í…ì¸  ë Œë”ë§ í—¬í¼ í•¨ìˆ˜
 const renderTutorialContent = (recipeId, index) => {
   switch (recipeId) {
     case 1:
-      return (
-        <>
-          <Recipe1TutorialExplain />
-          <div className="w-full h-12"></div>
-          <Recipe1TutorialExample recipeId={recipeId} index={index} />
-        </>
-      );
+      return <Recipe1TutorialExplain recipeId={recipeId} index={index} />;
     case 2:
       return (
         <>
@@ -396,7 +390,7 @@ const renderTutorialContent = (recipeId, index) => {
     default:
       return (
         <div className="text-white text-center py-20">
-          <p className="text-xl">Tutorial 컨텐츠 준비 중입니다.</p>
+          <p className="text-xl">Tutorial ì»¨í…ì¸  ì¤€ë¹„ ì¤‘ìž…ë‹ˆë‹¤.</p>
         </div>
       );
   }
