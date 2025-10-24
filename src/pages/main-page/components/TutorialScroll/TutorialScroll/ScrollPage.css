@@ -229,3 +229,20 @@ body {
   transform: translateY(0);
   box-shadow: 0 4px 12px rgba(255, 125, 42, 0.4);
 }
+
+.curtain {
+  position: fixed;
+  top: 0;
+  width: 50vw;
+  height: 100vh;
+  background: #000;
+  z-index: 9999;
+}
+
+.curtain.left {
+  left: 0;
+}
+
+.curtain.right {
+  right: 0;
+}

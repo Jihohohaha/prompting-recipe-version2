@@ -4,6 +4,7 @@ import GPTStudy from "./pages/gpt-study/GPTStudy";
 import Recipe1QuizMultipleResult from "./pages/gpt-study/components/content/tabs/expanded/quiz/Recipe1QuizMultipleResult";
 import Recipe1QuizEssay from "./pages/gpt-study/components/content/tabs/expanded/quiz/Recipe1QuizEssay";
 import ScrollPage from "./pages/main-page/components/TutorialScroll/TutorialScroll/ScrollPage";
+import ClosueStatueSelect from "./pages/main-page/components/closue-statue-select/ClosueStatueSelect";
 import { Routes, Route, useLocation } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
 
@@ -11,50 +12,14 @@ const AppRouter = () => {
   const location = useLocation();
 
   return (
-    <AnimatePresence mode="wait">
-      <Routes location={location} key={location.pathname}>
-        <Route
-          path="/"
-          element={
-            <PageTransition>
-              <MainPage />
-            </PageTransition>
-          }
-        />
-        <Route
-          path="/gpt-study"
-          element={
-            <PageTransition>
-              <GPTStudy />
-            </PageTransition>
-          }
-        />
-        <Route
-          path="/tutorial"
-          element={
-            <PageTransition direction="forward">
-              <ScrollPage />
-            </PageTransition>
-          }
-        />
-        <Route
-          path="/test"
-          element={
-            <PageTransition>
-              <Recipe1QuizMultipleResult />
-            </PageTransition>
-          }
-        />
-        <Route
-          path="/test2"
-          element={
-            <PageTransition>
-              <Recipe1QuizEssay />
-            </PageTransition>
-          }
-        />
-      </Routes>
-    </AnimatePresence>
+    <Routes>
+      <Route path="/" element={<MainPage />} />
+      <Route path="/gpt-study" element={<GPTStudy />} />
+      <Route path="/tutorial" element={<ScrollPage />} />
+      <Route path="/test" element={<Recipe1QuizMultipleResult />} />
+      <Route path="/test2" element={<Recipe1QuizEssay />} />
+      <Route path="/select" element={<ClosueStatueSelect />} />
+    </Routes>
   );
 };
 

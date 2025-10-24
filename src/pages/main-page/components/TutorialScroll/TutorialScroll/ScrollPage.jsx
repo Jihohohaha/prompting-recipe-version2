@@ -6,8 +6,19 @@ import book from "../../TutorialScroll/book.png";
 import gookja from "../../TutorialScroll/gookja.png";
 import star from "../../TutorialScroll/star.png";
 import lightbulb from "../../TutorialScroll/lightbulb.png";
+import { useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
 
 export default function ScrollPage() {
+  const navigate = useNavigate();
+  const [closing, setClosing] = useState(false);
+
+  const handleStartClick = () => {
+    setClosing(true);
+    // 닫히는 모션 후 페이지 이동
+    setTimeout(() => navigate("/select"), 1200);
+  };
+
   const sectionsRef = useRef([]);
   const [activeIndex, setActiveIndex] = useState(0);
 
@@ -185,9 +196,30 @@ export default function ScrollPage() {
           <p className="highlight-final">
             지금, 당신의 첫 번째 AI 레시피를 완성해보세요.
           </p>
-          <button className="start-button">학습 시작하기</button>
+          <button className="start-button" onClick={handleStartClick}>
+            학습 시작하기
+          </button>
         </div>
       </section>
+      {/* 🔥 커튼 닫히는 애니메이션 */}
+      {closing && (
+        <>
+          {/* 왼쪽 커튼 */}
+          <motion.div
+            className="curtain left"
+            initial={{ x: "-100%" }}
+            animate={{ x: 0 }}
+            transition={{ duration: 1.2, ease: [0.83, 0, 0.17, 1] }}
+          />
+          {/* 오른쪽 커튼 */}
+          <motion.div
+            className="curtain right"
+            initial={{ x: "100%" }}
+            animate={{ x: 0 }}
+            transition={{ duration: 1.2, ease: [0.83, 0, 0.17, 1] }}
+          />
+        </>
+      )}
     </div>
   );
 }
