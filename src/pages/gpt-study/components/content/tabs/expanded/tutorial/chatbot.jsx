@@ -75,7 +75,6 @@ const Chatbot = () => {
     const clientX = e.clientX;
     const clientY = e.clientY;
 
-    // 뷰포트 크기
     const vw = window.innerWidth;
     const vh = window.innerHeight;
 
@@ -109,11 +108,9 @@ const Chatbot = () => {
         newTop = startTop + dy;
       }
 
-      // 크기 클램핑
       newW = Math.max(MIN_W, Math.min(newW, Math.floor(vw * 0.95)));
       newH = Math.max(MIN_H, Math.min(newH, Math.floor(vh * 0.9)));
 
-      // 위치 클램핑
       newLeft = Math.max(0, Math.min(newLeft, vw - newW));
       newTop = Math.max(0, Math.min(newTop, vh - newH));
 
@@ -139,11 +136,18 @@ const Chatbot = () => {
     };
   }, [dragging, resizing, offset, size]);
 
+  // Esc로 닫기
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e) => {
+      if (e.key === "Escape") setOpen(false);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [open]);
+
   // 데모용 봇 응답 함수 (실서비스에선 교체)
   const requestBot = async (userText) => {
-    // 여기를 실제 API 호출로 바꿔 사용하세요.
-    // 예: const res = await fetch('/api/chat', { method:'POST', body: JSON.stringify({ text:userText }) })
-    //     const data = await res.json(); return data.reply;
     return new Promise((resolve) => {
       setTimeout(() => resolve(`"${userText}" 에 대한 응답이에요! 😄`), 1200);
     });
@@ -156,12 +160,11 @@ const Chatbot = () => {
     setMessages((prev) => [...prev, { text, from: "user" }]);
     setInput("");
 
-    // 타이핑 버블 표시
     setTyping(true);
     try {
       const reply = await requestBot(text);
       setMessages((prev) => [...prev, { text: reply, from: "bot" }]);
-    } catch (e) {
+    } catch {
       setMessages((prev) => [
         ...prev,
         { text: "오류가 발생했어요. 잠시 후 다시 시도해 주세요.", from: "bot" },
@@ -190,18 +193,27 @@ const Chatbot = () => {
       `}</style>
 
       {/* FAB */}
-      <button
-        className="absolute bottom-[100px] right-8 z-[9999] w-12 h-12 rounded-full bg-[#FE7525] shadow-lg flex items-center justify-center text-white text-[16px] hover:bg-[#FF8C42] transition-colors"
-        onClick={() => setOpen((o) => !o)}
-        aria-label="Open Chatbot"
-      >
-        Q/A
-      </button>
+      <div>
+        <img
+          src="/images/main-page/waiterstatue.png"
+          className="absolute bottom-2 right-2 z-[9999] h-[200px] flex items-center justify-center text-white transition-colors cursor-pointer scale-x-[-1]"
+          onClick={() => setOpen((o) => !o)}
+          aria-label="Open Chatbot"
+        />
+          <div className="absolute bottom-[160px] right-0 text-black px-4 py-2 rounded-xl shadow-lg text-sm font-semibold whitespace-nowrap z-[9999] -rotate-2">
+            Click!
+          </div>
+          <div className="absolute bottom-[200px] right-2 text-black px-4 py-2 rounded-xl shadow-lg text-sm font-semibold whitespace-nowrap z-[9999] rotate-12">
+            Click!
+          </div>
+      </div>
 
       {/* 모달 */}
       {open && (
         <div
           ref={modalRef}
+          role="dialog"
+          aria-modal="true"
           className="fixed bg-white rounded-xl shadow-2xl flex flex-col z-[9999] border border-[#FE7525]"
           style={{
             left: position.x !== null ? position.x : undefined,
@@ -213,12 +225,22 @@ const Chatbot = () => {
             cursor: dragging ? "grabbing" : resizeCursor || "default",
           }}
         >
-          {/* 드래그 핸들(상단 바) */}
+          {/* 드래그 핸들(상단 바) + 닫기 버튼 */}
           <div
-            className="px-4 py-3 border-b bg-[#FE7525] text-white font-bold rounded-t-xl cursor-move select-none"
+            className="relative px-4 py-3 border-b bg-[#FE7525] text-white font-bold rounded-t-xl cursor-move select-none"
             onPointerDown={handleDragStart}
           >
             채팅 로보트
+            <button
+              type="button"
+              onClick={(e) => { e.stopPropagation(); setOpen(false); }}
+              onPointerDown={(e) => e.stopPropagation()} // 드래그로 인식 방지
+              aria-label="닫기"
+              title="닫기"
+              className="absolute text-[32px] font-light -right-3 top-1/2 -translate-y-1/2 w-8 h-8 inline-flex items-center justify-center rounded-md bg-transparent active:scale-95 transition"
+            >
+              ×
+            </button>
           </div>
 
           {/* 메시지 */}
@@ -235,7 +257,7 @@ const Chatbot = () => {
                   </div>
                 ))}
 
-                {/* 타이핑 버블: 점 3개가 순차적으로 출렁 */}
+                {/* 타이핑 버블 */}
                 {typing && (
                   <div className="my-2 flex justify-start" aria-live="polite" aria-label="봇이 입력 중">
                     <div className="inline-flex items-center gap-1 h-5 px-3 py-2 rounded-lg bg-gray-200 text-gray-800">
@@ -259,26 +281,21 @@ const Chatbot = () => {
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && handleSend()}
               placeholder="무엇이든 물어보세요!"
-              disabled={typing && !input} // 타이핑 중에도 새 입력은 허용하려면 이 줄 제거
             />
             <button
-              className="ml-2 p-2 h-10 w-10 rounded-full bg-[#FE7525] text-white font-semibold hover:bg-[#FF8C42] transition-colors disabled:opacity-60"
+              className="ml-2 p-2 h-10 w-10 rounded-full bg-[#FE7525] text-white font-semibold hover:bg-[#FF8C42] transition-colors"
               onClick={handleSend}
-              disabled={typing && !input}
               title="전송"
             >
               {"->"}
             </button>
           </div>
 
-          {/* ── 리사이즈 핸들 8개 (투명, 넓은 히트영역) ── */}
-          {/* 모서리 */}
+          {/* 리사이즈 핸들 */}
           <div onPointerDown={handleResizeStart("nw")} className="absolute -top-1 -left-1 w-3 h-3" style={{ cursor: "nwse-resize" }} />
           <div onPointerDown={handleResizeStart("ne")} className="absolute -top-1 -right-1 w-3 h-3" style={{ cursor: "nesw-resize" }} />
           <div onPointerDown={handleResizeStart("sw")} className="absolute -bottom-1 -left-1 w-3 h-3" style={{ cursor: "nesw-resize" }} />
           <div onPointerDown={handleResizeStart("se")} className="absolute -bottom-1 -right-1 w-3 h-3" style={{ cursor: "nwse-resize" }} />
-
-          {/* 변 */}
           <div onPointerDown={handleResizeStart("n")} className="absolute -top-1 left-2 right-2 h-2" style={{ cursor: "ns-resize" }} />
           <div onPointerDown={handleResizeStart("s")} className="absolute -bottom-1 left-2 right-2 h-2" style={{ cursor: "ns-resize" }} />
           <div onPointerDown={handleResizeStart("w")} className="absolute top-2 bottom-2 -left-1 w-2" style={{ cursor: "ew-resize" }} />
