@@ -41,7 +41,7 @@ const SuccessScreen = ({ onNext }) => {
 
   return (
     <div 
-      className="relative w-full h-[700px] bg-cover bg-center" 
+      className="relative w-full h-[98vh] bg-cover bg-center" 
       style={{ backgroundImage: `url(${backgroundImagePath})` }}
     >
       <div className="w-full flex items-center justify-between px-[48px] pt-[28px]">
@@ -59,14 +59,7 @@ const SuccessScreen = ({ onNext }) => {
       <img 
         src="/images/gpt-study/quiz/SuccessMain.png"
         alt="Success Main"
-        className="absolute"
-        style={{
-          left: '50%',
-          top: '50%',
-          transform: 'translate(-50%, -50%)',
-          width: '1200px',
-          height: 'auto'
-        }}
+        className="absolute left-1/2 bottom-[60px] -translate-x-1/2 w-[960px] h-auto"
       />
 
       <img 
@@ -80,15 +73,10 @@ const SuccessScreen = ({ onNext }) => {
       />
 
       <div 
-        className="absolute font-pretendard text-xl text-white text-center tracking-widest"
-        style={{
-          left: '30%',
-          bottom: '20px'
-        }}
-      >
+        className="absolute font-pretendard text-[16px] text-white text-center tracking-widest left-1/2 -translate-x-1/2 bottom-6">
         요리 마스터가 되기 위한 비밀 레시피북을 손에 넣었습니다!<br/>
         이제 이 책을 펼쳐, 본격적으로 요리를 시작해볼까요?
-      </div>
+      </div> 
 
       <button
         onClick={onNext}

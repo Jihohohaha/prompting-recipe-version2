@@ -51,9 +51,9 @@ const Community = () => {
   }
 
   return (
-    <div className="w-full h-screen overflow-hidden relative">
+    <div className="w-full h-screen object-contain relative">
       {/* 배경 레이어 */}
-      <CommunityBackground 
+      <CommunityBackground
         hoveredButton={hoveredButton} 
         communityButtons={communityButtons} 
       />
