@@ -4,9 +4,9 @@ import CommunityBackground from '../../components/community/CommunityBackground'
 import CommunityHeader from '../../components/community/CommunityHeader'
 import CommunityButton from '../../components/community/CommunityButton'
 
-import aboutAiBg from '../../assets/images/about-ai-bg.png'
+import aboutAiBg from '../../assets/images/ai_info_bg.png'
 
-import aiArtGalleryBg from '../../assets/images/ai-art-gallery.png'
+import aiArtGalleryBg from '../../assets/images/ai_gallery_bg.png'
 
 const Community = () => {
   const navigate = useNavigate()

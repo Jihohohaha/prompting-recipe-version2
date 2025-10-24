@@ -54,7 +54,7 @@ const ArtworkModal = ({ artwork, onClose }) => {
     <>
       {/* 메인 모달 */}
       <div 
-        className="fixed inset-0 z-50 bg-gray-900 overflow-auto" // 배경색 변경
+        className="fixed inset-0 z-50 bg-black overflow-auto" // 배경색 변경
         onClick={handleBackdropClick}
       >
         {/* 배경 텍스트 - 가장 아래 레이어 */}
@@ -128,7 +128,7 @@ const ArtworkModal = ({ artwork, onClose }) => {
             <img
               src={galleryForkImage}
               alt="Gallery Fork"
-              className="absolute bottom-8 right-8 w-64 h-auto z-30"
+              className="absolute bottom-8 right-8 w-[378px] h-auto z-30"
             />
           </div>
         </div>
