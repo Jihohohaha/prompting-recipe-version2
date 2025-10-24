@@ -29,7 +29,7 @@ const AppRouter = () => {
     <AnimatePresence mode="wait">
       <Routes>
         <Route path="/login" element={<SocialLoginPage />} />
-        <Route path="/auth/callback" element={<AuthCallback />} />
+        <Route path="/auth/google/callback" element={<AuthCallback />} />
         <Route
           path="/"
           element={

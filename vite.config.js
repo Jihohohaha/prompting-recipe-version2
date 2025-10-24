@@ -6,12 +6,12 @@ export default defineConfig({
   server: {
     proxy: {
       '/backend': {
-        target: 'http://localhost:3000',
+        target: 'https://art-sw2025-be.vercel.app',
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/backend/, '')
       },
       '/api': {
-        target: 'http://localhost:3000',
+        target: 'https://art-sw2025-be.vercel.app',
         changeOrigin: true,
         secure: false
       },

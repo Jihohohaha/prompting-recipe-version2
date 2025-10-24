@@ -3,7 +3,7 @@ import axios from 'axios'
 
 class ApiService {
   constructor() {
-    this.baseURL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000'
+    this.baseURL = 'https://art-sw2025-be.vercel.app'
     this.accessToken = null
     
     // Axios 인스턴스 생성

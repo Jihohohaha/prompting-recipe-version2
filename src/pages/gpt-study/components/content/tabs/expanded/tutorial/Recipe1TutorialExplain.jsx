@@ -487,19 +487,22 @@ const Page4 = ({ isPage3Completed }) => {
               transform: 'translateX(-50%)'
             }}
           >
-            <span className="text-gray-600 text-center font-pretendard text-base w-full pl-12 pr-10 leading-snug">
-              너는 초등학교 수학 선생님이야.
-              <br />
-              학생의 질문에는 반드시 초등학생이
-              <br />
-              이해할 수 있는 수준으로 풀이 과정을 설명해.
-            </span>
+            <div className="-translate-x-[30px]">
+              <span className="text-gray-600 text-center font-pretendard text-base w-full pr-10 leading-snug">
+                너는 초등학교 수학 선생님이야.
+                <br />
+                학생의 질문에는 반드시 초등학생이
+                <br />
+                이해할 수 있는 수준으로 풀이 과정을 설명해.
+              </span>
+            </div>
+
             <button
               onClick={(e) => {
                 e.stopPropagation();
                 handleSendMessage();
               }}
-              className="absolute right-2 flex-shrink-0 hover:opacity-80 transition-opacity bg-transparent border-none p-0 cursor-pointer z-10"
+              className="absolute right-[100px] flex-shrink-0 hover:opacity-80 transition-opacity bg-transparent border-none p-0 cursor-pointer z-10"
             >
               <img
                 src="/images/gpt-study/Arrow2.png"

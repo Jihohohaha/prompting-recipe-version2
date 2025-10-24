@@ -1,8 +1,8 @@
 import React, { useEffect, useRef, useState } from "react";
 import "./ScrollPage.css";
 import orange_line from "../../TutorialScroll/orange_line.png";
-import orange_book from "../../TutorialScroll/orange_book.png";
-import book from "../../TutorialScroll/book.png";
+import orange_book from "../../TutorialScroll/orange_book.gif";
+import book from "../../TutorialScroll/book.gif";
 import gookja from "../../TutorialScroll/gookja.png";
 import star from "../../TutorialScroll/star.png";
 import lightbulb from "../../TutorialScroll/lightbulb.png";
@@ -99,7 +99,7 @@ export default function ScrollPage() {
         className={`fade-section ${activeIndex === 0 ? "active" : ""}`}
       >
         <motion.div
-          className="intro-text"
+          className="intro-text text-center"
           initial={{ opacity: 0, y: 40 }} // 👈 처음엔 투명 + 아래쪽
           animate={{ opacity: 1, y: 0 }} // 👈 자연스럽게 올라오면서 등장
           transition={{
@@ -282,10 +282,13 @@ export default function ScrollPage() {
       >
         <div className="ending-text">
           <p>AI 프롬프팅의 전 과정을 한 곳에서.</p>
-          <p className="highlight-final">
+          <p className="ending-text">
             지금, 당신의 첫 번째 AI 레시피를 완성해보세요.
           </p>
-          <button className="start-button" onClick={handleStartClick}>
+          <p className="highlight-final">
+            누구나 시작할 수 있는, 쉬운 첫걸음부터.
+          </p>
+          <button className="start-button rounded-full px-6 py-2" onClick={handleStartClick}>
             학습 시작하기
           </button>
         </div>
