@@ -3,7 +3,6 @@ import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom';
 import DishContainer from './DishContainer';
 import FloatingImage from './FloatingImage';
-import KeywordText from './KeywordText';
 import OrbitOverlay from './OrbitOverlay';
 import LogoOrbit from './LogoOrbit';
 import { dishes as dishesBase, getAIMenuFor } from './dishesData';
