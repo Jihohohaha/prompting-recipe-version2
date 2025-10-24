@@ -9,7 +9,10 @@ import React, {
 import { useNavigate } from "react-router-dom";
 import DishContainer from "./DishContainer";
 import FloatingImage from "./FloatingImage";
+<<<<<<< HEAD
 import KeywordText from "./KeywordText";
+=======
+>>>>>>> origin/main
 import OrbitOverlay from "./OrbitOverlay";
 import LogoOrbit from "./LogoOrbit";
 import { dishes as dishesBase, getAIMenuFor } from "./dishesData";
@@ -132,9 +135,15 @@ const ClosueStatueSelect = () => {
     }
     if (isTilt) {
       cornerTimerRef.current = setTimeout(
+<<<<<<< HEAD
         () => setCornerLogoVisible(true),
         1200
       );
+=======
+        () => setCornerLogoVisible(false),
+        1000
+      ); // Updated delay to 1000ms
+>>>>>>> origin/main
     } else {
       setCornerLogoVisible(false);
     }
@@ -336,7 +345,11 @@ const ClosueStatueSelect = () => {
   const descriptionScale = isTilt ? 2 : 1;
   const floatingStyle = {
     opacity: isTilt ? 0 : 1,
+<<<<<<< HEAD
     transition: "opacity 800ms cubic-bezier(0.2, 0.8, 0.2, 1)",
+=======
+    transition: "opacity 200ms cubic-bezier(0.2, 0.8, 0.2, 1)",
+>>>>>>> origin/main
   };
 
   const [dishScales, setDishScales] = useState(() =>
@@ -362,7 +375,11 @@ const ClosueStatueSelect = () => {
 
       {showMask && (
         <div
+<<<<<<< HEAD
           className="fixed inset-0 bg-black/90 z-[100]"
+=======
+          className="fixed inset-0 bg-black/90 z-[100] cursor-pointer select-none"
+>>>>>>> origin/main
           onClick={() => setShowMask(false)}
         >
           <div className="absolute inset-0 flex flex-col items-center justify-center cursor-pointer transition-opacity duration-500">
@@ -392,18 +409,39 @@ const ClosueStatueSelect = () => {
       >
         {/* 스크롤 프록시 */}
         <div
+<<<<<<< HEAD
           className="absolute inset-0 overflow-y-auto z-50 scrollbar-hide"
           style={{ WebkitOverflowScrolling: "touch", pointerEvents: "none" }}
+=======
+          className="absolute inset-0 w-screen h-[200vh]"
+          style={{
+            zIndex: 0,
+            background:
+              "linear-gradient(to bottom, black, black, #FF7D2A, #FF7D2A, #FF7D2A)",
+            transform: `translateY(${isTilt ? "-100vh" : "0"})`,
+            transition: "transform 900ms cubic-bezier(0.5, 0.8, 0.2, 1)",
+            willChange: "transform",
+            pointerEvents: "none",
+          }}
+>>>>>>> origin/main
           aria-hidden="true"
         >
           <div className="h-[1000vh]" />
         </div>
 
+<<<<<<< HEAD
         {/* 제목/설명 */}
         <div className="absolute top-12 left-1/2 -translate-x-1/2 text-center z-20 pointer-events-none">
           <h1
             className="text-6xl font-bold text-black mb-4 font-koolegant"
             style={{
+=======
+        <div className="absolute top-1/4 left-1/2 -translate-y-1/2 -translate-x-1/2">
+          <h1
+            className="text-[320px] font-bold text-white opacity-[20%] mb-4 font-koolegant whitespace-nowrap"
+            style={{
+              color: isTilt ? "transparent" : "white",
+>>>>>>> origin/main
               transform: `scale(${titleScale})`,
               transformOrigin: "top",
               transition: "transform 800ms cubic-bezier(0.2, 0.8, 0.2, 1)",
@@ -411,6 +449,7 @@ const ClosueStatueSelect = () => {
           >
             {titleText}
           </h1>
+<<<<<<< HEAD
           <p
             className="text-xl text-black"
             style={{
@@ -418,6 +457,140 @@ const ClosueStatueSelect = () => {
               transformOrigin: "center",
               transition: "opacity 0ms",
               opacity: descriptionScale === 1 ? 1 : 0,
+=======
+        </div>
+
+        <div
+          className="absolute w-[96vw] top-0 left-[2vw]"
+          style={{
+            opacity: isTilt ? "100" : "0",
+            transform: isTilt ? "translateY(0)" : "translateY(-100px)",
+            transformOrigin: "top",
+            transition: isTilt
+              ? "transform 800ms cubic-bezier(0.2, 0.8, 0.2, 1) 500ms, opacity 800ms cubic-bezier(0.2, 0.8, 0.2, 1) 500ms"
+              : "none",
+          }}
+        >
+          <img src="/images/main-page/chandelier.png" />
+        </div>
+
+        {/* 콘텐츠 래퍼(배경 위에 고정) */}
+        <div className="relative z-[1]">
+          {/* 스크롤 프록시 */}
+          <div
+            className="absolute inset-0 overflow-y-auto z-50 scrollbar-hide"
+            style={{ WebkitOverflowScrolling: "touch", pointerEvents: "none" }}
+            aria-hidden="true"
+          >
+            <div className="h-[1000vh]" />
+          </div>
+
+          {/* 제목/설명 */}
+          <div className="absolute top-12 left-1/2 -translate-x-1/2 text-center z-20 pointer-events-none">
+            <h1
+              className="text-6xl font-bold text-white mb-4 font-koolegant"
+              style={{
+                color: isTilt ? "black" : "white",
+                transform: `scale(${titleScale})`,
+                transformOrigin: "top",
+                transition: "transform 800ms cubic-bezier(0.2, 0.8, 0.2, 1)",
+              }}
+            >
+              {titleText}
+            </h1>
+            <p
+              className="text-xl text-white"
+              style={{
+                transform: `scale(${descriptionScale})`,
+                transformOrigin: "center",
+                transition: "opacity 0ms",
+                opacity: descriptionScale === 1 ? 1 : 0,
+              }}
+            >
+              {frontDish?.description}
+            </p>
+          </div>
+
+          {/* 부유 장식 */}
+          <div style={floatingStyle}>
+            <FloatingImage
+              src="/images/main-page/float1.png"
+              alt="f1"
+              className="top-[220px] left-[10px] w-[400px] h-[400px] z-0"
+            />
+            <FloatingImage
+              src="/images/main-page/float2.png"
+              alt="f2"
+              className="top-[100px] left-[350px] w-[240px] h-[240px] z-0"
+            />
+            <FloatingImage
+              src="/images/main-page/float3.png"
+              alt="f3"
+              className="top-[120px] right-[200px] w-[240px] h-[240px] z-0"
+            />
+            <FloatingImage
+              src="/images/main-page/float4.png"
+              alt="f4"
+              className="top-[400px] right-[10px] w-[240px] h-[240px] z-0"
+            />
+          </div>
+
+          {/* 웨이터 석상 */}
+          {isTilt && (
+            <div className="fixed bottom-0 left-[290px] -translate-x-1/2 z-50 pointer-events-none">
+              <style>
+                {`@keyframes waiter-slide-in {0%{transform:translateX(-160px);opacity:0;}100%{transform:translateX(0);opacity:1;}}`}
+              </style>
+              <img
+                src="/images/main-page/waiterstatue.png"
+                alt="waiter"
+                className="h-[260px] select-none"
+                draggable={false}
+                style={{
+                  animation:
+                    "waiter-slide-in 1500ms cubic-bezier(0.2, 0.8, 0.2, 1) 1000ms both",
+                  willChange: "transform, opacity",
+                  filter: "drop-shadow(0 6px 18px rgba(0,0,0,0.25))",
+                }}
+              />
+            </div>
+          )}
+
+          {/* 하단 틸트 UI */}
+          {isTilt && (
+            <div className="fixed left-1/2 -translate-x-1/2 bottom-[20px] h-[160px] rounded-[25px] z-[20] shadow-lg flex items-center">
+              <div className="relative h-full w-[1000px] rounded-l-[24px] bg-white bg-opacity-[40%]"></div>
+              <div className="absolute inset-0 flex items-center justify-center">
+                <p className="text-black text-[18px] text-center leading-[1.7] font-pretendard font-medium whitespace-pre-line">
+                  {detailDish?.description}
+                </p>
+              </div>
+              <div className="relative flex flex-col items-center justify-center h-full w-[260px] rounded-r-[24px] bg-black bg-opacity-[70%]">
+                <div className="text-[40px] font-koolegant mb-2">
+                  Ingredient
+                </div>
+                <div className="text-[16px] font-pretendard text-white">
+                  {[detailDish?.kw1, detailDish?.kw2, detailDish?.kw3]
+                    .filter(Boolean)
+                    .join(", ")}
+                  {detailDish?.kw4 ? `, ${detailDish.kw4}` : ""}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* 석상 */}
+          <div
+            className="fixed bottom-0 left-1/2 pointer-events-none"
+            style={{
+              zIndex: isTilt ? 20 : 30,
+              transform: `translateX(-50%) translateY(${isTilt ? -250 : 0}px)`,
+              transition: `transform ${isTilt ? 1600 : 700}ms ${
+                isTilt
+                  ? "cubic-bezier(0.2, 1, 0.5, 1)"
+                  : "cubic-bezier(0.3, 1, 0.8, 1)"
+              }`,
+>>>>>>> origin/main
             }}
           >
             {frontDish?.description}
@@ -514,10 +687,18 @@ const ClosueStatueSelect = () => {
               className="h-[260px] select-none"
               draggable={false}
               style={{
+<<<<<<< HEAD
                 animation:
                   "waiter-slide-in 1500ms cubic-bezier(0.2, 0.8, 0.2, 1) 1000ms both",
                 willChange: "transform, opacity",
                 filter: "drop-shadow(0 6px 18px rgba(0,0,0,0.25))",
+=======
+                transform: `scale(${isTilt ? 1.6 : 1})`,
+                transformOrigin: "bottom center",
+                transition: `transform ${
+                  isTilt ? 1000 : 500
+                }ms cubic-bezier(0.2, 0.8, 0.2, 1)`,
+>>>>>>> origin/main
               }}
             />
           </div>
@@ -563,11 +744,20 @@ const ClosueStatueSelect = () => {
             className="w-96 h-[250px] object-contain"
             draggable={false}
             style={{
+<<<<<<< HEAD
               transform: `scale(${isTilt ? 1.6 : 1})`,
               transformOrigin: "bottom center",
               transition: `transform ${
                 isTilt ? 1000 : 500
               }ms cubic-bezier(0.2, 0.8, 0.2, 1)`,
+=======
+              left: typeof window !== "undefined" ? window.innerWidth / 2 : 0,
+              top:
+                typeof window !== "undefined"
+                  ? window.innerHeight / 2 + 530
+                  : 0,
+              transformOrigin: "0 0",
+>>>>>>> origin/main
             }}
           />
         </div>
@@ -619,6 +809,7 @@ const ClosueStatueSelect = () => {
               instant={instantHide}
               showGuide={showGuides}
             />
+<<<<<<< HEAD
           )}
         </div>
 
@@ -635,6 +826,36 @@ const ClosueStatueSelect = () => {
         >
           {"<-"}
         </button>
+=======
+
+            {/* ⬇️ 로고 전용 궤도: 반드시 같은 컨테이너 안에! */}
+            {isTilt && (
+              <LogoOrbit
+                items={items}
+                rotationAngle={rotationAngle}
+                orbitTiltDeg={orbitTiltDeg}
+                frontDishIndex={frontDishIndex}
+                instant={instantHide}
+                showGuide={showGuides}
+              />
+            )}
+          </div>
+
+          {/* 뒤로가기 */}
+          <button
+            onClick={() => canGoBack && popHistory()}
+            disabled={!canGoBack}
+            className={`fixed top-6 left-6 z-[80] px-4 py-2 rounded-xl ${
+              canGoBack
+                ? "bg-black/70 hover:bg-black/80 cursor-pointer text-white"
+                : "bg-transparent cursor-not-allowed text-transparent pointer-events-none"
+            } transition-colors`}
+            title={canGoBack ? "뒤로" : "되돌릴 상태 없음"}
+          >
+            {"<-"}
+          </button>
+        </div>
+>>>>>>> origin/main
         {opening && (
           <>
             <motion.div

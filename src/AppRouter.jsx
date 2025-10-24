@@ -9,6 +9,7 @@ import Recipe1QuizEssay from "./pages/gpt-study/components/content/tabs/expanded
 import ScrollPage from "./pages/main-page/components/TutorialScroll/TutorialScroll/ScrollPage";
 import ClosueStatueSelect from "./pages/main-page/components/closue-statue-select/ClosueStatueSelect";
 
+// backend-integration 쪽 추가 기능
 import SocialLoginPage from "./pages/social-login/SocialLoginPage";
 import PrivateRoute from "./components/PrivateRoute";
 import AuthCallback from "./pages/auth/AuthCallback";

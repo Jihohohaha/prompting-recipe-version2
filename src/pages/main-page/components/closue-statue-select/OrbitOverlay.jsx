@@ -84,7 +84,7 @@ const OrbitOverlay = React.memo(function OrbitOverlay({
             top:  -RADIUS,
             width:  `${RADIUS * 2}px`,
             height: `${RADIUS * 2}px`,
-            border: '2px dashed rgba(0,0,0,0.35)',
+            border: '',
             borderRadius: '50%',
             zIndex: 59,
             pointerEvents: 'none',

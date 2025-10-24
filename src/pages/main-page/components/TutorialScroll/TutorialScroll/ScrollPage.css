@@ -10,27 +10,23 @@ body {
 
 .scroll-container {
   height: 100vh;
-  overflow-y: auto;
+  overflow-y: hidden;
+  position: relative;
   scroll-behavior: smooth;
-  background-color: #000;
-  padding-block: 15vh;
-  font-family: "Pretendard", -apple-system, BlinkMacSystemFont, "Segoe UI",
-    Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue",
-    sans-serif;
+  background: black;
 }
 
-/* 문단 기본 상태 */
 .fade-section {
-  font-size: 2.2rem;
-  min-height: 80vh;
-  display: grid;
-  place-items: center;
-  text-align: center;
-  color: #fff;
-  opacity: 0;
-  transform: translateY(40px);
-  transition: opacity 1s ease, transform 1s ease;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  opacity: 0.4;
+  transform: scale(0.97);
+  transition: all 1s cubic-bezier(0.25, 1, 0.3, 1);
 }
+
 
 /* 중앙 들어오면 활성화 */
 .fade-section.active {
@@ -238,6 +234,7 @@ body {
   background: #000;
   z-index: 9999;
 }
+
 
 .curtain.left {
   left: 0;
