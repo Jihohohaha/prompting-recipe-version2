@@ -45,33 +45,35 @@ const AppRouter = () => {
         <Route
           path="/gpt-study"
           element={
-            <PageTransition>
+          
               <GPTStudy />
-            </PageTransition>
+          
           }
         />
         <Route
           path="/gpt-study/:slug"
           element={
-            <PageTransition>
+            
               <GPTStudy />
-            </PageTransition>
+           
           }
         />
         <Route
           path="/gpt-study/:slug/:tab"
           element={
-            <PageTransition>
+         
               <GPTStudy />
-            </PageTransition>
+            
           }
         />
         <Route
           path="/gpt-study/:slug/:tab/:subTab"
           element={
-            <PageTransition>
-              <GPTStudy />
-            </PageTransition>
+          //   <PageTransition>
+          //     <GPTStudy />
+          //   </PageTransition>
+          //
+          <GPTStudy /> 
           }
         />
 

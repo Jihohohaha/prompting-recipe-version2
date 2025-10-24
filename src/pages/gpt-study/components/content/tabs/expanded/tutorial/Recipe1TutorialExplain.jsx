@@ -355,14 +355,122 @@ const Page3 = () => {
 
 // Page 4
 const Page4 = () => {
+  const [step, setStep] = useState(0); // 0: 비어있음, 1: 첫번째, 2: 두번째
+
+  // Page 3에서 넘어올 때 자동 시작 (useEffect로 트리거 가능)
+  useEffect(() => {
+    // 페이지 진입 시 첫 번째 단계 시작
+    const timer = setTimeout(() => {
+      setStep(1);
+    }, 500);
+    return () => clearTimeout(timer);
+  }, []);
+
+  const handleSendMessage = () => {
+    // 두 번째 단계로 전환
+    setStep(2);
+  };
+
   return (
-    <div className="w-full h-full flex flex-col justify-center px-12 bg-transparent">
-      <h2 className="font-pretendard text-3xl font-bold text-[#FE7525] mb-6">
-        페이지 4
-      </h2>
-      <p className="font-pretendard text-lg text-gray-800 leading-relaxed">
-        여기에 Explain 또는 Example 내용이 들어갑니다.
-      </p>
+    <div className="w-full h-full flex flex-col items-center justify-center px-12 bg-transparent relative">
+      {/* 첫 번째 단계: 텍스트 + 밑줄 + 별 */}
+      {step >= 1 && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 1 }}
+          className="absolute"
+          style={{
+            top: '50px',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            width: '100%',
+            textAlign: 'center'
+          }}
+        >
+          <div className="relative inline-block">
+            {/* 텍스트 */}
+            <div className="text-black text-lg font-pretendard text-center leading-tight mb-2">
+              그렇다면 Role Prompting은 어떻게 다를까요?
+            </div>
+
+            {/* 주황색 밑줄 */}
+            <div className="relative w-full flex justify-center mt-2">
+              <div 
+                className="h-[3px] bg-[#FE7525]"
+                style={{ width: '400px' }}
+              />
+              
+              {/* 별 이미지 - 좌측 상단 */}
+              <img
+                src="/images/gpt-study/role/star2.png"
+                alt="Star"
+                className="absolute"
+                style={{
+                  left: '-40px',
+                  top: '-30px',
+                  width: '35px',
+                  height: '30px',
+                  transform: 'scaleX(-1)' // 좌우 반전
+                }}
+              />
+            </div>
+          </div>
+        </motion.div>
+      )}
+
+      {/* 두 번째 단계: 추가 텍스트 */}
+      {step >= 2 && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.8 }}
+          className="absolute text-black text-lg font-pretendard text-center leading-tight"
+          style={{
+            top: '140px',
+            left: '50%',
+            transform: 'translateX(-50%)'
+          }}
+        >
+          이번에는 다음과 같이 '선생님'이라는 역할을 부여해보세요!
+        </motion.div>
+      )}
+
+      {/* 챗봇 Input 스타일 박스 - Page 3와 동일한 위치 */}
+      {step >= 1 && (
+        <div 
+          className="absolute w-[500px] bg-white rounded-full border-1 border-black py-1 flex items-center justify-center shadow-md"
+          style={{
+            bottom: '-50px',
+            left: '50%',
+            transform: 'translateX(-50%)'
+          }}
+        >
+          {/* 텍스트 - 전체 중앙 */}
+          <span className="text-gray-600 text-center font-pretendard text-base w-full px-12 leading-snug">
+            너는 초등학교 수학 선생님이야.
+            <br />
+            학생의 질문에는 반드시 초등학생이
+            <br />
+            이해할 수 있는 수준으로 풀이 과정을 설명해.
+          </span>
+
+          {/* 전송 버튼 - 우측 고정 */}
+          <button
+            onClick={(e) => {
+              e.stopPropagation(); // 페이지 넘김 방지
+              handleSendMessage();
+            }}
+            className="absolute right-2 flex-shrink-0 hover:opacity-80 transition-opacity bg-transparent border-none p-0 cursor-pointer"
+          >
+            <img
+              src="/images/gpt-study/Arrow2.png"
+              alt="Send"
+              className="w-8 h-8 object-contain"
+            />
+          </button>
+        </div>
+      )}
     </div>
   );
 };
