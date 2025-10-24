@@ -105,3 +105,11 @@
 .cute-scroll::-webkit-scrollbar-thumb:hover {
   background: #a97747;     /* 살짝 진하게 */
 }
+
+@font-face {
+  font-family: 'Koolegant';
+  src: url('/fonts/Koolegant.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap; /* 폰트 로딩 전략 */
+}
