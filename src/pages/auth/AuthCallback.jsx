@@ -1,47 +1,57 @@
 import React, { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
+import apiService from '../../services/apiService';
 
 const AuthCallback = () => {
   const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const accessToken = params.get('access_token');
-    const refreshToken = params.get('refresh_token');
-    const userInfo = params.get('user');
-    const error = params.get('error');
+    const handleAuthCallback = async () => {
+      const params = new URLSearchParams(location.search);
+      const code = params.get('code');
+      const error = params.get('error');
 
-    if (error) {
-      console.error('Authentication error:', error);
-      navigate('/login?error=' + encodeURIComponent(error), { replace: true });
-      return;
-    }
-
-    if (accessToken) {
-      console.log('AuthCallback: Access Token received:', accessToken);
-      localStorage.setItem('authToken', accessToken);
-      console.log('AuthCallback: authToken after setItem:', localStorage.getItem('authToken'));
-      if (refreshToken) {
-        localStorage.setItem('refreshToken', refreshToken);
-        console.log('AuthCallback: refreshToken after setItem:', localStorage.getItem('refreshToken'));
+      if (error) {
+        console.error('Authentication error:', error);
+        navigate('/login?error=' + encodeURIComponent(error), { replace: true });
+        return;
       }
-      if (userInfo) {
+
+      if (code) {
         try {
-          const user = JSON.parse(decodeURIComponent(userInfo));
-          localStorage.setItem('userInfo', JSON.stringify(user));
-          console.log('AuthCallback: userInfo after setItem:', localStorage.getItem('userInfo'));
+          // 백엔드에 인증 코드를 보내 토큰을 요청합니다.
+          const response = await apiService.post('/auth/google/callback', { code });
+          
+          const { accessToken, refreshToken, user } = response.data;
+
+          if (accessToken) {
+            // 토큰과 사용자 정보를 localStorage에 저장합니다.
+            localStorage.setItem('authToken', accessToken);
+            if (refreshToken) {
+              localStorage.setItem('refreshToken', refreshToken);
+            }
+            if (user) {
+              localStorage.setItem('userInfo', JSON.stringify(user));
+            }
+            
+            // 로그인 성공 후 메인 페이지로 리디렉션합니다.
+            navigate('/', { replace: true });
+          } else {
+            throw new Error('Access token not received');
+          }
         } catch (e) {
-          console.error('AuthCallback: Failed to parse user info', e);
+          console.error('Authentication failed:', e);
+          navigate('/login?error=AuthenticationFailed', { replace: true });
         }
+      } else {
+        // 코드가 없는 경우 로그인 페이지로 리디렉션합니다.
+        navigate('/login', { replace: true });
       }
-      console.log('AuthCallback: Navigating to / using useNavigate');
-      navigate('/', { replace: true });
-      return; // Added to prevent further execution in this useEffect run
-    } else {
-      console.log('AuthCallback: No access token found. Navigating to /login');
-      navigate('/', { replace: true });
-    }
-  }, [navigate]);
+    };
+
+    handleAuthCallback();
+  }, [location, navigate]);
 
   return (
     <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', fontSize: '24px' }}>
