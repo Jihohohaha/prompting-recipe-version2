@@ -19,6 +19,24 @@ const Closue = ({ onComplete }) => {
       className="relative w-screen h-screen"
       onMouseMove={handleMouseMove}
     >
+      <video 
+        src="/videos/Closue.mp4"
+        className="absolute inset-0 w-full h-full object-cover"
+        autoPlay
+        muted
+        loop
+      />
+    </div>
+  );
+};
+
+export default Closue;
+
+
+{/* <div
+      className="relative w-screen h-screen"
+      onMouseMove={handleMouseMove}
+    >
       {!isCompleted ? (
         <AssetsHandLightClosue
           mousePos={mousePos}
@@ -27,8 +45,4 @@ const Closue = ({ onComplete }) => {
       ) : (
         <OpenedClosue onComplete={onComplete} />
       )}
-    </div>
-  );
-};
-
-export default Closue;
+    </div> */}
