@@ -20,7 +20,7 @@ const Closue = ({ onComplete }) => {
       onMouseMove={handleMouseMove}
     >
       <video 
-        src="/videos/Closue.mp4"
+        src="/videos/closue.mp4"
         className="absolute inset-0 w-full h-full object-cover"
         autoPlay
         muted
