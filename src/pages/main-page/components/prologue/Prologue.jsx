@@ -120,7 +120,7 @@ const Prologue = ({ onComplete }) => {
 			{videoEnded && (
 				<div className="absolute bottom-20 left-1/2 transform -translate-x-1/2 z-[100] text-center pointer-events-none">
 					{!isScrollCompleted ? (
-						<p className="text-xl font-bold px-6 py-3 bg-black text-white rounded-lg shadow-xl border-2 border-white">
+						<p className="text-xl font-bold px-6 py-3 bg-gray-300 text-white rounded-full shadow-xl border-2 border-white">
 							스크롤하여 모든 문장을 확인하세요
 						</p>
 					) : (

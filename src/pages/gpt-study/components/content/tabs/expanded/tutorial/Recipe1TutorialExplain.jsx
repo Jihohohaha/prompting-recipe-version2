@@ -662,7 +662,7 @@ const Page5 = () => {
     style={{
       transform: 'translateX(-20px)'
     }}>
-      <p className="font-pretendard text-center leading-10 pt-24 gap-12">
+      <p className="font-pretendard text-center leading-11 pt-24 gap-12">
         <span className="bg-[#FE7525] px-2 py-0 font-extrabold text-3xl text-white">
           Role Prompting
         </span>
@@ -801,12 +801,12 @@ const Page7 = () => {
         <div className="mb-6">
           정리하자면! <span className="font-semibold text-2xl">Role Prompting</span> 은
         </div>
-        <div>
-          <span className="bg-white px-2 py-1 font-semibold text-2xl">모델이 특정 인격이나 역할을 맡아 답변하도록</span><br/>
-          <span className="bg-white px-2 py-1 font-semibold text-2xl">지시하는 방법</span> 이에요. 이 방식을 사용하면 답변의<br/>
-          <span className="bg-white px-2 py-1 font-semibold text-2xl">스타일과 관점을 원하는 방향으로 조정</span> 할 수 있지만,<br/>
-          반대로 <span className="bg-white px-2 py-1 font-semibold text-2xl">역할을 너무 과하게 지정하면</span><br/>
-          <span className="bg-white px-2 py-1 font-semibold text-2xl">어색한 말투로 굳어질 수도</span> 있습니다.
+        <div className="leading-11">
+          <span className="bg-[#FE7525] px-2 py-1 font-semibold text-white text-2xl">모델이 특정 인격이나 역할을 맡아 답변하도록</span><br/>
+          <span className="bg-[#FE7525] px-2 py-1 font-semibold text-white text-2xl">지시하는 방법</span> 이에요. 이 방식을 사용하면 답변의<br/>
+          <span className="bg-[#FE7525] px-2 py-1 font-semibold text-white text-2xl">스타일과 관점을 원하는 방향으로 조정</span> 할 수 있지만,<br/>
+          반대로 <span className="bg-[#FE7525] px-2 py-1 font-semibold text-white text-2xl">역할을 너무 과하게 지정하면</span><br/>
+          <span className="bg-[#FE7525] px-2 py-1 font-semibold text-white text-2xl">어색한 말투로 굳어질 수도</span> 있습니다.
         </div>
       </div>
     </div>
@@ -817,9 +817,9 @@ const Page7 = () => {
 const Page8 = () => {
   return (
     <div className="w-full h-full flex flex-col justify-center px-12 bg-transparent">
-      <div className="w-[700px] text-base font-pretendard text-black mb-6 text-center leading-10"
+      <div className="w-[700px] text-base font-pretendard text-black mb-6 text-center leading-8"
       style={{
-        transform: 'translateX(-140px) translateY(60px)'
+        transform: 'translateX(-140px) translateY(100px)'
       }}>
         또한{" "}
         <span className="px-2 py-1 text-[#FE7525] font-semibold text-xl">30년 경력의 베테랑 디자이너</span>
@@ -831,7 +831,7 @@ const Page8 = () => {
       {/* 이미지 div: 독립적으로 배치하고 크기 조절 */}
       <div className="w-[550px] flex justify-center items-center mt-12"
       style={{
-        transform: 'translateX(-20px) translateY(18px)'}}> {/* 이미지를 중앙에 배치하기 위한 컨테이너 */}
+        transform: 'translateX(-20px) translateY(26px)'}}> {/* 이미지를 중앙에 배치하기 위한 컨테이너 */}
         <img 
           src="/images/gpt-study/role/Page8Picture.png" 
           alt="구체적인 역할 지정 예시 이미지" 

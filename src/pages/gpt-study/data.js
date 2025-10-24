@@ -1,3 +1,4 @@
+import "../../../src/styles/App.css"
 // src/pages/gpt-study/data.js
 
 // 방법론별 색상 배열
@@ -70,6 +71,7 @@ export const gptStudyData = [
   {
     id: 1,
     title: "FEW SHOT",
+    font: "Koolegant",
     slug: "recipe1",
     displayTitle: "RECIPE 1.\n(ROLE\nPROMPTING)",
     description: "Few-shot 프롬프팅 기법을 학습합니다.",

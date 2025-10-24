@@ -6,6 +6,12 @@ body {
 
 .intro-text p {
   margin: 1rem 0;
+  text-align: center;
+  color: #fff;
+  font-family: "Pretendard-Light", sans-serif;
+  line-height: 1.8;
+  font-size: 1.8rem;
+  font-weight: 0;
 }
 
 .scroll-container {
@@ -83,7 +89,7 @@ body {
   font-family: "Pretendard", sans-serif;
   line-height: 1.8;
   font-size: 1.8rem;
-  font-weight: 500;
+  font-weight: 100;
   margin-top: 3rem;
 }
 
