@@ -1,209 +1,159 @@
 // src/pages/gpt-study/components/content/tabs/expanded/quiz/Recipe1QuizEssay.jsx
-import { motion, useInView } from "framer-motion";
-import { useRef, useState } from "react";
+import React, { useState } from "react";
+import "../../../../../../../styles/App.css";
 
 const Recipe1QuizEssay = () => {
   return (
-    <div className="bg-black rounded-3xl overflow-hidden">
-      {/* Section 1: 헤더 */}
-      <SectionHeader />
-      
-      {/* Section 2 */}
-      <Section2 />
-      
-      {/* Section 3 */}
-      <Section3 />
-      
-      {/* Section 4 */}
-      <Section4 />
-      
-      {/* Section 5 */}
-      <Section5 />
+    <div className="flex w-screen h-screen overflow-hidden">
+      {/* 왼쪽 영역 */}
+      <div className="flex-1 bg-[url('/images/gpt-study/quiz/yellowbg.png')]  bg-cover bg-center flex flex-col rounded-l-3xl overflow-hidden">
+        <SectionHeader />
+        <Section2 />
+        <Section3 />
+      </div>
+
+      {/* 오른쪽 영역 */}
+      <div className="flex-1 bg-black flex flex-col rounded-r-3xl overflow-hidden">
+        <Section4 />
+        <Section5 />
+      </div>
     </div>
   );
-}
+};
 
-// Section 1: 헤더
+//
+// ---------- Section 1 ----------
 const SectionHeader = () => {
   return (
-    <>
-      <div className="w-full flex items-center justify-between px-[48px] pt-[24px]">
-        {/* (ROLE) */}
-        <div className="font-mortend text-3xl text-white font-bold">
-          ( ROLE <br /> PROMPTING )
-        </div>
-
-        {/* 너비가 긴 선 */}
-        <div className="flex-1 mx-[20px]">
-          <span className="block w-full h-[2px] bg-white"></span>
-        </div>
-
-        {/* RECIPE 1. */}
-        <div className="font-koolegant text-4xl text-white">RECIPE 1.</div>
+    <div className="flex flex-col items-center justify-center py-3">
+      <img
+        src="/images/gpt-study/quiz/orange_book.png"
+        alt="Recipe Book Icon"
+        className="w-[130x] h-[130px] mb-2"
+      />
+      <h2 className="text-3xl font-cafe24 text-[#7A4B26]">[Secret Recipe]</h2>
+      <div className="text-[#7A4B26] font-koolegant text-3xl tracking-wider mt-6 items-center justify-center">
+        INGREDIENTS
       </div>
-
-      {/* 너비가 긴 선 */}
-      <div className="flex-1 px-[45px] mt-[20px]">
-        <span className="block w-full h-[1.5px] bg-white"></span>
-      </div>
-    </>
+    </div>
   );
 };
 
-// Section 2
+//
+// ---------- Section 2 ----------
 const Section2 = () => {
   return (
-    <div className="flex items-center justify-center text-white
-     font-medium mt-[60px] py-[40px] bg-[#FE7525] rounded-2xl mx-[48px] 
-     text-center text-2xl font-pretendard leading-relaxed tracking-wider">
-      이번 요리는 석상이가 ‘진짜 사람’이 되기 위한 테스트예요.<br/>
-      당신이 직접 주제와 역할을 정해, 나만의 Role Prompting 프롬프트를 완성해야 합니다.<br/>
-      이 레시피가 완성되면, 석상이는 드디어 말하고 생각하는 존재로 깨어날 거예요.
+    <div className="flex items-center justify-center gap-6 mb-12">
+      {["역할 지정", "상황", "목적"].map((item, index) => (
+        <div
+          key={index}
+          className="mb-5 px-8 bg-[#7A4B26]/[0.15] rounded-full py-2 border-2 border-[#7A4B26] text-[#7A4B26] text-xl transition-all"
+        >
+          {item}
+        </div>
+      ))}
     </div>
   );
 };
 
-// Section 3
+//
+// ---------- Section 3 ----------
 const Section3 = () => {
-  const [showHint, setShowHint] = useState(false);
-  const backgroundImagePath = '/images/gpt-study/quiz/EssayMain.png';
-  
   return (
-    <div className="w-full px-[48px] py-[40px]">
-      <div className="relative w-full mx-3">
-        <img src={backgroundImagePath} alt="Section 3 Background" className="w-full h-auto" />
-        
-        {/* 힌트 버튼 - 이미지 위에 배치 */}
-        <button
-          onClick={() => setShowHint(!showHint)}
-          className={`absolute bg-[#FE7525]/50 border-2 border-[#642D05] rounded-full
-             px-2 py-1 text-black text-2xl font-medium transition-all ${
-            showHint ? 'font-bold' : 'hover:font-bold'
-          }`}
-          style={{
-            bottom: '80px',  // 이미지 하단에서 20px 위
-            left: '50%',     // 중앙 정렬
-            transform: 'translateX(-50%)'
-          }}
-        >
-          {showHint ? (
-            <span className="inline-block w-[1000px] text-center">
-              "이 말은 누가, 언제, 왜 하는 걸까?"질문에 답할 수 있다면, 이미 정답에 가까워요.
-            </span>
-          ) : (
-            '세프의 힌트 보기'
-          )}
-        </button>
+    <div className="flex flex-col items-center justify-center text-left text-[#7A4B26] font-semibold font-pretendard px-16 text-xl leading-relaxed">
+      <h3 className="text-3xl font-koolegant pb-6">TIPS</h3>
+      <p>
+        1. 먼저, 세 가지 재료의 균형을 떠올리세요. ‘역할’만 강조하면 단순한
+        지시문이 되고, ‘상황’과 ‘목적’이 빠지면 문장의 맥락이 흐려집니다. 역할을
+        정한 뒤, 그 인물이 놓인 상황과 목적을 함께 설정해보세요.
+      </p>
+      <br />
+      <p>
+        2. 문장을 완성하기 전, 당신이 설정한 인물이 어떤 말투와 태도로
+        대답할지를 계속 떠올려보세요. 그러면 문장 속 재료들이 자연스레
+        어우러지고, 당신만의 맛이 드러날 거예요.
+      </p>
+    </div>
+  );
+};
+
+//
+// ---------- Section 4 ----------
+const Section4 = () => {
+  return (
+    <div className="w-full flex flex-col items-center justify-center bg-black py-[20px]">
+      {/* 제목 */}
+      <div className="flex items-center justify-center space-x-6 mb-10">
+        <img
+          src="/images/gpt-study/quiz/Fork.png"
+          alt="Fork Left"
+          className="w-[80px] h-[80px] rotate-45"
+        />
+        <h2 className="text-[#FE7525] font-cafe24 text-4xl font-bold">
+          [Final Mission]
+        </h2>
+        <img
+          src="/images/gpt-study/quiz/Fork.png"
+          alt="Fork Right"
+          className="w-[80px] h-[80px] -rotate-45"
+        />
+      </div>
+
+      {/* 미션 텍스트 */}
+      <div
+        className="bg-[#000000] text-[FBEAD0]/0.3 text-center font-pretendard text-[18px] leading-relaxed 
+                      rounded-2xl px-10 shadow-lg font-semibold w-[80%]"
+      >
+        직접 자유 주제와 역할을 정해, 나만의 Role Prompting <br />
+        프롬프트를 만들어보세요. 전문 직업, 특정 캐릭터, 혹은 일상 속 상황 등을
+        자유롭게 설정해 당신만의 Role Prompting을 완성해보세요!
       </div>
     </div>
   );
 };
 
-// Section 4
-const Section4 = () => {
-  const backgroundImagePath = '/images/gpt-study/quiz/Dialog.png';
+const Section5 = () => {
   return (
-    <div className="w-full px-[48px] pt-[20px] pb-[40px] relative z-50">
-      <div className="relative w-full mx-3">
-        <img src={backgroundImagePath} alt="Section 4 Background" className="w-full h-auto" />
-        
-        <div className="absolute inset-0 flex flex-col items-center">
-          {/* Your Recipe 제목 */}
-          <div className="text-5xl text-center text-[#642D05] font-pretendard font-bold tracking-widest mt-[50px]">
-            Your Recipe
-          </div>
+    <div className="w-full flex flex-col items-center justify-center bg-black relative">
+      <img
+        src="/images/gpt-study/quiz/linespoon.png"
+        alt="Decoration Line 1"
+        className="absolute left-0 top-[250px] w-[600px] opacity-80"
+      />
+      {/* 말풍선 박스 */}
+      <div
+        className="relative bg-gradient-to-b from-[#FCEED2] to-[#FBE4B7] text-[#4B2E0C]
+             rounded-3xl px-20 py-6 text-center shadow-xl w-[90%] h-auto flex flex-col items-center"
+      >
+        {/* 제목 */}
+        <h3 className="text-3xl font-mortend font-bold mb-6">Your Recipe</h3>
 
-          {/* Textarea */}
-          <textarea 
-            className="w-[80%] h-[300px] mt-[80px] p-4 bg-transparent
-             border-none outline-none text-[#642D05] text-3xl text-center tracking-wider
-              font-pretendard resize-none placeholder:text-[#642D05] placeholder:text-xl placeholder:font-pretendard" 
-            placeholder="이제, 당신만의 레시피를 써 넣어보세요."
+        {/* 입력창 */}
+        <div className="flex justify-center w-full">
+          <textarea
+            placeholder="이제, 이 곳에 당신만의 레시피를 써 넣어보세요."
+            className="w-[500px] h-[200px] p-6 text-[16px] font-pretendard text-[#4B2E0C]
+                       bg-[#FFF8EE] rounded-2xl border-2 border-[#C49A6C]
+                       placeholder:text-[#A97C50] placeholder:italic
+                       focus:outline-none focus:ring-4 focus:ring-[#FE7525]/40 transition-all duration-300 mt-2
+                       overflow-y-auto cute-scroll"
             style={{
-              caretColor: '#642D05' // 커서 색상
+              boxShadow: "inset 0 4px 10px rgba(0,0,0,0.05)",
+              caretColor: "#642D05",
             }}
           />
         </div>
+
+        {/* 제출 버튼 */}
+        <button
+          onClick={() => alert("레시피가 제출되었습니다! 🍳")}
+          className="mt-10 bg-[#FE7525]/[0.9] hover:bg-[#FF9E4A] text-white text-xl 
+                     font-pretendard font-semibold py-4 px-20 rounded-[10px]
+                     border-none border-[#642D05] shadow-md transition-transform duration-300 hover:scale-105"
+        >
+          레시피 제출하기
+        </button>
       </div>
-    </div>
-  );
-};
-
-// Section 5
-const Section5 = () => {
-  return (
-    <div className="relative w-full h-[400px] px-[48px] pt-[40px] pb-[10px] z-0">
-      {/* 2. Line1.png - 좌측 상단 */}
-      <img 
-        src="/images/gpt-study/quiz/Line1.png"
-        alt="Line 1"
-        className="absolute z-0"
-        style={{
-          left: '0',
-          top: '-250px', // 조정 필요
-          width: '592px',
-          height: '453px'
-        }}
-      />
-      {/* 3. Line2.png - 우측, 57.83° 회전 */}
-      <img 
-        src="/images/gpt-study/quiz/Line2.png"
-        alt="Line 2"
-        className="absolute"
-        style={{
-          right: '0',
-          top: '-300px', // 조정 필요
-          width: '728px',
-          height: '573px',
-          transform: 'rotate(-0.83deg)'
-        }}
-      />
-      {/* 1. ResultButton.png - 중앙 (버튼) */}
-      <button 
-        className="absolute bg-transparent border-none p-0 m-0 cursor-pointer"
-        style={{
-          left: '58%',
-          top: '0%',
-          transform: 'translate(-50%, -50%)',
-          width: '1314px',
-          height: '695px'
-        }}
-      >
-        <img 
-          src="/images/gpt-study/quiz/ResultButton.png"
-          alt="Result Button"
-          className="w-full h-full"
-        />
-      </button>
-
-
-      {/* 4. Ladle.png - ResultButton 좌측, -12.6° 회전 */}
-      <img 
-        src="/images/gpt-study/quiz/Ladle.png"
-        alt="Ladle"
-        className="absolute"
-        style={{
-          left: 'calc(50% - 800px)', // 조정 필요
-          top: '10%',
-          transform: 'translateY(-50%) rotate(-12.6deg)',
-          width: '454px',
-          height: '454px'
-        }}
-      />
-
-      {/* 5. Fork.png - ResultButton 우측, -76.59° 회전 */}
-      <img 
-        src="/images/gpt-study/quiz/Fork.png"
-        alt="Fork"
-        className="absolute"
-        style={{
-          right: 'calc(60% - 800px)', // 조정 필요
-          top: '70%',
-          transform: 'translateY(-50%) rotate(356.59deg)',
-          width: '298px',
-          height: '298px'
-        }}
-      />
     </div>
   );
 };
