@@ -8,7 +8,7 @@ function ProgressPill({ label, percent = 0 }) {
   return (
     <div className="relative w-[260px] h-11 rounded-full border-2 overflow-hidden"
          style={{ borderColor: 'white', background: '#ffffff20' }}>
-      <div className="absolute left-0 top-0 h-full"
+      <div className="absolute left-0 top-0 h-full rounded-full"
            style={{ width: `${p}%`, backgroundColor: ORANGE, transition: 'width 450ms ease' }} />
       <div className="relative z-10 h-full flex items-center pl-4 pr-16">
         <span className="text-white tracking-wide text-sm font-semibold uppercase">{label}</span>

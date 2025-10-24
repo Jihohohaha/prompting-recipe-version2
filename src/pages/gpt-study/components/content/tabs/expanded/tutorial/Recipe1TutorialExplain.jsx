@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { motion } from "framer-motion";
 import "./BookFlip.css";
+import Chatbot from "./chatbot";
 
 const Recipe1TutorialExplain = () => {
   const [leftPageIndex, setLeftPageIndex] = useState(0); // 왼쪽 페이지 인덱스
@@ -80,7 +81,7 @@ const Recipe1TutorialExplain = () => {
   return (
     <div className="w-full min-h-[70vh] flex flex-col items-center justify-center bg-black relative">
       {/* Book.png 배경 이미지 */}
-      <div className="relative" style={{ width: "1136px", height: "618px" }}>
+      <div className="relative" style={{ width: "1136px", height: "688px" }}>
         <img
           src="/images/gpt-study/Book.png"
           alt="Book Background"
@@ -89,6 +90,7 @@ const Recipe1TutorialExplain = () => {
 
         {/* 책 컨테이너 - 이미지 정가운데에 배치 */}
         <div className="absolute inset-0 flex items-center justify-center">
+          <Chatbot />
           <div className="book-wrapper" style={{ width: "1100px", height: "450px" }}>
             <div className="book-container">
               {/* 왼쪽 페이지 컨테이너 */}
@@ -135,6 +137,7 @@ const Recipe1TutorialExplain = () => {
           </div>
         </div>
       </div>
+
     </div>
   );
 };
