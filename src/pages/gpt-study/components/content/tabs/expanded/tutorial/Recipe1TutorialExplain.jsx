@@ -652,9 +652,12 @@ const Page4 = ({ isPage3Completed }) => {
 // Page 5
 const Page5 = () => {
   return (
-    <div className="bg-transparent text-black w-[500px] text-xl">
-      <p className="font-pretendard text-center text-base leading-10 pt-24 gap-6">
-        <span className="bg-[#FE7525] px-2 py-1 font-extrabold text-2xl text-white">
+    <div className="bg-transparent text-black w-[500px] text-2xl"
+    style={{
+      transform: 'translateX(-20px)'
+    }}>
+      <p className="font-pretendard text-center leading-10 pt-24 gap-12">
+        <span className="bg-[#FE7525] px-2 py-0 font-extrabold text-3xl text-white">
           Role Prompting
         </span>
         {" "}이 좋은 이유는
@@ -662,16 +665,16 @@ const Page5 = () => {
         모델이 단순히 문맥에 맞게 대답하는 데서
         <br/>
         그치지 않고{" "}
-        <span className="bg-[#FE7525] px-2 py-1 font-extrabold text-2xl text-white">
+        <span className="bg-[#FE7525] px-2 py-0 font-extrabold text-3xl text-white">
           정확하면서도
         </span>
         <br />
-        <span className="bg-[#FE7525] px-2 py-1 font-extrabold text-2xl text-white">
+        <span className="bg-[#FE7525] px-2 py-0 font-extrabold text-3xl text-white">
           맥락에 맞는 사고
         </span>
         {" "}와
         <br />
-        <span className="bg-[#FE7525] px-2 py-1 font-extrabold text-2xl text-white">
+        <span className="bg-[#FE7525] px-2 py-0 font-extrabold text-3xl text-white">
           표현을 유도
         </span>
 
@@ -820,17 +823,16 @@ const Page8 = () => {
         {" "}을 얻을 수 있어요.
       </div>
       {/* 이미지 div: 독립적으로 배치하고 크기 조절 */}
-      <div className="w-[600px] flex justify-center items-center"> {/* 이미지를 중앙에 배치하기 위한 컨테이너 */}
+      <div className="w-[550px] flex justify-center items-center mt-12"
+      style={{
+        transform: 'translateX(-20px) translateY(18px)'}}> {/* 이미지를 중앙에 배치하기 위한 컨테이너 */}
         <img 
           src="/images/gpt-study/role/Page8Picture.png" 
           alt="구체적인 역할 지정 예시 이미지" 
-          className="w-[600px] h-[600px] object-contain rounded-xl" // 👈 변경된 부분
+          className="w-[550px] h-[300px] object-contain rounded-xl" // 👈 변경된 부분
           style={{ 
             width: '900px', // 필요에 따라 최대 너비 지정
-            height: '400px', // 필요에 따라 최대 높이 지정
-            transform: 'translateX(50px), translateY(20px)'
-            // 독립적으로 이동시키고 싶다면 여기에 transform 속성을 추가할 수 있습니다.
-            // 예를 들어, transform: 'translateX(50px) translateY(20px)'
+            height: '350px', // 필요에 따라 최대 높이 지정
           }}
         />
       </div>
@@ -841,52 +843,161 @@ const Page8 = () => {
 
 // Page 9
 const Page9 = () => {
+  const navigate = useNavigate();
+  const { slug } = useParams();
+
+  const handleGoToQuiz = () => {
+    navigate(`/gpt-study/${slug}/quiz`);
+  };
+
   return (
-    <div className="w-full h-full flex flex-col justify-center px-12 bg-transparent">
-      <h2 className="font-pretendard text-3xl font-bold text-[#FE7525] mb-6">
-        페이지 9
-      </h2>
-      <p className="font-pretendard text-lg text-gray-800 leading-relaxed">
-        여기에 Explain 또는 Example 내용이 들어갑니다.
-      </p>
+    <div className="text-black font-pretendard w-full flex flex-col items-center justify-center pt-32 relative font-semibold">
+      {/* SecondLine2 */}
+      <img
+        src="/images/gpt-study/role/SecondLine2.png"
+        alt="Second Line 2"
+        className="absolute"
+        style={{
+          right: "0px",
+          top: "200px",
+          width: "150px",
+          height: "100px",
+          transform: 'rotate(7deg) translateX(35px) translateY(-100px)'
+        }}
+      />
+
+      {/* Star 1 - '그럼' 좌측 하단 */}
+      <img
+        src="/images/gpt-study/role/Star2.png"
+        alt="Star 1"
+        className="absolute"
+        style={{
+          left: "300px",
+          top: "70px",
+          width: "45px",
+          height: "39px",
+        }}
+      />
+
+      {/* Star 2 - '감이' 위 */}
+      <img
+        src="/images/gpt-study/role/Star2.png"
+        alt="Star 2"
+        className="absolute"
+        style={{
+          left: "70px",
+          top: "250px",
+          width: "45px",
+          height: "39px",
+        }}
+      />
+
+      {/* 텍스트 */}
+      <div className="w-full text-lg font-pretendard font-normal leading-[2.5] text-center z-10">
+        <p className="md-20">
+          어때요? <span className="font-bold text-2xl">Role Prompting</span> 에
+          대해 이제 감이 오죠?
+        </p>
+        <p>
+          좋아요! 하지만{" "}
+          <span className="underline underline-offset-8 decoration-[#FE7525] decoration-4">
+            진짜 셰프가 되려면 조금 더 학습
+          </span>
+          이 필요하답니다.
+        </p>
+        <p>그럼 이제 다음 단계로 넘어가 볼까요?</p>
+      </div>
+
+      {/* 버튼 */}
+      <div className="w-full flex items-center justify-center gap-4 mt-12 z-10">
+        <button
+          onClick={handleGoToQuiz}
+          className="bg-[#FE7525] border-2 border-black rounded-full px-8 py-2 text-xl font-medium font-pretendard text-white hover:bg-[#D46100] transition-colors"
+        >
+          퀴즈 풀러 가기
+        </button>
+      </div>
     </div>
   );
 };
 
 // Final Page
-const FinalPage = ({ navigate, slug }) => {
-  const handleGoToChat = () => {
-    navigate(`/gpt-study/${slug}/chat`);
+const FinalPage = () => {
+  const navigate = useNavigate();
+
+  const handleGoToRecipe1 = () => {
+    navigate('/gpt-study/recipe1');
   };
 
   return (
-    <div className="w-full h-full flex flex-col items-center justify-center px-8 bg-transparent">
-      <motion.div
-        initial={{ opacity: 0, scale: 0.9 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 0.6 }}
-        className="text-center space-y-6"
-      >
-        <h2 className="font-pretendard text-3xl font-bold text-white">
-          Role Prompting
-          <br />
-          마스터 완료! 🎉
-        </h2>
-        <div className="w-24 h-1 bg-white mx-auto"></div>
-        <p className="font-pretendard text-lg text-white/90 leading-relaxed">
-          이제 연습으로
-          <br />
-          실력을 키워보세요!
-        </p>
+    <div className="w-full h-full flex flex-col items-center justify-center bg-transparent pt-6">
+      {/* 그림들 영역 */}
+      <div className="w-full h-full flex items-center justify-center relative">
+        {/* FE7525 원 (작은) */}
+        <div
+          className="absolute bg-[#FE7525] rounded-full"
+          style={{
+            width: "55px",
+            height: "55px",
+            right: "50px",
+            top: "10px",
+          }}
+        />
+
+        {/* FE7525 링 (큰) */}
+        <div
+          className="absolute rounded-full ring-8 ring-[#FE7525]"
+          style={{
+            width: "212px",
+            height: "212px",
+            left: "20px",
+            top: "30px",
+          }}
+        />
+
+        {/* FE7525 원 (중간) */}
+        <div
+          className="absolute bg-[#FE7525] rounded-full"
+          style={{
+            width: "119px",
+            height: "119px",
+            right: "50px",
+            bottom: "-50px",
+          }}
+        />
+
+        {/* movie.png 이미지 */}
+        <img
+          src="/images/gpt-study/role/movie.png"
+          alt="Role Prompting"
+          className="absolute"
+          style={{
+            left: "50%",
+            top: "50%",
+            transform: "translate(-50%, -30%)",
+            width: "400px",
+            height: "250px",
+            objectFit: "contain",
+          }}
+        />
+      </div>
+
+      {/* 버튼 영역 */}
+      <div className="w-full flex items-center justify-center pt-12 pb-8"
+      style={{
+            transform: "translateY(35px)"
+          }}>
         <button
-          onClick={handleGoToChat}
-          className="bg-white border-2 border-white rounded-full px-6 py-3 text-lg font-pretendard font-semibold text-[#FE7525] hover:bg-[#FE7525] hover:text-white transition-all mt-4"
+          onClick={handleGoToRecipe1}
+          className="bg-[#FE7525] border-2 border-black rounded-full px-8 py-2 text-xl font-medium font-pretendard text-white hover:bg-[#D46100] transition-colors"
+
         >
-          레시피 연습하러 가기
+          다른 레시피 더 알아보기
         </button>
-      </motion.div>
+      </div>
     </div>
   );
 };
+
 
 export default Recipe1TutorialExplain;
