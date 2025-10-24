@@ -1,3 +1,4 @@
+// src/pages/gpt-study/components/image-switcher/DivSwitcher.jsx
 import React, { useMemo } from 'react';
 import { motion } from 'framer-motion';
 
@@ -28,6 +29,20 @@ const getContrastText = (hex) => {
 
 const titleCase = (s = '') => s.toLowerCase().replace(/\b([a-z])/g, (m) => m.toUpperCase());
 
+const isRolePrompting = (recipe) => /role\s*prompting/i.test(recipe?.title || '');
+const getProgressPercent = (recipe) => {
+  // Role Prompting만 100% 예외(기본 60%), 나머지는 100%
+  if (isRolePrompting(recipe)) return recipe?.progress ?? 60;
+  return 100;
+};
+const getProgressColors = (recipe) => {
+  const textColor = getContrastText(recipe?.color || '#777');
+  return {
+    track: 'rgba(0,0,0,0.28)',
+    fill: textColor === '#111111' ? '#111111' : '#FFFFFF',
+  };
+};
+
 /* ───────── 비활성 카드 UI ───────── */
 const DesignedCard = React.memo(function DesignedCard({ recipe, index }) {
   const color = recipe?.color || '#777';
@@ -51,10 +66,16 @@ const DesignedCard = React.memo(function DesignedCard({ recipe, index }) {
       aria-hidden
     >
       <div className="h-full w-full relative">
-        <div className="absolute left-4 top-3 tracking-wide text-[14px] font-semibold" style={{ color: isVeryLight ? color : textColor }}>
+        <div
+          className="absolute left-1/2 -translate-x-1/2 top-3 tracking-wide text-[14px] font-semibold"
+          style={{ color: isVeryLight ? color : textColor }}
+        >
           {topLabel}
         </div>
-        <div className="absolute left-4 right-4 top-10 font-pretendard font-semibold leading-[1.15] break-words" style={{ color: isVeryLight ? '#111' : textColor, fontSize: 22 }}>
+        <div
+          className="absolute left-1/2 -translate-x-1/2 text-center top-10 font-pretendard font-semibold leading-[1.15] break-words"
+          style={{ color: isVeryLight ? '#111' : textColor, fontSize: 22 }}
+        >
           {mainLabel}
         </div>
       </div>
@@ -84,11 +105,19 @@ const DivSwitcher = React.memo(function DivSwitcher({
   const transformOrigin = expandDirection === 'bottom' ? 'top center' : 'bottom center';
   const hasActiveImage = Boolean(activeSrc);
 
+  // 이미지/프로그레스 바 치수
+  const IMG_W = 180;
+  const IMG_H = 180;
+  const BAR_H = 10;
+
+  // 진행률/색
+  const percent = getProgressPercent(recipe);
+  const { track, fill } = getProgressColors(recipe);
+
   return (
     <motion.div
       className={`cursor-pointer relative ${className}`}
       onClick={onClick}
-      // ⬇️ 크기+위치 레이아웃 보간(예전처럼 부드럽게 확장)
       layout
       transition={{ layout: { duration: 0.28, ease: [0.4, 0, 0.2, 1] } }}
     >
@@ -99,11 +128,9 @@ const DivSwitcher = React.memo(function DivSwitcher({
           shadow-[0_6px_16px_rgba(0,0,0,0.25)]
         `}
         style={{ transformOrigin }}
-        // ⬇️ 높이 자체 애니메이션 (확장/축소의 핵심)
         initial={false}
         animate={{ height: isActive ? expandedHeight : baseHeight, opacity: 1, scale: 1 }}
         transition={{ duration: 0.28, ease: [0.4, 0, 0.2, 1] }}
-        // ⬇️ 레이아웃 변화도 함께 보간
         layout
       >
         {/* 1) 항상 배경색 */}
@@ -112,29 +139,51 @@ const DivSwitcher = React.memo(function DivSwitcher({
         {/* 2) 비활성 카드 */}
         {!isActive && <DesignedCard recipe={recipe} index={index} />}
 
-        {/* 3) 활성 + 이미지 있을 때: 좌측 정렬 이미지 */}
+        {/* 3) 활성 + 이미지 있을 때: 좌하단 이미지 + 바로 아래 프로그레스바 */}
         {isActive && hasActiveImage && (
-          <motion.img
-            key={activeSrc}
-            src={activeSrc}
-            alt=""
-            aria-hidden
-            className="
-              absolute top-1/2 left-1 -translate-y-1/2
-              select-none pointer-events-none
-            "
-            style={{ width: 180, height: 180, objectFit: 'contain' }}
-            initial={{ opacity: 0, scale: 1.05 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.22, ease: [0.2, 0.8, 0.2, 1] }}
-            layout
-          />
+          <>
+            <motion.img
+              key={activeSrc}
+              src={activeSrc}
+              alt=""
+              aria-hidden
+              className="absolute bottom-6 left-5 select-none pointer-events-none"
+              style={{ width: IMG_W, height: IMG_H, objectFit: 'contain' }}
+              initial={{ opacity: 0, scale: 1.05 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.22, ease: [0.2, 0.8, 0.2, 1] }}
+              layout
+            />
+
+            <motion.div
+              className="absolute left-[22px]"
+              style={{
+                bottom: '10px',
+                width: IMG_W,
+                height: BAR_H,
+                borderRadius: 9999,
+                background: track,
+                overflow: 'hidden',
+              }}
+              initial={{ opacity: 0, y: -6 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.22, ease: [0.2, 0.8, 0.2, 1], delay: 0.02 }}
+            >
+              <motion.div
+                className="h-full"
+                style={{ background: fill }}
+                initial={{ width: '0%' }}
+                animate={{ width: `${Math.max(0, Math.min(100, percent))}%` }}
+                transition={{ duration: 0.35, ease: [0.2, 0.8, 0.2, 1] }}
+              />
+            </motion.div>
+          </>
         )}
 
-        {/* 4) 활성인데 이미지가 없으면 카드 디자인 유지 */}
+        {/* 4) 활성인데 이미지가 없으면 카드 유지 (프로그레스바 미표시) */}
         {isActive && !hasActiveImage && <DesignedCard recipe={recipe} index={index} />}
 
-        {/* (옵션) 비활성 hover 시 살짝 확대 */}
+        {/* 5) 비활성 hover 살짝 확대 */}
         {!isActive && (
           <motion.div
             className="absolute inset-0"

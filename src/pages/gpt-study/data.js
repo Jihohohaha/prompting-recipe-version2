@@ -15,7 +15,7 @@ export const recipeColors = [
 export const gptStudyData = [
   {
     id: 0,
-    title: "Prompt Chaining",
+    title: "TUTORIAL\nfor\nCHATGPT",
     slug: "Prompt Chaining",
     displayTitle: "Title.\n(PROMPT\nCHAINING)",
     description: "여러 개의 프롬프트를 단계적으로 연결해 복잡한 문제를 해결합니다.",
@@ -459,9 +459,9 @@ export const gptStudyData = [
   },
   {
     id: 7,
-    title: "Today Receipt",
+    title: "Today Recipe",
     slug: "recipe7",
-    displayTitle: "RECIPE 7.\n(TODAY\nRECEIPT)",
+    displayTitle: "RECIPE 7.\n(TODAY'S RECIPE)",
     description: "오늘의 레시피를 학습합니다.",
     color: recipeColors[6],
     images: {
@@ -501,7 +501,7 @@ export const gptStudyData = [
         id: "quiz",
         title: "QUIZ",
         multipleChoice: {
-          question: "Today Receipt의 특징은?",
+          question: "Today Recipe의 특징은?",
           options: [
             "기본 기법만 다룬다",
             "고급 패턴을 조합한다",
