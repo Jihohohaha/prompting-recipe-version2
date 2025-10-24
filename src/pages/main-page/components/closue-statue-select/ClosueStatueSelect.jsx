@@ -361,7 +361,7 @@ const ClosueStatueSelect = () => {
 
       {showMask && (
         <div
-          className="fixed inset-0 bg-black/90 z-[100] cursor-pointer select-none"
+          className="fixed inset-0 bg-black/90 z-[9999] cursor-pointer select-none"
           onClick={() => setShowMask(false)}
         >
           <div className="absolute inset-0 flex flex-col items-center justify-center cursor-pointer transition-opacity duration-500">
