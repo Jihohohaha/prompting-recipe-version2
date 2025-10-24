@@ -24,148 +24,23 @@ const AppRouter = () => {
 
   return (
     <AnimatePresence mode="wait">
-      <Routes location={location} key={location.pathname}>
-        {/* 로그인 & 인증 */}
+      <Routes>
         <Route path="/login" element={<SocialLoginPage />} />
         <Route path="/auth/callback" element={<AuthCallback />} />
-
-        {/* 메인 페이지 */}
-        <Route
-          path="/"
-          element={
-            <PrivateRoute>
-              <PageTransition>
-                <MainPage />
-              </PageTransition>
-            </PrivateRoute>
-          }
-        />
-
-        {/* GPT Study */}
-        <Route
-          path="/gpt-study"
-          element={
-          
-              <GPTStudy />
-          
-          }
-        />
-        <Route
-          path="/gpt-study/:slug"
-          element={
-            
-              <GPTStudy />
-           
-          }
-        />
-        <Route
-          path="/gpt-study/:slug/:tab"
-          element={
-         
-              <GPTStudy />
-            
-          }
-        />
-        <Route
-          path="/gpt-study/:slug/:tab/:subTab"
-          element={
-          //   <PageTransition>
-          //     <GPTStudy />
-          //   </PageTransition>
-          //
-          <GPTStudy /> 
-          }
-        />
-
-        {/* 튜토리얼 */}
-        <Route
-          path="/tutorial"
-          element={
-            <PageTransition direction="forward">
-              <ScrollPage />
-            </PageTransition>
-          }
-        />
-
-        {/* 선택 페이지 (main 새 추가) */}
-        <Route
-          path="/select"
-          element={
-            <PageTransition direction="forward">
-              <ClosueStatueSelect />
-            </PageTransition>
-          }
-        />
-
-        {/* 테스트 */}
-        <Route
-          path="/test"
-          element={
-            <PageTransition>
-              <Recipe1QuizMultipleResult />
-            </PageTransition>
-          }
-        />
-        <Route
-          path="/test2"
-          element={
-            <PageTransition>
-              <Recipe1QuizEssay />
-            </PageTransition>
-          }
-        />
-
-        {/* 커뮤니티 */}
-        <Route
-          path="/community"
-          element={
-            <PrivateRoute>
-              <PageTransition>
-                <Community />
-              </PageTransition>
-            </PrivateRoute>
-          }
-        />
-        <Route
-          path="/community/ai-articles"
-          element={
-            <PrivateRoute>
-              <PageTransition>
-                <AIArticles />
-              </PageTransition>
-            </PrivateRoute>
-          }
-        />
-        <Route
-          path="/community/ai-gallery"
-          element={
-            <PrivateRoute>
-              <PageTransition>
-                <AIGallery />
-              </PageTransition>
-            </PrivateRoute>
-          }
-        />
-        <Route
-          path="/community/information"
-          element={
-            <PrivateRoute>
-              <PageTransition>
-                <Information />
-              </PageTransition>
-            </PrivateRoute>
-          }
-        />
-        <Route
-          path="/community/creation"
-          element={
-            <PrivateRoute>
-              <PageTransition>
-                <Creation />
-              </PageTransition>
-            </PrivateRoute>
-          }
-        />
+        <Route path="/" element={<PrivateRoute><MainPage /></PrivateRoute>} />
+        <Route path="/tutorial" element={<ScrollPage/>}/>
+        <Route path="/select" element={<ClosueStatueSelect/>}/>
+        <Route path="/gpt-study" element={<GPTStudy />} />
+        <Route path="/gpt-study/:slug" element={<GPTStudy />} />
+        <Route path="/gpt-study/:slug/:tab" element={<GPTStudy />} />
+        <Route path="/gpt-study/:slug/:tab/:subTab" element={<GPTStudy />} />
+        <Route path="/test" element={<Recipe1QuizMultipleResult />} />
+        <Route path="/test2" element={<Recipe1QuizEssay />} />
+        <Route path="/community" element={<PrivateRoute><Community /></PrivateRoute>} />
+        <Route path="/community/ai-articles" element={<PrivateRoute><AIArticles /></PrivateRoute>} />
+        <Route path="/community/ai-gallery" element={<PrivateRoute><AIGallery /></PrivateRoute>} />
+        <Route path="/community/information" element={<PrivateRoute><Information /></PrivateRoute>} />
+        <Route path="/community/creation" element={<PrivateRoute><Creation /></PrivateRoute>} />
       </Routes>
     </AnimatePresence>
   );

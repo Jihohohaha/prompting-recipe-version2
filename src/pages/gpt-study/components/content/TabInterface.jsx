@@ -88,7 +88,7 @@ const TabInterface = ({ recipe }) => {
         </div>
       </div>
 
-      <div className='w-full rounded-full h-8 flex items-center justify-left px-6 mb-3'
+      <div className='w-full rounded-full h-8 flex items-center text-mortend justify-left px-6 mb-3'
         style={{ backgroundColor: hexToRgba(primaryColor, 0.88) }}>
         <div className="text-white font-bold text-sm">
           {`section ${recipe.id}. ${recipe.displayTitle}`}

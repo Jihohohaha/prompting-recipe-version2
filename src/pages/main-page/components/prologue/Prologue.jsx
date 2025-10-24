@@ -139,6 +139,16 @@ const Prologue = ({ onComplete }) => {
       )}
     </div>
   );
+  // return (
+  //   <div className="relative w-screen h-screen overflow-hidden">
+  //     <video 
+  //       src="/videos/startVideo.mp4"
+  //       className="absolute inset-0 w-full h-full object-cover"
+  //       autoPlay
+  //       muted
+  //     />
+  //   </div>
+  // );
 };
 
 export default Prologue;
