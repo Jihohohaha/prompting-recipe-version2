@@ -26,7 +26,7 @@ const AppContent = () => {
 function App() {
   return (
     <Router>
-      <HeaderWrapper /> // New component
+      <HeaderWrapper />
       <AppRouter />
     </Router>
   )

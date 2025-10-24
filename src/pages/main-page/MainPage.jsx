@@ -45,7 +45,7 @@ const MainPage = () => {
     <div className="w-full h-screen overflow-hidden">
       {/*디버그용 페이지 전환 버튼*/}
       {process.env.NODE_ENV === "development" && (
-        <div className="fixed top-10 left-4 z-[100] bg-white/90 p-4 rounded-lg shadow-lg border-2 border-green-500">
+        <div className="fixed top-10 left-4 z-[9999] bg-white/90 p-4 rounded-lg shadow-lg border-2 border-green-500">
           <div className="text-sm font-bold mb-2 text-green-600">
             Page Navigator
           </div>
