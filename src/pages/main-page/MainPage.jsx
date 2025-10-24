@@ -1,14 +1,32 @@
-import { useState } from "react";
+import { useState, useEffect } from "react"; // Added useEffect
+import { useSearchParams } from "react-router-dom"; // Added
 import Prologue from "./components/prologue/Prologue";
 import Closue from "./components/closue/Closue";
 import ClosueStatueSelect from "./components/closue-statue-select/ClosueStatueSelect";
 
 const MainPage = () => {
-  // URL 파라미터로 시작 페이지 결정
+  const [searchParams] = useSearchParams(); // Added
+  const skipToClosue = searchParams.get("step") === "5"; // Added
+
   const urlParams = new URLSearchParams(window.location.search);
   const debugPage = urlParams.get("page") || "prologue";
 
-  const [currentPage, setCurrentPage] = useState(debugPage);
+  const [currentPage, setCurrentPage] = useState(skipToClosue ? "closure" : debugPage);
+
+  // Effect to update currentPage when URL search params change
+  useEffect(() => {
+    const stepParam = searchParams.get("step");
+    const pageParam = searchParams.get("page");
+
+    if (stepParam === "5") {
+      setCurrentPage("closure");
+    } else if (pageParam) {
+      setCurrentPage(pageParam);
+    } else {
+      // If no relevant params, default to prologue
+      setCurrentPage("prologue");
+    }
+  }, [searchParams]); // Dependency on searchParams
 
   const renderPage = () => {
     switch (currentPage) {

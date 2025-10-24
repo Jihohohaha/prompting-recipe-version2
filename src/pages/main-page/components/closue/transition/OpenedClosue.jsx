@@ -1,12 +1,16 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { motion } from "framer-motion";
+import { useSearchParams } from "react-router-dom"; // Added
 import StartButton from "../../../../../pages/gpt-study/components/StartButton";
 import CommunityButton from "../../../../../pages/gpt-study/components/CommunityButton";
 import ScrollPage from "../../TutorialScroll/TutorialScroll/ScrollPage";
 
 const OpenedClosue = ({ onComplete }) => {
-  const [scrollProgress, setScrollProgress] = useState(0);
-  const [isScrollCompleted, setIsScrollCompleted] = useState(false);
+  const [searchParams] = useSearchParams(); // Added
+  const skipToStep5 = searchParams.get("step") === "5"; // Added
+
+  const [scrollProgress, setScrollProgress] = useState(skipToStep5 ? 1 : 0); // Modified
+  const [isScrollCompleted, setIsScrollCompleted] = useState(skipToStep5 ? true : false); // Modified
   const containerRef = useRef(null);
 
   // 스크롤 텍스트들

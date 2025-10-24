@@ -34,11 +34,12 @@ const AuthCallback = () => {
           console.error('AuthCallback: Failed to parse user info', e);
         }
       }
-      console.log('AuthCallback: Forcing full page redirect to /');
-      window.location.href = '/';
+      console.log('AuthCallback: Navigating to / using useNavigate');
+      navigate('/', { replace: true });
+      return; // Added to prevent further execution in this useEffect run
     } else {
       console.log('AuthCallback: No access token found. Navigating to /login');
-      navigate('/login', { replace: true });
+      navigate('/', { replace: true });
     }
   }, [navigate]);
 
