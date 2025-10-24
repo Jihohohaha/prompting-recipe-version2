@@ -282,10 +282,13 @@ export default function ScrollPage() {
       >
         <div className="ending-text">
           <p>AI 프롬프팅의 전 과정을 한 곳에서.</p>
-          <p className="highlight-final">
+          <p className="ending-text">
             지금, 당신의 첫 번째 AI 레시피를 완성해보세요.
           </p>
-          <button className="start-button" onClick={handleStartClick}>
+          <p className="highlight-final">
+            누구나 시작할 수 있는, 쉬운 첫걸음부터.
+          </p>
+          <button className="start-button rounded-full px-6 py-2" onClick={handleStartClick}>
             학습 시작하기
           </button>
         </div>

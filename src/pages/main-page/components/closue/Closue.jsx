@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import AssetsHandLightClosue from './transition/AssetHandLightClosue';
-import OpenedClosue from './transition/OpenedClosue';
+import React, { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import AssetsHandLightClosue from "./transition/AssetHandLightClosue";
+import OpenedClosue from "./transition/OpenedClosue";
 
 const Closue = ({ onComplete }) => {
   const [isCompleted, setIsCompleted] = useState(false);
@@ -47,7 +47,7 @@ const Closue = ({ onComplete }) => {
               <div className="absolute inset-0 bg-[#F5F5F5]" />
             )}
 
-            <video 
+            <video
               src="/videos/Closue.mp4"
               className="absolute inset-0 w-full h-full object-cover"
               autoPlay
@@ -87,8 +87,8 @@ const Closue = ({ onComplete }) => {
 
 export default Closue;
 
-
-{/* <div
+{
+  /* <div
       className="relative w-screen h-screen"
       onMouseMove={handleMouseMove}
     >
@@ -100,4 +100,5 @@ export default Closue;
       ) : (
         <OpenedClosue onComplete={onComplete} />
       )}
-    </div> */}
+    </div> */
+}

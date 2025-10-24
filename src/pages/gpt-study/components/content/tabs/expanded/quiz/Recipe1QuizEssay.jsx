@@ -1,6 +1,10 @@
 // src/pages/gpt-study/components/content/tabs/expanded/quiz/Recipe1QuizEssay.jsx
 import React, { useState } from "react";
 import "../../../../../../../styles/App.css";
+import { useNavigate } from "react-router-dom"; // ✅ 추가
+import { motion, AnimatePresence } from "framer-motion";
+
+const API_BASE_URL = "https://artsw-ai.onrender.com";
 
 const Recipe1QuizEssay = () => {
   return (
@@ -113,47 +117,120 @@ const Section4 = () => {
 };
 
 const Section5 = () => {
+  const [recipe, setRecipe] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [showOverlay, setShowOverlay] = useState(false);
+  const navigate = useNavigate();
+
+  const handleSubmit = async () => {
+    if (!recipe.trim()) {
+      alert("레시피 내용을 입력해주세요! 🍳");
+      return;
+    }
+
+    // 🎬 검정 화면 닫힘 시작
+    setShowOverlay(true);
+    setLoading(true);
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/chat/quiz`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          messages: [{ type: "user", text: recipe }],
+        }),
+      });
+
+      const data = await response.json();
+      const gptText =
+        data?.data?.text?.data?.text ||
+        data?.data?.text ||
+        "⚠️ 서버 응답 형식이 예상과 다릅니다.";
+      console.log("GPT 응답:", gptText);
+
+      if (gptText.trim() === "True") {
+        // ✅ 검정화면 유지 중 navigate
+        setTimeout(() => navigate("/complete"), 800);
+      } else {
+        // ❌ 실패 시
+        setTimeout(() => navigate("/fail"), 800);
+      }
+    } catch (error) {
+      console.error("API 요청 실패:", error);
+      alert("서버 요청에 실패했습니다 😢");
+      setShowOverlay(false);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
-    <div className="w-full flex flex-col items-center justify-center bg-black relative">
+    <div className="w-full h-screen flex flex-col items-center justify-center bg-black relative overflow-hidden">
+      {/* 🎨 배경 이미지 */}
       <img
         src="/images/gpt-study/quiz/linespoon.png"
-        alt="Decoration Line 1"
-        className="absolute left-0 top-[250px] w-[600px] opacity-80"
+        alt="Decoration Line"
+        className="absolute left-0 top-[250px] w-[600px] opacity-80 z-0"
       />
-      {/* 말풍선 박스 */}
+
+      {/* 💬 메인 콘텐츠 */}
       <div
-        className="relative bg-gradient-to-b from-[#FCEED2] to-[#FBE4B7] text-[#4B2E0C]
+        className="relative z-10 bg-gradient-to-b from-[#FCEED2] to-[#FBE4B7] text-[#4B2E0C]
              rounded-3xl px-20 py-6 text-center shadow-xl w-[90%] h-auto flex flex-col items-center"
       >
-        {/* 제목 */}
         <h3 className="text-3xl font-mortend font-bold mb-6">Your Recipe</h3>
 
-        {/* 입력창 */}
-        <div className="flex justify-center w-full">
-          <textarea
-            placeholder="이제, 이 곳에 당신만의 레시피를 써 넣어보세요."
-            className="w-[500px] h-[200px] p-6 text-[16px] font-pretendard text-[#4B2E0C]
-                       bg-[#FFF8EE] rounded-2xl border-2 border-[#C49A6C]
-                       placeholder:text-[#A97C50] placeholder:italic
-                       focus:outline-none focus:ring-4 focus:ring-[#FE7525]/40 transition-all duration-300 mt-2
-                       overflow-y-auto cute-scroll"
-            style={{
-              boxShadow: "inset 0 4px 10px rgba(0,0,0,0.05)",
-              caretColor: "#642D05",
-            }}
-          />
-        </div>
+        <textarea
+          value={recipe}
+          onChange={(e) => setRecipe(e.target.value)}
+          placeholder="이제, 이 곳에 당신만의 레시피를 써 넣어보세요."
+          className="w-[500px] h-[200px] p-6 text-[16px] font-pretendard text-[#4B2E0C]
+                     bg-[#FFF8EE] rounded-2xl border-2 border-[#C49A6C]
+                     placeholder:text-[#A97C50] placeholder:italic
+                     focus:outline-none focus:ring-4 focus:ring-[#FE7525]/40 transition-all duration-300 mt-2
+                     overflow-y-auto cute-scroll"
+          style={{
+            boxShadow: "inset 0 4px 10px rgba(0,0,0,0.05)",
+            caretColor: "#642D05",
+          }}
+          disabled={loading}
+        />
 
-        {/* 제출 버튼 */}
         <button
-          onClick={() => alert("레시피가 제출되었습니다! 🍳")}
+          onClick={handleSubmit}
+          disabled={loading}
           className="mt-10 bg-[#FE7525]/[0.9] hover:bg-[#FF9E4A] text-white text-xl 
                      font-pretendard font-semibold py-4 px-20 rounded-[10px]
-                     border-none border-[#642D05] shadow-md transition-transform duration-300 hover:scale-105"
+                     border-none border-[#642D05] shadow-md transition-transform duration-300 hover:scale-105 disabled:opacity-60"
         >
-          레시피 제출하기
+          {loading ? "서버로 전송 중..." : "레시피 제출하기"}
         </button>
       </div>
+
+      {/* 🕶️ 전체화면 시네마틱 오버레이 */}
+      <AnimatePresence>
+        {showOverlay && (
+          <motion.div
+            initial={{ scaleY: 0 }}
+            animate={{ scaleY: 1 }}
+            exit={{ scaleY: 0 }}
+            transition={{
+              duration: 0.9,
+              ease: [0.76, 0, 0.24, 1],
+            }}
+            className="fixed top-0 left-0 w-screen h-screen bg-black origin-bottom z-50 flex items-center justify-center"
+          >
+            <motion.p
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.3, duration: 0.5 }}
+              className="text-white text-2xl font-pretendard"
+            >
+              🎥 당신의 레시피를 평가 중입니다...
+            </motion.p>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };

@@ -19,6 +19,8 @@ import AIGallery from "./pages/community/AIGallery";
 import Information from "./pages/community/Information";
 import Creation from "./pages/community/Creation";
 import WriteArticle from "./pages/community/WriteArticle";
+import Complete from "./pages/gpt-study/components/content/tabs/expanded/quiz/Recipe1QuizEssayComplete";
+import Fail from "./pages/gpt-study/components/content/tabs/expanded/quiz/Recipe1QuizEssayFail";
 
 const AppRouter = () => {
   const location = useLocation();
@@ -27,7 +29,7 @@ const AppRouter = () => {
     <AnimatePresence mode="wait">
       <Routes>
         <Route path="/login" element={<SocialLoginPage />} />
-        <Route path="/auth/callback" element={<AuthCallback />} />
+        <Route path="/auth/google/callback" element={<AuthCallback />} />
         <Route
           path="/"
           element={
@@ -44,6 +46,8 @@ const AppRouter = () => {
         <Route path="/gpt-study/:slug/:tab/:subTab" element={<GPTStudy />} />
         <Route path="/test" element={<Recipe1QuizMultiple />} />
         <Route path="/test2" element={<Recipe1QuizEssay />} />
+        <Route path="/complete" element={<Complete />} />
+        <Route path="/fail" element={<Fail />} />
         <Route
           path="/community"
           element={

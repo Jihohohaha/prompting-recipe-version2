@@ -6,7 +6,7 @@ import '../../styles/socialLogin.css';
 const SocialLoginPage = () => {
   const handleGoogleLogin = () => {
     // 백엔드의 Google 로그인 API 엔드포인트로 이동합니다.
-    window.location.href = 'http://localhost:3000/auth/google';
+    window.location.href = 'https://art-sw2025-be.vercel.app/auth/google';
   };
 
   return (
