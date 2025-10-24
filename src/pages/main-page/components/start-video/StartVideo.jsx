@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { getHandLightMask } from './handlightUtil';
 import { centerImage, folders, letters, fontUrl, vw, vh } from './assetData';
@@ -26,7 +25,7 @@ const StartVideo = ({ onFinish }) => {
     const t6 = setTimeout(() => setShake(false), 3000); // 6초 후 세 번째 흔들림 끝
     const t7 = setTimeout(() => setShowAssets(true), 3500); // 6초 후 자산 등장 시작
     // 8.5초 후 애니메이션 종료
-    const t8 = setTimeout(() => setFinished(true), 9000);
+    const t8 = setTimeout(() => setFinished(true), 3000);
     return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3); clearTimeout(t4); clearTimeout(t5); clearTimeout(t6); clearTimeout(t7); clearTimeout(t8); };
   }, []);
 
@@ -40,90 +39,110 @@ const StartVideo = ({ onFinish }) => {
   // 폴더/글씨 등장 시간 랜덤
   const assetDelays = React.useMemo(() => Array.from({ length: folders.length + letters.length }, (_, i) => Math.random() * 2000), []);
 
+  const handleVideoEnd = () => {
+    setTimeout(() => {
+      if (typeof onFinish === 'function') {
+        onFinish();
+      }
+    }, 100);
+  };
+
+  // return (
+  //   <div
+  //     className="absolute top-0 left-0 w-screen h-screen z-20 bg-transparent"
+  //     style={{ overflow: 'hidden' }}
+  //   >
+  //     {/* 아래 레이어: F5F5F5 배경 + 중앙 이미지 */}
+  //     <div
+  //       className="absolute top-0 left-0 w-full h-full z-10"
+  //       style={{ background: '#F5F5F5' }}
+  //     >
+  //       <img
+  //         src={centerImage.src}
+  //         alt="center"
+  //         style={{
+  //           position: 'absolute',
+  //           left: vw(centerImage.x),
+  //           top: vh(centerImage.y),
+  //           width: vw(centerImage.width),
+  //           height: vh(centerImage.height),
+  //           userSelect: 'none',
+  //           transform: shake
+  //             ? 'translateX(-20px) rotate(-3deg)'
+  //             : 'none',
+  //           animation: shake
+  //             ? 'shake-center 1s cubic-bezier(.36,.07,.19,.97) 0s 2 alternate'
+  //             : 'none',
+  //         }}
+  //         draggable={false}
+  //       />
+  //       <style>{`
+  //         @keyframes shake-center {
+  //           0% { transform: translateX(0) rotate(0deg); }
+  //           20% { transform: translateX(-20px) rotate(-3deg); }
+  //           40% { transform: translateX(20px) rotate(3deg); }
+  //           60% { transform: translateX(-10px) rotate(-2deg); }
+  //           80% { transform: translateX(10px) rotate(2deg); }
+  //           100% { transform: translateX(0) rotate(0deg); }
+  //         }
+  //         @font-face {
+  //           font-family: 'Watermelon';
+  //           src: url('${fontUrl}') format('truetype');
+  //           font-display: swap;
+  //         }
+  //       `}</style>
+  //     </div>
+
+  //     {/* 위 레이어: 검정 배경 + 중앙 HandLight 마스크 */}
+  //     <div
+  //       className="absolute top-0 left-0 w-full h-full z-20"
+  //       style={{
+  //         background: '#000',
+  //         ...getHandLightMask(centerX*(9/10), centerY*(11/10), 230),
+  //       }}
+  //     />
+
+  //     {/* 폴더/글씨 튀어나오는 애니메이션 (z-30으로 올림) */}
+  //     {showAssets && (
+  //       <div className="absolute top-0 left-0 w-full h-full z-30">
+  //         {folders.map((f, i) => (
+  //           <FlyingAsset
+  //             key={`folder-${i}`}
+  //             asset={f}
+  //             type="img"
+  //             delay={assetDelays[i]}
+  //             duration={1200 + Math.random() * 1200}
+  //             from={{ x: centerX - f.width / 2, y: centerY - f.height / 2 }}
+  //             to={{ x: f.x, y: f.y }}
+  //           />
+  //         ))}
+  //         {letters.map((l, i) => (
+  //           <FlyingAsset
+  //             key={`letter-${i}`}
+  //             asset={l}
+  //             type="text"
+  //             delay={assetDelays[folders.length + i]}
+  //             duration={1200 + Math.random() * 1200}
+  //             from={{ x: centerX - l.width / 2, y: centerY - l.height / 2 }}
+  //             to={{ x: l.x, y: l.y }}
+  //           >
+  //             {l.text}
+  //           </FlyingAsset>
+  //         ))}
+  //       </div>
+  //     )}
+  //   </div>
+  // );
   return (
-    <div
-      className="absolute top-0 left-0 w-screen h-screen z-20 bg-transparent"
-      style={{ overflow: 'hidden' }}
-    >
-      {/* 아래 레이어: F5F5F5 배경 + 중앙 이미지 */}
-      <div
-        className="absolute top-0 left-0 w-full h-full z-10"
-        style={{ background: '#F5F5F5' }}
-      >
-        <img
-          src={centerImage.src}
-          alt="center"
-          style={{
-            position: 'absolute',
-            left: vw(centerImage.x),
-            top: vh(centerImage.y),
-            width: vw(centerImage.width),
-            height: vh(centerImage.height),
-            userSelect: 'none',
-            transform: shake
-              ? 'translateX(-20px) rotate(-3deg)'
-              : 'none',
-            animation: shake
-              ? 'shake-center 1s cubic-bezier(.36,.07,.19,.97) 0s 2 alternate'
-              : 'none',
-          }}
-          draggable={false}
-        />
-        <style>{`
-          @keyframes shake-center {
-            0% { transform: translateX(0) rotate(0deg); }
-            20% { transform: translateX(-20px) rotate(-3deg); }
-            40% { transform: translateX(20px) rotate(3deg); }
-            60% { transform: translateX(-10px) rotate(-2deg); }
-            80% { transform: translateX(10px) rotate(2deg); }
-            100% { transform: translateX(0) rotate(0deg); }
-          }
-          @font-face {
-            font-family: 'Watermelon';
-            src: url('${fontUrl}') format('truetype');
-            font-display: swap;
-          }
-        `}</style>
-      </div>
-
-      {/* 위 레이어: 검정 배경 + 중앙 HandLight 마스크 */}
-      <div
-        className="absolute top-0 left-0 w-full h-full z-20"
-        style={{
-          background: '#000',
-          ...getHandLightMask(centerX*(9/10), centerY*(11/10), 230),
-        }}
+    <div className="relative w-screen h-screen overflow-hidden">
+      <video 
+        src="/videos/startVideo.mp4"
+        className="absolute inset-0 w-full h-full object-cover"
+        autoPlay
+        muted
+        onEnded={handleVideoEnd}
+        onError={handleVideoEnd}
       />
-
-      {/* 폴더/글씨 튀어나오는 애니메이션 (z-30으로 올림) */}
-      {showAssets && (
-        <div className="absolute top-0 left-0 w-full h-full z-30">
-          {folders.map((f, i) => (
-            <FlyingAsset
-              key={`folder-${i}`}
-              asset={f}
-              type="img"
-              delay={assetDelays[i]}
-              duration={1200 + Math.random() * 1200}
-              from={{ x: centerX - f.width / 2, y: centerY - f.height / 2 }}
-              to={{ x: f.x, y: f.y }}
-            />
-          ))}
-          {letters.map((l, i) => (
-            <FlyingAsset
-              key={`letter-${i}`}
-              asset={l}
-              type="text"
-              delay={assetDelays[folders.length + i]}
-              duration={1200 + Math.random() * 1200}
-              from={{ x: centerX - l.width / 2, y: centerY - l.height / 2 }}
-              to={{ x: l.x, y: l.y }}
-            >
-              {l.text}
-            </FlyingAsset>
-          ))}
-        </div>
-      )}
     </div>
   );
 };
