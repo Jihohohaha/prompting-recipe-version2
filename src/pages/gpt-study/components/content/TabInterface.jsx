@@ -80,9 +80,15 @@ const TabInterface = ({ recipe }) => {
               key={tab.id}
               onClick={() => handleTabClick(tab.id)}
               className={`
+<<<<<<< HEAD
                 flex-1 h-14 font-bold text-lg font-mortend justify-left 
                 rounded-t-lg transition-all duration-300
                 ${!isActive && 'hover:opacity-95'}
+=======
+                flex-1 h-full font-bold text-lg font-pretendard
+                rounded-t-2xl rounded-b-none transition-all duration-300
+                ${!isActive ? 'hover:opacity-95' : ''}
+>>>>>>> 2be5bc86dcab0c165ce9482e1ad9c9e2afffba14
               `}
               style={{
                 backgroundColor: isActive ? primaryColor : tabBg,
@@ -104,6 +110,7 @@ const TabInterface = ({ recipe }) => {
           <div className="h-[2px] bg-white" style={{ width: 'calc(100% - 4rem)' }} />
         </div>
 
+<<<<<<< HEAD
         <div className="text-white font-bold text-8xl whitespace-pre-line text-left mt-48">
           {(() => {
             const [prefix, suffix] = recipe.displayTitle.split('.');
@@ -114,6 +121,10 @@ const TabInterface = ({ recipe }) => {
               </>
             );
           })()}
+=======
+        <div className="text-white font-bold mt-48 text-8xl font-mortend whitespace-pre-line text-left mt-16">
+          {recipe.displayTitle}
+>>>>>>> 2be5bc86dcab0c165ce9482e1ad9c9e2afffba14
         </div>
 
         <div className="flex justify-center">
