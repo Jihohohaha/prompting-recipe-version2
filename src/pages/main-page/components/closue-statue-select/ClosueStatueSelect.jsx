@@ -5,6 +5,7 @@ import DishContainer from './DishContainer';
 import FloatingImage from './FloatingImage';
 import KeywordText from './KeywordText';
 import OrbitOverlay from './OrbitOverlay';
+import LogoOrbit from './LogoOrbit';
 import { dishes as dishesBase, getAIMenuFor } from './dishesData';
 
 // ───────────────────────── 상수 및 유틸 ─────────────────────────
@@ -46,11 +47,10 @@ const browseTriplet = (front, n) => ({
   right: (front + 1) % n,         // 45°
 });
 
-// ───────────────────────── 컴포넌트 ─────────────────────────
 const ClosueStatueSelect = () => {
   const navigate = useNavigate();
-  const ROUTE_WIPE_MS = 1500;                 // ⬅️ 원형 와이프 재생 시간
-  const [routeWipe, setRouteWipe] = useState(false); // ⬅️ 와이프 on/off
+  const ROUTE_WIPE_MS = 1500;
+  const [routeWipe, setRouteWipe] = useState(false);
   const [cornerLogoVisible, setCornerLogoVisible] = useState(false);
   const cornerTimerRef = useRef(null);
 
@@ -59,51 +59,54 @@ const ClosueStatueSelect = () => {
   const [orbitTiltDeg, setOrbitTiltDeg] = useState(0); // 0 ↔ -70 (틸트)
   const [showMask, setShowMask] = useState(true);
 
-  // 제목 락(틸트 상태에서 제목 고정)
+  // 제목 락
   const [titleLock, setTitleLock] = useState({ active: false, text: null });
   const lockTitleWith = useCallback((text) => setTitleLock({ active: true, text }), []);
   const unlockTitle   = useCallback(() => setTitleLock({ active: false, text: null }), []);
 
-  // 틸트 모드에서의 아이템 세트
+  // 틸트 모드 아이템
   const [aiItems, setAiItems] = useState([]);
 
-  // 틸트 진입 프레임에서만 즉시 숨김 플래그
+  // 틸트 진입 프레임 즉시 숨김
   const [instantHide, setInstantHide] = useState(false);
 
   const isTilt = orbitTiltDeg !== 0;
   const items  = isTilt ? aiItems : dishesBase;
   const n      = items.length || 0;
 
-  // 현재 12시에 온 인덱스
+  const [showGuides, setShowGuides] = useState(true); // 처음엔 보이게
+  useEffect(() => {
+    const onKey = (e) => { if (e.key.toLowerCase() === 'g') setShowGuides(s => !s); };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, []);
+
+  // 현재 12시 인덱스
   const frontDishIndex = useMemo(
     () => getFrontIndex(rotationAngle, n),
     [rotationAngle, n]
   );
   const frontDish = useMemo(() => items[frontDishIndex] ?? items[0], [items, frontDishIndex]);
 
-  // 제목 텍스트
+  // 제목
   const titleText = titleLock.active && titleLock.text ? titleLock.text : (frontDish?.title ?? '');
 
-  // 틸트가 풀리면 제목 락 해제
+  // 틸트 해제 시 제목 락 해제
   useEffect(() => { if (!isTilt) unlockTitle(); }, [isTilt, unlockTitle]);
-  // 틸트 진입 시 1000ms 뒤 우상단 로고 표시, 해제 시 즉시 숨김
+
+  // 틸트 시 코너 로고 노출 딜레이
   useEffect(() => {
     if (cornerTimerRef.current) {
       clearTimeout(cornerTimerRef.current);
       cornerTimerRef.current = null;
     }
     if (isTilt) {
-      cornerTimerRef.current = setTimeout(() => {
-        setCornerLogoVisible(true);
-      }, 1200);
+      cornerTimerRef.current = setTimeout(() => setCornerLogoVisible(false), 1000); // Updated delay to 1000ms
     } else {
       setCornerLogoVisible(false);
     }
     return () => {
-      if (cornerTimerRef.current) {
-        clearTimeout(cornerTimerRef.current);
-        cornerTimerRef.current = null;
-      }
+      if (cornerTimerRef.current) clearTimeout(cornerTimerRef.current);
     };
   }, [isTilt]);
 
@@ -151,7 +154,7 @@ const ClosueStatueSelect = () => {
     setTimeout(() => (stepLockRef.current = false), STEP_COOLDOWN_MS);
   }, []);
 
-  // 마우스 휠 → 단계 회전
+  // 마우스 휠
   useEffect(() => {
     const onWheel = (e) => {
       const root = rootRef.current;
@@ -160,7 +163,7 @@ const ClosueStatueSelect = () => {
       if (stepLockRef.current) return;
       wheelAccumRef.current += e.deltaY;
       if (Math.abs(wheelAccumRef.current) >= WHEEL_STEP) {
-        const dir = wheelAccumRef.current > 0 ? 1 : -1; // 1 = 아래 스크롤 → 반시계 45°
+        const dir = wheelAccumRef.current > 0 ? 1 : -1;
         wheelAccumRef.current = 0;
         doStep(dir);
       }
@@ -169,7 +172,7 @@ const ClosueStatueSelect = () => {
     return () => window.removeEventListener('wheel', onWheel);
   }, [doStep]);
 
-  // 터치 스와이프 → 단계 회전
+  // 터치 스와이프
   useEffect(() => {
     const within = (t) => rootRef.current && rootRef.current.contains(t);
     const onStart = (e) => {
@@ -206,79 +209,65 @@ const ClosueStatueSelect = () => {
     };
   }, [doStep]);
 
-  // ───────────────────────── 틸트 진입 헬퍼 ─────────────────────────
+  // ───────────────────────── 틸트 진입 ─────────────────────────
   const enterTiltWithCategoryAtFront = useCallback((baseIdx) => {
-    // 복귀를 위해 스냅샷
     pushHistory(baseIdx);
-
-    // 틸트 직전 기준 인덱스를 현재 각도에 가장 가까운 동치각으로 스냅
     setRotationAngle((prevAngle) => nearestAngle(angleForFrontIndex(baseIdx), prevAngle));
 
-    // 카테고리 세트 + 제목 락
     const baseDish = dishesBase[baseIdx] ?? dishesBase[0];
     const nextMenu = getAIMenuFor(baseDish.title);
     setAiItems(nextMenu);
     lockTitleWith(baseDish.title);
 
-    // ⬇️ 틸트 진입 프레임: 사라질 접시들 즉시 언마운트
     setInstantHide(true);
     setOrbitTiltDeg(-70);
-    // 다음 틱에 해제(다음부터는 기존 페이드 동작 유지)
     setTimeout(() => setInstantHide(false), 0);
-
-    setPendingBaseIndex(null);
   }, [pushHistory, lockTitleWith]);
 
-  // ───────────────────────── 클릭 핸들러 ─────────────────────────
+  // 클릭 핸들러
   const handleDishClick = useCallback((dish, index) => {
     if (!dish) return;
 
-    // 틸트 상태
     if (isTilt) {
       const { left, center, right } = tiltedTriplet(frontDishIndex, n);
-      if (index === right) { doStep(1);  return; }   // -45° → 반시계 45°
-      if (index === left)  { doStep(-1); return; }   // -135° → 시계 45°
+      if (index === right) { doStep(1);  return; }
+      if (index === left)  { doStep(-1); return; }
       if (index === center){
         if (dish.address) {
-          // ⬇️ 검은 원 와이프 → 완료 후 라우팅
           setRouteWipe(true);
-          setTimeout(() => {
-            navigate(dish.address);
-          }, ROUTE_WIPE_MS);
+          setTimeout(() => { navigate(dish.address); }, ROUTE_WIPE_MS);
         }
         return;
-      } // -90° → 라우팅(원형 와이프)
+      }
       return;
     }
 
-    // 프리-틸트 상태
     const { left, center, right } = browseTriplet(frontDishIndex, dishesBase.length);
-    if (index === right) { doStep(1);  return; }     // 45° → 반시계 45°
-    if (index === left)  { doStep(-1); return; }     // 135° → 시계 45°
+    if (index === right) { doStep(1);  return; }
+    if (index === left)  { doStep(-1); return; }
     if (index === center) {
-      // 바로 틸트 진입(숨김/스핀 없음, 틸트 프레임에 즉시 언마운트)
       enterTiltWithCategoryAtFront(center);
       return;
     }
   }, [isTilt, frontDishIndex, n, doStep, navigate, enterTiltWithCategoryAtFront]);
 
-  // 오버레이 원 클릭: 사용 안 함(클릭은 DishItem이 전담)
+  // 오버레이 클릭(사용안함)
   const handleOverlayToggle = useCallback(() => {}, []);
 
-  // ───────────────────────── 틸트 설명용 디테일 인덱스 ─────────────────────────
+  // 틸트 설명용 디테일 인덱스
   const [detailIndex, setDetailIndex] = useState(null);
   useEffect(() => {
     if (!isTilt || n === 0) { setDetailIndex(null); return; }
-    const { center } = tiltedTriplet(frontDishIndex, n); // -90°
+    const { center } = tiltedTriplet(frontDishIndex, n);
     setDetailIndex(center);
   }, [isTilt, frontDishIndex, n]);
 
   const detailDish = (isTilt && detailIndex != null) ? items[detailIndex] : frontDish;
 
-  // ───────────────────────── 파생 UI 값 ─────────────────────────
+  // 파생 UI 값
   const titleScale = isTilt ? 2.5 : 1;
   const descriptionScale = isTilt ? 2 : 1;
-  const floatingStyle = { opacity: isTilt ? 0 : 1, transition: 'opacity 800ms cubic-bezier(0.2, 0.8, 0.2, 1)' };
+  const floatingStyle = { opacity: isTilt ? 0 : 1, transition: 'opacity 200ms cubic-bezier(0.2, 0.8, 0.2, 1)' };
 
   const [dishScales, setDishScales] = useState(() => Array(items.length).fill(1));
   useEffect(() => {
@@ -288,16 +277,11 @@ const ClosueStatueSelect = () => {
   // ───────────────────────── 렌더 ─────────────────────────
   return (
     <>
-      {/* 틸트 모드일 때 현재(-90°) 아이템 로고를 우상단에 표시 */}
       <CornerLogo show={cornerLogoVisible && !!detailDish?.logo} src={detailDish?.logo} title={detailDish?.title} />
-      {/* ⬇️ 원형 와이프 오버레이 */}
       <CircleWipe show={routeWipe} durationMs={ROUTE_WIPE_MS} />
 
       {showMask && (
-        <div
-          className="fixed inset-0 bg-black/90 z-[100]"
-          onClick={() => setShowMask(false)}
-        >
+        <div className="fixed inset-0 bg-black/90 z-[100] cursor-pointer select-none" onClick={() => setShowMask(false)}>
           <div className='absolute inset-0 flex flex-col items-center justify-center cursor-pointer transition-opacity duration-500'>
             <h1 className="text-6xl font-bold text-white mb-8 font-koolegant">Choose Your Dish</h1>
             <p className="text-xl text-white mb-12">오늘의 메뉴를 선택하세요.</p>
@@ -308,174 +292,191 @@ const ClosueStatueSelect = () => {
 
       <div
         ref={rootRef}
-        className="relative w-screen h-screen overflow-hidden bg-gradient-to-b from-orange-400 to-orange-500 select-none"
+        className="relative w-screen h-[200vh] overflow-hidden select-none"
         onDragStart={(e) => e.preventDefault()}
-        style={{
-          userSelect: 'none',
-          WebkitUserSelect: 'none',
-          MozUserSelect: 'none',
-          msUserSelect: 'none',
-        }}
+        style={{ userSelect: 'none', WebkitUserSelect: 'none', MozUserSelect: 'none', msUserSelect: 'none' }}
       >
-        {/* 스크롤 프록시(휠/터치 스텝 회전용) */}
+        {/* ── 배경 레이어(배경만 이동) ───────────────────────────────────── */}
         <div
-          className="absolute inset-0 overflow-y-auto z-50 scrollbar-hide"
-          style={{ WebkitOverflowScrolling: 'touch', pointerEvents: 'none' }}
+          className="absolute inset-0 w-screen h-[200vh]"
+          style={{
+            zIndex: 0,
+            background: 'linear-gradient(to bottom, black, black, #FF7D2A, #FF7D2A, #FF7D2A)',
+            transform: `translateY(${isTilt ? '-100vh' : '0'})`,
+            transition: 'transform 900ms cubic-bezier(0.5, 0.8, 0.2, 1)',
+            willChange: 'transform',
+            pointerEvents: 'none',
+          }}
           aria-hidden="true"
-        >
-          <div className="h-[1000vh]" />
-        </div>
+        />
 
-        {/* 제목/설명 */}
-        <div className="absolute top-20 left-1/2 -translate-x-1/2 text-center z-20 pointer-events-none">
+        <div className='absolute top-1/4 left-1/2 -translate-y-1/2 -translate-x-1/2'>
           <h1
-            className="text-6xl font-bold text-black mb-4 font-koolegant"
-            style={{ transform: `scale(${titleScale})`, transformOrigin: 'center', transition: 'transform 800ms cubic-bezier(0.2, 0.8, 0.2, 1)' }}
+            className="text-[320px] font-bold text-white opacity-[20%] mb-4 font-koolegant whitespace-nowrap"
+            style={{ color: isTilt ? 'transparent' : 'white', transform: `scale(${titleScale})`, transformOrigin: 'top', transition: 'transform 800ms cubic-bezier(0.2, 0.8, 0.2, 1)' }}
           >
             {titleText}
           </h1>
-          <p
-            className="text-xl text-black"
-            style={{ transform: `scale(${descriptionScale})`, transformOrigin: 'center', transition: 'opacity 0ms', opacity: descriptionScale === 1 ? 1 : 0 }}
+        </div>
+
+        <div
+          className='absolute w-[96vw] top-0 left-[2vw]'
+          style={{
+            opacity: isTilt ? '100' : '0',
+            transform: isTilt ? 'translateY(0)' : 'translateY(-100px)',
+            transformOrigin: 'top',
+            transition: isTilt ? 'transform 800ms cubic-bezier(0.2, 0.8, 0.2, 1) 500ms, opacity 800ms cubic-bezier(0.2, 0.8, 0.2, 1) 500ms' : 'none'
+          }}>
+          <img src='/images/main-page/chandelier.png'/>
+        </div>
+
+        {/* 콘텐츠 래퍼(배경 위에 고정) */}
+        <div className="relative z-[1]">
+          {/* 스크롤 프록시 */}
+          <div className="absolute inset-0 overflow-y-auto z-50 scrollbar-hide" style={{ WebkitOverflowScrolling: 'touch', pointerEvents: 'none' }} aria-hidden="true">
+            <div className="h-[1000vh]" />
+          </div>
+
+          {/* 제목/설명 */}
+          <div className="absolute top-12 left-1/2 -translate-x-1/2 text-center z-20 pointer-events-none">
+            <h1
+              className="text-6xl font-bold text-white mb-4 font-koolegant"
+              style={{ color: isTilt ? 'black' : 'white', transform: `scale(${titleScale})`, transformOrigin: 'top', transition: 'transform 800ms cubic-bezier(0.2, 0.8, 0.2, 1)' }}
+            >
+              {titleText}
+            </h1>
+            <p
+              className="text-xl text-white"
+              style={{ transform: `scale(${descriptionScale})`, transformOrigin: 'center', transition: 'opacity 0ms', opacity: descriptionScale === 1 ? 1 : 0 }}
+            >
+              {frontDish?.description}
+            </p>
+          </div>
+
+          {/* 부유 장식 */}
+          <div style={floatingStyle}>
+            <FloatingImage src="/images/main-page/float1.png" alt="f1" className="top-[220px] left-[10px] w-[400px] h-[400px] z-0" />
+            <FloatingImage src="/images/main-page/float2.png" alt="f2" className="top-[100px] left-[350px] w-[240px] h-[240px] z-0" />
+            <FloatingImage src="/images/main-page/float3.png" alt="f3" className="top-[120px] right-[200px] w-[240px] h-[240px] z-0" />
+            <FloatingImage src="/images/main-page/float4.png" alt="f4" className="top-[400px] right-[10px] w-[240px] h-[240px] z-0" />
+          </div>
+
+          {/* 웨이터 석상 */}
+          {isTilt && (
+            <div className="fixed bottom-0 left-[290px] -translate-x-1/2 z-50 pointer-events-none">
+              <style>
+                {`@keyframes waiter-slide-in {0%{transform:translateX(-160px);opacity:0;}100%{transform:translateX(0);opacity:1;}}`}
+              </style>
+              <img
+                src="/images/main-page/waiterstatue.png"
+                alt="waiter"
+                className="h-[260px] select-none"
+                draggable={false}
+                style={{ animation: 'waiter-slide-in 1500ms cubic-bezier(0.2, 0.8, 0.2, 1) 1000ms both', willChange: 'transform, opacity', filter: 'drop-shadow(0 6px 18px rgba(0,0,0,0.25))' }}
+              />
+            </div>
+          )}
+
+          {/* 하단 틸트 UI */}
+          {isTilt && (
+            <div className='fixed left-1/2 -translate-x-1/2 bottom-[20px] h-[160px] rounded-[25px] z-[20] shadow-lg flex items-center'>
+              <div className="relative h-full w-[1000px] rounded-l-[24px] bg-white bg-opacity-[40%]"></div>
+              <div className="absolute inset-0 flex items-center justify-center">
+                <p className="text-black text-[18px] text-center leading-[1.7] font-pretendard font-medium whitespace-pre-line">
+                  {detailDish?.description}
+                </p>
+              </div>
+              <div className="relative flex flex-col items-center justify-center h-full w-[300px] rounded-r-[24px] bg-black bg-opacity-[70%]">
+                <div className="text-[40px] font-koolegant mb-2">Ingredient</div>
+                <div className="text-[16px] font-pretendard text-white">
+                  {[detailDish?.kw1, detailDish?.kw2, detailDish?.kw3].filter(Boolean).join(', ')}
+                  {detailDish?.kw4 ? `, ${detailDish.kw4}` : ''}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* 석상 */}
+          <div
+            className="fixed bottom-0 left-1/2 pointer-events-none"
+            style={{
+              zIndex: isTilt ? 20 : 30,
+              transform: `translateX(-50%) translateY(${isTilt ? -250 : 0}px)`,
+              transition: `transform ${isTilt ? 1600 : 700}ms ${isTilt ? 'cubic-bezier(0.2, 1, 0.5, 1)' : 'cubic-bezier(0.3, 1, 0.5, 1)'}`
+            }}
           >
-            {frontDish?.description}
-          </p>
-        </div>
-
-        {/* 부유 장식 */}
-        <div style={floatingStyle}>
-          <FloatingImage src="/images/main-page/flower.png" alt="Flower" className="bottom-[392px] left-[160px] w-[300px] h-[300px] z-0" />
-          <FloatingImage src="/images/main-page/cup.png" alt="Cup" className="bottom-[375px] left-[360px] w-[200px] h-[200px] z-0" />
-          <FloatingImage src="/images/main-page/salt.png" alt="Salt" className="bottom-[400px] right-[360px] w-[200px] h-[200px] z-0" />
-          <FloatingImage src="/images/main-page/glass.png" alt="Glass" className="bottom-[392px] right-[160px] w-[300px] h-[300px] z-0" />
-        </div>
-
-        {/* 프리-틸트 키워드 */}
-        {!isTilt && frontDish && (
-          <>
-            <KeywordText className="bottom-[470px] left-[290px] -translate-x-1/2" fontSizeClass="text-lg">{frontDish.kw1}</KeywordText>
-            <KeywordText className="bottom-[450px] left-[290px] -translate-x-1/2" fontSizeClass="text-sm">{frontDish.ekw1}</KeywordText>
-            <KeywordText className="bottom-[480px] left-[470px] -translate-x-1/2" fontSizeClass="text-lg">{frontDish.kw2}</KeywordText>
-            <KeywordText className="bottom-[460px] left-[470px] -translate-x-1/2" fontSizeClass="text-sm">{frontDish.ekw2}</KeywordText>
-            <KeywordText className="bottom-[470px] right-[460px] translate-x-1/2" fontSizeClass="text-lg">{frontDish.kw3}</KeywordText>
-            <KeywordText className="bottom-[450px] right-[460px] translate-x-1/2" fontSizeClass="text-sm">{frontDish.ekw3}</KeywordText>
-            <KeywordText className="bottom-[600px] right-[290px] translate-x-1/2" fontSizeClass="text-lg">{frontDish.kw4}</KeywordText>
-            <KeywordText className="bottom-[580px] right-[290px] translate-x-1/2" fontSizeClass="text-sm">{frontDish.ekw4}</KeywordText>
-          </>
-        )}
-        
-        {/* 웨이터 석상 */}
-        {isTilt && (
-          <div className="absolute bottom-0 left-[290px] -translate-x-1/2 z-50 pointer-events-none">
-            <style>
-              {`
-                @keyframes waiter-slide-in {
-                  0%   { transform: translateX(-160px); opacity: 0; }
-                  100% { transform: translateX(0);      opacity: 1; }
-                }
-              `}
-            </style>
-
             <img
-              src="/images/main-page/waiterstatue.png"
-              alt="waiter"
-              className="h-[260px] select-none"
+              src="/images/main-page/statue.png"
+              alt="석상"
+              className="w-96 h-[250px] object-contain"
               draggable={false}
               style={{
-                // name | duration | timing | delay | fill-mode
-                animation: 'waiter-slide-in 1500ms cubic-bezier(0.2, 0.8, 0.2, 1) 1000ms both',
-                willChange: 'transform, opacity',
-                filter: 'drop-shadow(0 6px 18px rgba(0,0,0,0.25))',
+                transform: `scale(${isTilt ? 1.6 : 1})`,
+                transformOrigin: 'bottom center',
+                transition: `transform ${isTilt ? 1000 : 500}ms cubic-bezier(0.2, 0.8, 0.2, 1)`
               }}
             />
           </div>
-        )}
 
-        {/* 하단 틸트 UI(설명+재료) : 틸트 시 -90° 위치의 접시 기준으로 표시 */}
-        {isTilt && (
-          <div className='absolute flex left-1/2 -translate-x-1/2 bottom-[20px] h-[160px] rounded-[25px] z-[25] shadow-lg items-center'>
-            <div className="relative h-full w-[1000px] rounded-l-[24px] bg-white bg-opacity-[40%]"></div>
-            <div className="absolute inset-0 flex items-center justify-center">
-              <p className="text-black text-[18px] text-center leading-[1.7] font-pretendard font-medium whitespace-pre-line">
-                {detailDish?.description}
-              </p>
-            </div>
-            <div className="relative flex flex-col items-center justify-center h-full w-[300px] rounded-r-[24px] bg-black bg-opacity-[70%]">
-              <div className="text-[40px] font-koolegant mb-2">Ingredient</div>
-              <div className="text-[16px] font-pretendard text-white">
-                {[detailDish?.kw1, detailDish?.kw2, detailDish?.kw3].filter(Boolean).join(', ')}
-                {detailDish?.kw4 ? `, ${detailDish.kw4}` : ''}
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* 석상 */}
-        <div
-          className="absolute bottom-0 left-1/2 pointer-events-none"
-          style={{
-            zIndex: isTilt ? 20 : 30,
-            transform: `translateX(-50%) translateY(${isTilt ? -250 : 0}px)`,
-            transition: `transform ${isTilt ? 1600 : 700}ms ${isTilt ? 'cubic-bezier(0.2, 1, 0.5, 1)' : 'cubic-bezier(0.3, 1, 0.5, 1)'}`
-          }}
-        >
-          <img
-            src="/images/main-page/statue.png"
-            alt="석상"
-            className="w-96 h-[250px] object-contain"
-            draggable={false}
+          {/* 오비트(접시들) */}
+          <div
+            className="absolute"
             style={{
-              transform: `scale(${isTilt ? 1.6 : 1})`,
-              transformOrigin: 'bottom center',
-              transition: `transform ${isTilt ? 1000 : 500}ms ${isTilt ? 'cubic-bezier(0.2, 0.8, 0.2, 1)' : 'cubic-bezier(0.2, 0.8, 0.2, 1)'}`
+              left: typeof window !== 'undefined' ? window.innerWidth / 2 : 0,
+              top: typeof window !== 'undefined' ? window.innerHeight / 2 + 530 : 0,
+              transformOrigin: '0 0',
             }}
-          />
+          >
+            <DishContainer
+              items={items}
+              rotationAngle={rotationAngle}
+              orbitTiltDeg={orbitTiltDeg}
+              frontDishIndex={frontDishIndex}
+              dishScales={dishScales}
+              handleDishClick={handleDishClick}
+              selectedDish={null}
+              hideText={false}
+              isTiltMode={isTilt}
+              instant={instantHide}
+              showTiltLogos={false}
+            />
+
+            <OrbitOverlay
+              items={items}
+              rotationAngle={rotationAngle}
+              orbitTiltDeg={orbitTiltDeg}
+              frontDishIndex={frontDishIndex}
+              dishScales={dishScales}
+              selectedDish={null}
+              onCircleClick={handleOverlayToggle}
+              isTiltMode={isTilt}
+              instant={instantHide}
+              showGuide={showGuides}
+            />
+
+            {/* ⬇️ 로고 전용 궤도: 반드시 같은 컨테이너 안에! */}
+            {isTilt && (
+              <LogoOrbit
+                items={items}
+                rotationAngle={rotationAngle}
+                orbitTiltDeg={orbitTiltDeg}
+                frontDishIndex={frontDishIndex}
+                instant={instantHide}
+                showGuide={showGuides}
+              />
+            )}
+          </div>
+
+          {/* 뒤로가기 */}
+          <button
+            onClick={() => canGoBack && popHistory()}
+            disabled={!canGoBack}
+            className={`fixed top-6 left-6 z-[80] px-4 py-2 rounded-xl ${canGoBack ? 'bg-black/70 hover:bg-black/80 cursor-pointer text-white' : 'bg-transparent cursor-not-allowed text-transparent pointer-events-none'} transition-colors`}
+            title={canGoBack ? '뒤로' : '되돌릴 상태 없음'}
+          >
+            {'<-' }
+          </button>
         </div>
-
-        {/* 오비트(접시들) */}
-        <div
-          className="absolute"
-          style={{
-            left: typeof window !== 'undefined' ? window.innerWidth / 2 : 0,
-            top: typeof window !== 'undefined' ? window.innerHeight / 2 + 530 : 0,
-            transformOrigin: '0 0',
-          }}
-        >
-          <DishContainer
-            items={items}
-            rotationAngle={rotationAngle}
-            orbitTiltDeg={orbitTiltDeg}
-            frontDishIndex={frontDishIndex}
-            dishScales={dishScales}
-            handleDishClick={handleDishClick}
-            selectedDish={null}
-            hideText={false}
-            isTiltMode={isTilt}
-            instant={instantHide}           // ⬅️ 틸트 프레임에만 즉시 언마운트
-          />
-
-          <OrbitOverlay
-            items={items}
-            rotationAngle={rotationAngle}
-            orbitTiltDeg={orbitTiltDeg}
-            frontDishIndex={frontDishIndex}
-            dishScales={dishScales}
-            selectedDish={null}
-            onCircleClick={handleOverlayToggle}
-            isTiltMode={isTilt}
-            instant={instantHide}           // ⬅️ 동일
-          />
-        </div>
-
-        {/* 뒤로가기 */}
-        <button
-          onClick={() => canGoBack && popHistory()}
-          disabled={!canGoBack}
-          className={`fixed top-6 left-6 z-[80] px-4 py-2 rounded-xl ${canGoBack ? 'bg-black/70 hover:bg-black/80 cursor-pointer text-white' : 'bg-transparent cursor-not-allowed text-transparent pointer-events-none'} transition-colors`}
-          title={canGoBack ? '뒤로' : '되돌릴 상태 없음'}
-        >
-          {'<-' }
-        </button>
       </div>
     </>
   );
@@ -486,26 +487,19 @@ function CornerLogo({ show, src, title }) {
     position: 'fixed',
     top: '290px',
     right: '700px',
-    zIndex: 85,          // 타이틀/뒤로가기보다 위, 와이프(9999)보단 아래
-    width: '40px',      // 필요하면 96~128px 사이로 조정
+    zIndex: 85,
+    width: '40px',
     height: '40px',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    pointerEvents: 'none', // 클릭 방해 없음
+    pointerEvents: 'none',
     transition: 'opacity 200ms ease, transform 200ms ease',
     opacity: show ? 1 : 0,
     transform: `${show ? 'scale(1)' : 'scale(0.92)'} rotate(15deg)`,
     filter: 'drop-shadow(0 4px 12px rgba(0,0,0,0.25))',
   };
-
-  const imgStyle = {
-    width: '100%',
-    height: '100%',
-    objectFit: 'contain',
-    userSelect: 'none',
-  };
-
+  const imgStyle = { width: '100%', height: '100%', objectFit: 'contain', userSelect: 'none' };
   if (!src) return null;
   return (
     <div style={baseStyle} aria-hidden={!show}>
@@ -513,23 +507,14 @@ function CornerLogo({ show, src, title }) {
     </div>
   );
 }
-/** 원형 와이프 오버레이: clip-path로 원을 확장해 화면을 덮음 */
+
 function CircleWipe({ show, durationMs = 1500, origin = 'center' }) {
   const cx = typeof window !== 'undefined' ? window.innerWidth / 2 : 0;
   const cy = typeof window !== 'undefined' ? window.innerHeight / 2 : 0;
   const at = origin === 'center' ? `${cx}px ${cy}px` : origin;
-  const maxR = '200vh'; // 화면 전체 덮는 충분히 큰 반경
-
+  const maxR = '200vh';
   return (
-    <div
-      style={{
-        position: 'fixed',
-        inset: 0,
-        zIndex: 9999,
-        pointerEvents: show ? 'auto' : 'none', // 재생 중 입력 차단
-      }}
-      aria-hidden="true"
-    >
+    <div style={{ position: 'fixed', inset: 0, zIndex: 9999, pointerEvents: show ? 'auto' : 'none' }} aria-hidden="true">
       <div
         style={{
           position: 'absolute',
