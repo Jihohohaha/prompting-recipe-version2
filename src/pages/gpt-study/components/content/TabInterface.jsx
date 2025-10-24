@@ -48,7 +48,7 @@ const TabInterface = ({ recipe }) => {
               key={tab.id}
               onClick={() => handleTabClick(tab.id)}
               className={`
-                flex-1 h-14 font-bold text-lg font-pretendard
+                flex-1 h-14 font-bold text-lg font-mortend justify-left 
                 rounded-t-lg transition-all duration-300
                 ${!isActive && 'hover:opacity-95'}
               `}
@@ -76,7 +76,7 @@ const TabInterface = ({ recipe }) => {
           />
         </div>
 
-        <div className="text-white font-bold mt-48 text-8xl font-pretendard whitespace-pre-line text-left mt-16">
+        <div className="text-white font-bold mt-48 text-8xl font-mortend whitespace-pre-line text-left mt-16">
           {recipe.displayTitle}
         </div>
 

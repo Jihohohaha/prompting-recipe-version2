@@ -536,8 +536,8 @@ const ClosueStatueSelect = () => {
                   {detailDish?.description}
                 </p>
               </div>
-              <div className="relative flex flex-col items-center justify-center h-full w-[260px] rounded-r-[24px] bg-black bg-opacity-[70%]">
-                <div className="text-[40px] font-koolegant mb-2">
+              <div className="relative flex flex-col items-center justify-center h-full w-[260px] rounded-r-[24px] bg-black bg-opacity-[90%]">
+                <div className="text-[40px] text-white font-koolegant mb-2">
                   Ingredient
                 </div>
                 <div className="text-[16px] font-pretendard text-white">
