@@ -42,6 +42,25 @@ const folderConfigs = [
   },
 ];
 
+// eyes 스타일들을 미리 계산하여 캐싱
+const eyesConfigs = [
+  {
+    src: '/images/main-page/eyes.gif',
+    width: 220, height: 220,
+    x: convertX(127), y: convertY(489), opacity: 1, rotate: 5,
+  },
+  {
+    src: '/images/main-page/eyes.gif',
+    width: 270, height: 270,
+    x: convertX(1693), y: convertY(98), opacity: 1, rotate: -6,
+  },
+  {
+    src: '/images/main-page/eyes.gif',
+    width: 210, height: 210,
+    x: convertX(1547), y: convertY(892), opacity: 1, rotate: 0,
+  },
+];
+
 // 폴더 스타일들을 미리 계산
 const folders = folderConfigs.map((f, i) => ({
   ...f,
@@ -54,6 +73,25 @@ const folders = folderConfigs.map((f, i) => ({
     height: vh(f.height),
     opacity: f.opacity,
     transform: `rotate(${f.rotate}deg) translateZ(0)`, // 3D 가속 강제
+    pointerEvents: 'none',
+    userSelect: 'none',
+    willChange: 'transform',
+    backfaceVisibility: 'hidden', // 렌더링 최적화
+  }
+}));
+
+// eyes 스타일들을 미리 계산
+const eyes = eyesConfigs.map((e, i) => ({
+  ...e,
+  id: i,
+  style: {
+    position: 'absolute',
+    left: vw(e.x),
+    top: vh(e.y),
+    width: vw(e.width),
+    height: vh(e.height),
+    opacity: e.opacity,
+    transform: `rotate(${e.rotate}deg) translateZ(0)`, // 3D 가속 강제
     pointerEvents: 'none',
     userSelect: 'none',
     willChange: 'transform',
@@ -129,6 +167,16 @@ const Z30Layer = React.memo(({
           src={folder.src}
           alt={`folder-${folder.id}`}
           style={folder.style}
+          draggable={false}
+          loading="lazy" // 이미지 지연 로딩
+        />
+      ))}
+      {eyes.map((eye) => (
+        <img
+          key={eye.id}
+          src={eye.src}
+          alt={`eyes-${eye.id}`}
+          style={eye.style}
           draggable={false}
           loading="lazy" // 이미지 지연 로딩
         />
