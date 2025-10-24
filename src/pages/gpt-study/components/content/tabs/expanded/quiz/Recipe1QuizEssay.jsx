@@ -1,26 +1,86 @@
 // src/pages/gpt-study/components/content/tabs/expanded/quiz/Recipe1QuizEssay.jsx
 import React, { useState } from "react";
 import "../../../../../../../styles/App.css";
-import { useNavigate } from "react-router-dom"; // ✅ 추가
 import { motion, AnimatePresence } from "framer-motion";
 
 const API_BASE_URL = "https://artsw-ai.onrender.com";
 
-const Recipe1QuizEssay = () => {
-  return (
-    <div className="flex w-screen h-screen overflow-hidden">
-      {/* 왼쪽 영역 */}
-      <div className="flex-1 bg-[url('/images/gpt-study/quiz/yellowbg.png')]  bg-cover bg-center flex flex-col rounded-l-3xl overflow-hidden">
-        <SectionHeader />
-        <Section2 />
-        <Section3 />
-      </div>
+const Recipe1QuizEssay = ({ onClose }) => {
+  const [result, setResult] = useState(null); // null, 'loading', 'success', 'fail'
 
-      {/* 오른쪽 영역 */}
-      <div className="flex-1 bg-black flex flex-col rounded-r-3xl overflow-hidden">
-        <Section4 />
-        <Section5 />
-      </div>
+  const handleReset = () => {
+    setResult(null);
+  };
+
+  return (
+    <div className="flex w-full h-full overflow-hidden relative">
+      {/* 기본 화면 */}
+      {!result && (
+        <>
+          {/* 왼쪽 영역 */}
+          <div className="flex-1 bg-[url('/images/gpt-study/quiz/yellowbg.png')] bg-cover bg-center flex flex-col rounded-l-3xl overflow-hidden">
+            <SectionHeader />
+            <Section2 />
+            <Section3 />
+          </div>
+
+          {/* 오른쪽 영역 */}
+          <div className="flex-1 bg-black flex flex-col rounded-r-3xl overflow-hidden">
+            <Section4 />
+            <Section5 setResult={setResult} />
+          </div>
+        </>
+      )}
+
+      {/* 로딩 비디오 */}
+      <AnimatePresence>
+        {result === 'loading' && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.5 }}
+            className="absolute inset-0 z-20 flex items-center justify-center bg-black rounded-3xl"
+          >
+            <video
+              src="/videos/result-loading.mp4"
+              autoPlay
+              loop
+              muted
+              playsInline
+              className="w-full h-full object-cover rounded-3xl"
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* 성공 화면 */}
+      <AnimatePresence>
+        {result === 'success' && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.8 }}
+            className="absolute inset-0 z-20"
+          >
+            <MissionComplete onClose={onClose} />
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* 실패 화면 */}
+      <AnimatePresence>
+        {result === 'fail' && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.8 }}
+            className="absolute inset-0 z-20"
+          >
+            <MissionFailed onClose={onClose} onRetry={handleReset} />
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };
@@ -47,7 +107,7 @@ const SectionHeader = () => {
 // ---------- Section 2 ----------
 const Section2 = () => {
   return (
-    <div className="flex items-center justify-center gap-6 mb-12">
+    <div className="flex items-center justify-center gap-6 mb-2">
       {["역할 지정", "상황", "목적"].map((item, index) => (
         <div
           key={index}
@@ -64,18 +124,20 @@ const Section2 = () => {
 // ---------- Section 3 ----------
 const Section3 = () => {
   return (
-    <div className="flex flex-col items-center justify-center text-left text-[#7A4B26] font-semibold font-pretendard px-16 text-xl leading-relaxed">
-      <h3 className="text-3xl font-koolegant pb-6">TIPS</h3>
-      <p>
-        1. 먼저, 세 가지 재료의 균형을 떠올리세요. ‘역할’만 강조하면 단순한
-        지시문이 되고, ‘상황’과 ‘목적’이 빠지면 문장의 맥락이 흐려집니다. 역할을
-        정한 뒤, 그 인물이 놓인 상황과 목적을 함께 설정해보세요.
+    <div className="flex flex-col items-center justify-center text-left text-[#7A4B26] font-semibold font-pretendard px-16 text-lg leading-relaxed">
+      <h3 className="text-3xl font-koolegant pb-1">TIPS</h3>
+      <p className="text-center">
+        먼저, 세 가지 재료의 균형을 떠올리세요.<br />
+        '역할'만 강조하면 단순한 지시문이 되고,<br/>
+        '상황'과 '목적'이 빠지면 문장의 맥락이 흐려집니다.<br/> <br />
+        역할을 정한 뒤, 그 인물이 놓인 상황과 목적을 함께 설정해보세요.
       </p>
       <br />
-      <p>
-        2. 문장을 완성하기 전, 당신이 설정한 인물이 어떤 말투와 태도로
-        대답할지를 계속 떠올려보세요. 그러면 문장 속 재료들이 자연스레
-        어우러지고, 당신만의 맛이 드러날 거예요.
+      <p className="text-center">
+         문장을 완성하기 전, 당신이 설정한 인물이 <br/>
+         어떤 말투와 태도로 대답할지를 계속 떠올려보세요.<br/>
+         그러면 문장 속 재료들이 자연스레 어우러지고,<br/>
+         당신만의 맛이 드러날 거예요.
       </p>
     </div>
   );
@@ -116,11 +178,9 @@ const Section4 = () => {
   );
 };
 
-const Section5 = () => {
+const Section5 = ({ setResult }) => {
   const [recipe, setRecipe] = useState("");
   const [loading, setLoading] = useState(false);
-  const [showOverlay, setShowOverlay] = useState(false);
-  const navigate = useNavigate();
 
   const handleSubmit = async () => {
     if (!recipe.trim()) {
@@ -128,8 +188,7 @@ const Section5 = () => {
       return;
     }
 
-    // 🎬 검정 화면 닫힘 시작
-    setShowOverlay(true);
+    setResult('loading');
     setLoading(true);
 
     try {
@@ -148,24 +207,25 @@ const Section5 = () => {
         "⚠️ 서버 응답 형식이 예상과 다릅니다.";
       console.log("GPT 응답:", gptText);
 
-      if (gptText.trim() === "True") {
-        // ✅ 검정화면 유지 중 navigate
-        setTimeout(() => navigate("/complete"), 800);
-      } else {
-        // ❌ 실패 시
-        setTimeout(() => navigate("/fail"), 800);
-      }
+      // 로딩 비디오를 최소 2초는 보여주기
+      setTimeout(() => {
+        if (gptText.trim() === "True") {
+          setResult('success');
+        } else {
+          setResult('fail');
+        }
+      }, 2000);
     } catch (error) {
       console.error("API 요청 실패:", error);
       alert("서버 요청에 실패했습니다 😢");
-      setShowOverlay(false);
+      setResult(null);
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="w-full h-screen flex flex-col items-center justify-center bg-black relative overflow-hidden">
+    <div className="w-full h-full flex flex-col items-center justify-center bg-black relative overflow-hidden">
       {/* 🎨 배경 이미지 */}
       <img
         src="/images/gpt-study/quiz/linespoon.png"
@@ -206,31 +266,352 @@ const Section5 = () => {
           {loading ? "서버로 전송 중..." : "레시피 제출하기"}
         </button>
       </div>
+    </div>
+  );
+};
 
-      {/* 🕶️ 전체화면 시네마틱 오버레이 */}
-      <AnimatePresence>
-        {showOverlay && (
-          <motion.div
-            initial={{ scaleY: 0 }}
-            animate={{ scaleY: 1 }}
-            exit={{ scaleY: 0 }}
-            transition={{
-              duration: 0.9,
-              ease: [0.76, 0, 0.24, 1],
+// ========== 성공 화면 ==========
+const MissionComplete = ({ onClose }) => {
+  return (
+    <div
+      style={{
+        backgroundColor: "#000",
+        color: "white",
+        textAlign: "center",
+        height: "100%",
+        width: "100%",
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "space-between",
+        alignItems: "center",
+        fontFamily: "Pretendard, sans-serif",
+        position: "relative",
+        overflow: "hidden",
+        padding: "60px 0",
+        borderRadius: "24px",
+      }}
+    >
+      {/* 🎥 동영상 */}
+      <video
+        src="/videos/shining.mp4"
+        autoPlay
+        loop
+        muted
+        playsInline
+        className="absolute top-0 left-0 w-full h-full object-cover"
+        style={{ borderRadius: "24px" }}
+      />
+
+      {/* ✨ ROLE PROMPTING 배경 텍스트 */}
+      <h1
+        className="font-cafe24"
+        style={{
+          position: "absolute",
+          bottom: "5%",
+          left: "50%",
+          transform: "translateX(-50%)",
+          fontSize: "12vw",
+          color: "rgba(199, 106, 45, 0.12)",
+          zIndex: 1,
+          whiteSpace: "nowrap",
+          userSelect: "none",
+          pointerEvents: "none",
+        }}
+      >
+        ROLE PROMPTING
+      </h1>
+
+      {/* 상단 텍스트 영역 */}
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{
+          delay: 0.3,
+          duration: 0.8,
+          ease: "easeOut",
+        }}
+        style={{
+          zIndex: 10,
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          marginTop: "20px",
+        }}
+      >
+        <h1 className="text-[64px] font-cafe24 text-[#FF702A] font-bold drop-shadow-[0_0_15px_rgba(255,112,42,0.6)] mb-6">
+          Mission Complete
+        </h1>
+
+        <div
+          style={{
+            maxWidth: "850px",
+            lineHeight: 1.8,
+            fontSize: "18px",
+            color: "#fff",
+            textShadow: "0 0 10px rgba(0,0,0,0.3)",
+          }}
+        >
+          <p
+            style={{
+              fontSize: "20px",
+              fontWeight: 500,
+              marginBottom: "16px",
             }}
-            className="fixed top-0 left-0 w-screen h-screen bg-black origin-bottom z-50 flex items-center justify-center"
           >
-            <motion.p
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.3, duration: 0.5 }}
-              className="text-white text-2xl font-pretendard"
-            >
-              🎥 당신의 레시피를 평가 중입니다...
-            </motion.p>
-          </motion.div>
-        )}
-      </AnimatePresence>
+            "나는... 조금 따뜻해진 기분이야."
+          </p>
+          <p>
+            차가운 대리석 피부에 미세한 온기가 감돌기 시작했다. 석상이는 이제
+            '역할의 레시피'를 마스터했다.
+          </p>
+          <p>
+            그러나 아직 '완전한 인간'이 되려면 남은 다섯 가지 레시피를 완성해야
+            한다...
+          </p>
+        </div>
+      </motion.div>
+
+      {/* 하단 이미지 + 버튼 */}
+      <motion.div
+        initial={{ opacity: 0, y: 40 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{
+          delay: 0.6,
+          duration: 0.8,
+          ease: "easeOut",
+        }}
+        style={{
+          zIndex: 10,
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          gap: "2rem",
+        }}
+      >
+        {/* 🗿 석상 이미지 */}
+        <img
+          src="/images/gpt-study/quiz/statuecomplete.png"
+          alt="Role Prompting Statue"
+          style={{
+            width: "400vw",
+            objectFit: "contain",
+            filter: "drop-shadow(0 0 25px rgba(255,255,255,0.1))",
+            transform: "translateY(-30vh)",
+          }}
+        />
+
+        {/* 버튼 */}
+        <button
+          onClick={onClose}
+          style={{
+            position: "absolute",
+            bottom: "8%",
+            right: "8%",
+            backgroundColor: "#FF702A",
+            color: "white",
+            fontFamily: "Pretendard, sans-serif",
+            fontSize: "18px",
+            fontWeight: 600,
+            padding: "16px 38px",
+            border: "none",
+            borderRadius: "40px",
+            cursor: "pointer",
+            transition: "background-color 0.3s, transform 0.3s",
+            boxShadow: "0 0 20px rgba(255, 112, 42, 0.3)",
+          }}
+          onMouseOver={(e) => {
+            e.currentTarget.style.backgroundColor = "#E9631F";
+            e.currentTarget.style.transform = "scale(1.05)";
+          }}
+          onMouseOut={(e) => {
+            e.currentTarget.style.backgroundColor = "#FF702A";
+            e.currentTarget.style.transform = "scale(1)";
+          }}
+        >
+          다른 레시피 학습하기
+        </button>
+      </motion.div>
+    </div>
+  );
+};
+
+// ========== 실패 화면 ==========
+const MissionFailed = ({ onClose, onRetry }) => {
+  return (
+    <div
+      style={{
+        background: "linear-gradient(to bottom, #000, #2c2c2c)",
+        color: "white",
+        textAlign: "center",
+        height: "100%",
+        width: "100%",
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "space-between",
+        alignItems: "center",
+        fontFamily: "Pretendard, sans-serif",
+        position: "relative",
+        overflow: "hidden",
+        padding: "60px 0",
+        borderRadius: "24px",
+      }}
+    >
+      {/* ✨ ROLE PROMPTING 배경 텍스트 */}
+      <h1
+        className="font-cafe24"
+        style={{
+          position: "absolute",
+          bottom: "5%",
+          left: "50%",
+          transform: "translateX(-50%)",
+          fontSize: "12vw",
+          color: "rgba(255,255,255,0.06)",
+          zIndex: 1,
+          whiteSpace: "nowrap",
+          userSelect: "none",
+          pointerEvents: "none",
+        }}
+      >
+        ROLE PROMPTING
+      </h1>
+
+      {/* 상단 텍스트 영역 */}
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{
+          delay: 0.3,
+          duration: 0.8,
+          ease: "easeOut",
+        }}
+        style={{
+          zIndex: 10,
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          marginTop: "20px",
+        }}
+      >
+        <h1 className="text-[64px] font-cafe24 text-[#B8B8B8] font-bold drop-shadow-[0_0_15px_rgba(255,255,255,0.4)] mb-6">
+          Mission Failed
+        </h1>
+
+        <div
+          style={{
+            maxWidth: "850px",
+            lineHeight: 1.8,
+            fontSize: "18px",
+            color: "#DDD",
+            textShadow: "0 0 10px rgba(0,0,0,0.3)",
+          }}
+        >
+          <p
+            style={{
+              fontSize: "20px",
+              fontWeight: 500,
+              marginBottom: "16px",
+            }}
+          >
+            "……아직 아무런 온기도 느껴지지 않아."
+          </p>
+          <p>
+            차가운 대리석 피부는 여전히 생명 없는 돌처럼 굳어 있었다. 석상이는
+            '역할의 레시피'를 완성하지 못했다.
+          </p>
+          <p>완전한 인간이 되기까지, 아직 먼 길이 남아 있다…</p>
+        </div>
+      </motion.div>
+
+      {/* 하단 이미지 + 버튼 */}
+      <div
+        style={{
+          position: "relative",
+          width: "100%",
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "flex-end",
+          padding: "0 8%",
+          zIndex: 10,
+        }}
+      >
+        {/* 왼쪽 교사 석상 */}
+        <div style={{ position: "" }}>
+          {/* 왼쪽 버튼 */}
+          <button
+            onClick={onClose}
+            style={{
+              position: "absolute",
+              top: "-13px",
+              marginTop: "20px",
+              backgroundColor: "#FF702A",
+              color: "white",
+              fontFamily: "Pretendard, sans-serif",
+              fontSize: "18px",
+              fontWeight: 600,
+              padding: "14px 34px",
+              border: "none",
+              borderRadius: "40px",
+              cursor: "pointer",
+              transition: "background-color 0.3s, transform 0.3s",
+              boxShadow: "0 0 20px rgba(255, 112, 42, 0.3)",
+            }}
+            onMouseOver={(e) => {
+              e.currentTarget.style.backgroundColor = "#E9631F";
+              e.currentTarget.style.transform = "scale(1.05)";
+            }}
+            onMouseOut={(e) => {
+              e.currentTarget.style.backgroundColor = "#FF702A";
+              e.currentTarget.style.transform = "scale(1)";
+            }}
+          >
+            다른 레시피 학습하기
+          </button>
+        </div>
+
+        {/* 가운데 실패한 석상 */}
+        <img
+          src="/images/gpt-study/quiz/sadstatue.png"
+          alt="Sad Statue"
+          style={{
+            position: "absolute",
+            width: "1000px",
+            left: "250px",
+            top: "-600px",
+            transform: "translateY(-40px)",
+            filter: "drop-shadow(0 0 25px rgba(255,255,255,0.1))",
+          }}
+        />
+
+        {/* 오른쪽 버튼 */}
+        <button
+          onClick={onRetry}
+          style={{
+            backgroundColor: "#FF702A",
+            color: "white",
+            fontFamily: "Pretendard, sans-serif",
+            fontSize: "18px",
+            fontWeight: 600,
+            padding: "16px 40px",
+            border: "none",
+            borderRadius: "40px",
+            cursor: "pointer",
+            transition: "background-color 0.3s, transform 0.3s",
+            boxShadow: "0 0 20px rgba(255, 112, 42, 0.3)",
+            alignSelf: "flex-end",
+            marginBottom: "30px",
+          }}
+          onMouseOver={(e) => {
+            e.currentTarget.style.backgroundColor = "#E9631F";
+            e.currentTarget.style.transform = "scale(1.05)";
+          }}
+          onMouseOut={(e) => {
+            e.currentTarget.style.backgroundColor = "#FF702A";
+            e.currentTarget.style.transform = "scale(1)";
+          }}
+        >
+          다시 도전하기
+        </button>
+      </div>
     </div>
   );
 };
