@@ -97,7 +97,15 @@ export default function ScrollPage() {
         ref={(el) => (sectionsRef.current[0] = el)}
         className={`fade-section ${activeIndex === 0 ? "active" : ""}`}
       >
-        <div className="intro-text">
+        <motion.div
+          className="intro-text"
+          initial={{ opacity: 0, y: 40 }} // 👈 처음엔 투명 + 아래쪽
+          animate={{ opacity: 1, y: 0 }} // 👈 자연스럽게 올라오면서 등장
+          transition={{
+            duration: 1.2, // 부드럽게 1.2초 동안
+            ease: [0.25, 0.8, 0.25, 1], // cubic-bezier ease-out
+          }}
+        >
           <p>"AI is the ingredient, the user is the chef.</p>
           <p>
             Prompt engineering is the <span className="highlight">recipe.</span>
@@ -106,7 +114,7 @@ export default function ScrollPage() {
             Only with a good <span className="highlight">recipe</span> can you
             create a great dish."
           </p>
-        </div>
+        </motion.div>
         <div className="scroll-hint">
           <p className="scroll-text"></p>
           <div className="arrow-down"></div>
