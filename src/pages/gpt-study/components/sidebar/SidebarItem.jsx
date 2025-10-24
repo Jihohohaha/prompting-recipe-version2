@@ -1,11 +1,10 @@
-// src/pages/gpt-study/components/sidebar/SidebarItem.jsx
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import gsap from 'gsap';
 import useGPTStudyStore from '../../store';
-import ImageSwitcher from '../image-switcher/ImageSwitcher';
+import DivSwitcher from '../image-switcher/DivSwitcher';
 
-const SidebarItem = ({ recipe, index }) => {
+export default function SidebarItem({ recipe, index }) {
   const navigate = useNavigate();
   const { activeSection, setActiveSection, collapseContent } = useGPTStudyStore();
   const isActive = activeSection === index;
@@ -13,34 +12,20 @@ const SidebarItem = ({ recipe, index }) => {
 
   const expandDirection = index < 4 ? 'bottom' : 'top';
 
-  const handleClick = () => {
-    console.log(`🖱️ Sidebar clicked: ${recipe.title} (index: ${index})`);
-    
-    // 1. 모든 탭 접기
+  const handleClick = useCallback(() => {
     collapseContent();
-    
-    // 2. activeSection 업데이트
     setActiveSection(index);
-    
-    // 3. URL을 recipe root로 변경
-    navigate(`/gpt-study/${recipe.slug}`);
-    
-    // 4. ✅ Reference 방식: double setTimeout + gsap.set
-    setTimeout(() => {
-      setTimeout(() => {
-        const container = document.querySelector('main');
-        const targetSection = document.querySelector(`#section-${index}`);
-        
-        if (container && targetSection) {
-          // ✅ gsap.set: 즉시 스크롤 (애니메이션 없음)
-          gsap.set(container, {
-            scrollTop: targetSection.offsetTop
-          });
-          console.log(`✅ Instant scroll to section ${index} (Reference pattern)`);
-        }
-      }, 500); // ✅ Reference: 500ms 지연
-    }, 0); // ✅ Reference: 다음 이벤트 루프로
-  };
+    navigate(`/gpt-study/${encodeURIComponent(recipe.slug)}`);
+
+    requestAnimationFrame(() => {
+      const container = document.querySelector('main');
+      const targetSection = document.querySelector(`#section-${index}`);
+      if (container && targetSection) {
+        const GUTTER = 10;
+        gsap.set(container, { scrollTop: Math.max(0, targetSection.offsetTop - GUTTER) });
+      }
+    });
+  }, [collapseContent, setActiveSection, index, navigate, recipe.slug]);
 
   return (
     <div
@@ -48,17 +33,17 @@ const SidebarItem = ({ recipe, index }) => {
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      <ImageSwitcher
-        defaultImage={recipe.images.default}
-        selectedImage={recipe.images.selected}
+      <DivSwitcher
         isActive={isActive}
         isHovered={isHovered}
         expandDirection={expandDirection}
         onClick={handleClick}
-        alt={recipe.title}
+        baseHeight={200}
+        expandedHeight={320}              // ⬅️ 필요에 맞게 조절 (예: 280~340)
+        activeSrc={recipe?.images?.selected}
+        recipe={recipe}
+        index={index}
       />
     </div>
   );
-};
-
-export default SidebarItem;
+}

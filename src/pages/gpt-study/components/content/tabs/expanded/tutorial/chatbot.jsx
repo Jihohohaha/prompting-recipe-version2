@@ -1,6 +1,6 @@
 // src/components/Chatbot.jsx
 import React, { useState, useRef, useEffect } from "react";
-
+const API_BASE_URL = "https://artsw-ai.onrender.com";
 const Chatbot = () => {
   const [open, setOpen] = useState(false);
 
@@ -19,7 +19,14 @@ const Chatbot = () => {
   const [offset, setOffset] = useState({ x: 0, y: 0 }); // 드래그 시 모달 내 마우스 위치
 
   const modalRef = useRef(null);
-  const startRef = useRef({ mouseX: 0, mouseY: 0, startLeft: 0, startTop: 0, startW: 0, startH: 0 });
+  const startRef = useRef({
+    mouseX: 0,
+    mouseY: 0,
+    startLeft: 0,
+    startTop: 0,
+    startW: 0,
+    startH: 0,
+  });
 
   const MIN_W = 320;
   const MIN_H = 160;
@@ -88,7 +95,8 @@ const Chatbot = () => {
     }
 
     if (resizing) {
-      const { mouseX, mouseY, startLeft, startTop, startW, startH } = startRef.current;
+      const { mouseX, mouseY, startLeft, startTop, startW, startH } =
+        startRef.current;
       let dx = clientX - mouseX;
       let dy = clientY - mouseY;
 
@@ -147,10 +155,31 @@ const Chatbot = () => {
   }, [open]);
 
   // 데모용 봇 응답 함수 (실서비스에선 교체)
+  // ✅ 실제 API 요청 함수로 교체
   const requestBot = async (userText) => {
-    return new Promise((resolve) => {
-      setTimeout(() => resolve(`"${userText}" 에 대한 응답이에요! 😄`), 1200);
-    });
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/chat/chatbot`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          messages: [{ type: "user", text: userText }],
+        }),
+      });
+
+      const data = await response.json();
+
+      // ✅ 중첩 구조 파싱
+      const gptText =
+        data?.data?.text?.data?.text ||
+        data?.data?.text ||
+        "⚠️ 서버 응답 형식이 예상과 다릅니다.";
+
+      console.log("🤖 GPT 응답:", gptText);
+      return gptText;
+    } catch (error) {
+      console.error("🚨 Chatbot API 요청 실패:", error);
+      return "서버 오류가 발생했어요. 잠시 후 다시 시도해 주세요.";
+    }
   };
 
   const handleSend = async () => {
@@ -175,11 +204,15 @@ const Chatbot = () => {
   };
 
   const resizeCursor =
-    resizing === "n" || resizing === "s" ? "ns-resize"
-    : resizing === "e" || resizing === "w" ? "ew-resize"
-    : resizing === "ne" || resizing === "sw" ? "nesw-resize"
-    : resizing === "nw" || resizing === "se" ? "nwse-resize"
-    : undefined;
+    resizing === "n" || resizing === "s"
+      ? "ns-resize"
+      : resizing === "e" || resizing === "w"
+      ? "ew-resize"
+      : resizing === "ne" || resizing === "sw"
+      ? "nesw-resize"
+      : resizing === "nw" || resizing === "se"
+      ? "nwse-resize"
+      : undefined;
 
   return (
     <>
@@ -200,12 +233,12 @@ const Chatbot = () => {
           onClick={() => setOpen((o) => !o)}
           aria-label="Open Chatbot"
         />
-          <div className="absolute bottom-[160px] right-0 text-black px-4 py-2 rounded-xl shadow-lg text-sm font-semibold whitespace-nowrap z-[9999] -rotate-2">
-            Click!
-          </div>
-          <div className="absolute bottom-[200px] right-2 text-black px-4 py-2 rounded-xl shadow-lg text-sm font-semibold whitespace-nowrap z-[9999] rotate-12">
-            Click!
-          </div>
+        <div className="absolute bottom-[160px] right-0 text-black px-4 py-2 rounded-xl shadow-lg text-sm font-semibold whitespace-nowrap z-[9999] -rotate-2">
+          Click!
+        </div>
+        <div className="absolute bottom-[200px] right-2 text-black px-4 py-2 rounded-xl shadow-lg text-sm font-semibold whitespace-nowrap z-[9999] rotate-12">
+          Click!
+        </div>
       </div>
 
       {/* 모달 */}
@@ -233,7 +266,10 @@ const Chatbot = () => {
             채팅 로보트
             <button
               type="button"
-              onClick={(e) => { e.stopPropagation(); setOpen(false); }}
+              onClick={(e) => {
+                e.stopPropagation();
+                setOpen(false);
+              }}
               onPointerDown={(e) => e.stopPropagation()} // 드래그로 인식 방지
               aria-label="닫기"
               title="닫기"
@@ -246,12 +282,25 @@ const Chatbot = () => {
           {/* 메시지 */}
           <div className="flex-1 px-4 py-2 overflow-y-auto">
             {messages.length === 0 && !typing ? (
-              <div className="text-gray-400 text-sm text-center mt-8">메시지를 입력해보세요!</div>
+              <div className="text-gray-400 text-sm text-center mt-8">
+                메시지를 입력해보세요!
+              </div>
             ) : (
               <>
                 {messages.map((msg, idx) => (
-                  <div key={idx} className={`my-2 flex ${msg.from === "user" ? "justify-end" : "justify-start"}`}>
-                    <span className={`inline-block px-3 py-2 rounded-lg ${msg.from === "user" ? "bg-[#FE7525] text-white" : "bg-gray-200 text-gray-800"}`}>
+                  <div
+                    key={idx}
+                    className={`my-2 flex ${
+                      msg.from === "user" ? "justify-end" : "justify-start"
+                    }`}
+                  >
+                    <span
+                      className={`inline-block px-3 py-2 rounded-lg ${
+                        msg.from === "user"
+                          ? "bg-[#FE7525] text-white"
+                          : "bg-gray-200 text-gray-800"
+                      }`}
+                    >
                       {msg.text}
                     </span>
                   </div>
@@ -259,12 +308,25 @@ const Chatbot = () => {
 
                 {/* 타이핑 버블 */}
                 {typing && (
-                  <div className="my-2 flex justify-start" aria-live="polite" aria-label="봇이 입력 중">
+                  <div
+                    className="my-2 flex justify-start"
+                    aria-live="polite"
+                    aria-label="봇이 입력 중"
+                  >
                     <div className="inline-flex items-center gap-1 h-5 px-3 py-2 rounded-lg bg-gray-200 text-gray-800">
                       <span className="sr-only">입력 중...</span>
-                      <span className="w-2 h-2 rounded-full bg-gray-600 animate-bobDot" style={{ animationDelay: "0ms" }} />
-                      <span className="w-2 h-2 rounded-full bg-gray-600 animate-bobDot" style={{ animationDelay: "120ms" }} />
-                      <span className="w-2 h-2 rounded-full bg-gray-600 animate-bobDot" style={{ animationDelay: "240ms" }} />
+                      <span
+                        className="w-2 h-2 rounded-full bg-gray-600 animate-bobDot"
+                        style={{ animationDelay: "0ms" }}
+                      />
+                      <span
+                        className="w-2 h-2 rounded-full bg-gray-600 animate-bobDot"
+                        style={{ animationDelay: "120ms" }}
+                      />
+                      <span
+                        className="w-2 h-2 rounded-full bg-gray-600 animate-bobDot"
+                        style={{ animationDelay: "240ms" }}
+                      />
                     </div>
                   </div>
                 )}
@@ -292,14 +354,46 @@ const Chatbot = () => {
           </div>
 
           {/* 리사이즈 핸들 */}
-          <div onPointerDown={handleResizeStart("nw")} className="absolute -top-1 -left-1 w-3 h-3" style={{ cursor: "nwse-resize" }} />
-          <div onPointerDown={handleResizeStart("ne")} className="absolute -top-1 -right-1 w-3 h-3" style={{ cursor: "nesw-resize" }} />
-          <div onPointerDown={handleResizeStart("sw")} className="absolute -bottom-1 -left-1 w-3 h-3" style={{ cursor: "nesw-resize" }} />
-          <div onPointerDown={handleResizeStart("se")} className="absolute -bottom-1 -right-1 w-3 h-3" style={{ cursor: "nwse-resize" }} />
-          <div onPointerDown={handleResizeStart("n")} className="absolute -top-1 left-2 right-2 h-2" style={{ cursor: "ns-resize" }} />
-          <div onPointerDown={handleResizeStart("s")} className="absolute -bottom-1 left-2 right-2 h-2" style={{ cursor: "ns-resize" }} />
-          <div onPointerDown={handleResizeStart("w")} className="absolute top-2 bottom-2 -left-1 w-2" style={{ cursor: "ew-resize" }} />
-          <div onPointerDown={handleResizeStart("e")} className="absolute top-2 bottom-2 -right-1 w-2" style={{ cursor: "ew-resize" }} />
+          <div
+            onPointerDown={handleResizeStart("nw")}
+            className="absolute -top-1 -left-1 w-3 h-3"
+            style={{ cursor: "nwse-resize" }}
+          />
+          <div
+            onPointerDown={handleResizeStart("ne")}
+            className="absolute -top-1 -right-1 w-3 h-3"
+            style={{ cursor: "nesw-resize" }}
+          />
+          <div
+            onPointerDown={handleResizeStart("sw")}
+            className="absolute -bottom-1 -left-1 w-3 h-3"
+            style={{ cursor: "nesw-resize" }}
+          />
+          <div
+            onPointerDown={handleResizeStart("se")}
+            className="absolute -bottom-1 -right-1 w-3 h-3"
+            style={{ cursor: "nwse-resize" }}
+          />
+          <div
+            onPointerDown={handleResizeStart("n")}
+            className="absolute -top-1 left-2 right-2 h-2"
+            style={{ cursor: "ns-resize" }}
+          />
+          <div
+            onPointerDown={handleResizeStart("s")}
+            className="absolute -bottom-1 left-2 right-2 h-2"
+            style={{ cursor: "ns-resize" }}
+          />
+          <div
+            onPointerDown={handleResizeStart("w")}
+            className="absolute top-2 bottom-2 -left-1 w-2"
+            style={{ cursor: "ew-resize" }}
+          />
+          <div
+            onPointerDown={handleResizeStart("e")}
+            className="absolute top-2 bottom-2 -right-1 w-2"
+            style={{ cursor: "ew-resize" }}
+          />
         </div>
       )}
     </>

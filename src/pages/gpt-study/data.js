@@ -1,3 +1,4 @@
+import "../../../src/styles/App.css"
 // src/pages/gpt-study/data.js
 
 // 방법론별 색상 배열
@@ -5,16 +6,72 @@ export const recipeColors = [
   '#FE7525', // Recipe 1
   '#FFC300', // Recipe 2
   '#87CA34', // Recipe 3
-  '#29D069', // Recipe 4
+  '#C6D96A', // Recipe 4
   '#29D069', // Recipe 5
-  '#A05BF8', // Recipe 6
-  '#A05BF9'  // Recipe 7
+  '#0278ED', // Recipe 6
+  '#A05BF9',  // Recipe 7
+  '#FFFFFF'
 ];
 
 export const gptStudyData = [
   {
+    id: 0,
+    title: "Prompt Chaining",
+    slug: "Prompt Chaining",
+    displayTitle: "Title.\n(PROMPT\nCHAINING)",
+    description: "여러 개의 프롬프트를 단계적으로 연결해 복잡한 문제를 해결합니다.",
+    color: recipeColors[7],
+    images: {
+      // 이미지 스위처를 안 쓰더라도 구조상 필요하면 경로 유지
+      // 없으면 임시로 7번 이미지 재사용해도 무방
+      default: "/images/gpt-study/Recipe7.png",
+      selected: ""
+    },
+    tabs: [
+      {
+        id: "tutorial",
+        title: "TUTORIAL",
+        sections: [
+          {
+            type: "explain",
+            content: [
+              { type: "text", content: "큰 문제를 작은 단계로 쪼개어 각 단계의 출력을 다음 단계의 입력으로 활용합니다." },
+              { type: "text", content: "각 단계마다 목표/형식/평가 기준을 명시하면 체인 안정성이 높아집니다." },
+            ]
+          },
+          {
+            type: "example",
+            content: [
+              { type: "text", content: "예: ①요구사항 추출 → ②설계안 도출 → ③코드 스켈레톤 → ④테스트 케이스 생성" }
+            ]
+          }
+        ]
+      },
+      {
+        id: "quiz",
+        title: "QUIZ",
+        multipleChoice: {
+          question: "Prompt Chaining의 핵심 가치는?",
+          options: [
+            "모델 파라미터를 줄인다",
+            "문제를 단계별로 분해해 안정적 품질을 얻는다",
+            "추론 속도를 무조건 높인다",
+            "프롬프트 길이를 항상 줄인다"
+          ],
+          answer: 1
+        },
+        essay: {
+          question: "4단계 이상의 체인을 설계해보고 각 단계의 입/출력을 간단히 적어보세요.",
+          placeholder: "예: 1) 문제정의 → 2) 정보수집 → 3) 초안 생성 → 4) 검토/개선 ..."
+        }
+      },
+      { id: "chat", title: "CHAT" }
+    ]
+  },
+  {
     id: 1,
     title: "FEW SHOT",
+    font: "Koolegant",
     slug: "recipe1",
     displayTitle: "RECIPE 1.\n(ROLE\nPROMPTING)",
     description: "Few-shot 프롬프팅 기법을 학습합니다.",

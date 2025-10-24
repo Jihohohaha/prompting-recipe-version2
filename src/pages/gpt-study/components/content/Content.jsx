@@ -1,5 +1,4 @@
-// src/pages/gpt-study/components/content/Content.jsx
-import { useEffect, useRef } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
@@ -12,100 +11,74 @@ gsap.registerPlugin(ScrollTrigger);
 const Content = () => {
   const contentRef = useRef(null);
   const { slug, tab } = useParams();
-  const { setActiveSection, setExpandedContent, isProgrammaticScroll } = useGPTStudyStore();
-  const triggersRef = useRef([]);
+  const { setActiveSection, setExpandedContent } = useGPTStudyStore();
 
-  // URL 변경 시 expandedContent 업데이트
+  // URL → expandedContent 동기화
   useEffect(() => {
     if (!slug) return;
-    
     const recipe = gptStudyData.find(r => r.slug === slug);
     if (!recipe) return;
-
-    if (tab) {
-      setExpandedContent({ recipeId: recipe.id, tabId: tab });
-    } else {
-      setExpandedContent(null);
-    }
+    if (tab) setExpandedContent({ recipeId: recipe.id, tabId: tab });
+    else setExpandedContent(null);
   }, [slug, tab, setExpandedContent]);
 
-  // ✅ Reference 방식: ScrollTrigger 생성
+  // ScrollTriggers: 최초 1회 생성, store 값은 콜백에서 즉시 조회
   useEffect(() => {
     if (!contentRef.current) return;
 
     const container = contentRef.current;
+    const triggers = [];
 
-    // 기존 트리거 정리
-    triggersRef.current.forEach(trigger => trigger.kill());
-    triggersRef.current = [];
-
-    console.log('🎯 Creating ScrollTriggers (Reference pattern)');
-
-    gptStudyData.forEach((recipe, index) => {
+    const makeTrigger = (index) => {
       const startAnchor = container.querySelector(`#section-start-${index}`);
       const endAnchor = container.querySelector(`#section-end-${index}`);
+      if (!startAnchor || !endAnchor) return;
 
-      if (startAnchor && endAnchor) {
-        const trigger = ScrollTrigger.create({
-          scroller: container,
-          trigger: startAnchor,
-          start: 'top 30%',
-          endTrigger: endAnchor,
-          end: 'bottom 30%',
-          invalidateOnRefresh: true,
-          onToggle: (self) => {
-            // ✅ 프로그래매틱 스크롤 중이면 무시!
-            if (isProgrammaticScroll) {
-              console.log(`🚫 ScrollTrigger ignored for section ${index} (programmatic scroll)`);
-              return;
-            }
-            
-            if (self.isActive) {
-              console.log(`📍 Section ${index} activated (manual scroll)`);
-              setActiveSection(index);
-            }
-          },
-        });
-        
-        triggersRef.current.push(trigger);
-      }
-    });
+      const trigger = ScrollTrigger.create({
+        scroller: container,
+        trigger: startAnchor,
+        start: 'top 30%',
+        endTrigger: endAnchor,
+        end: 'bottom 30%',
+        invalidateOnRefresh: true,
+        onToggle: (self) => {
+          // 최신 store 값을 즉시 조회(재구성이 필요 없음)
+          const { isProgrammaticScroll } = useGPTStudyStore.getState();
+          if (isProgrammaticScroll) return;
+          if (self.isActive) setActiveSection(index);
+        },
+      });
+      triggers.push(trigger);
+    };
+
+    gptStudyData.forEach((_, index) => makeTrigger(index));
 
     return () => {
-      triggersRef.current.forEach(trigger => trigger.kill());
-      triggersRef.current = [];
+      triggers.forEach(t => t.kill());
     };
-  }, [setActiveSection, isProgrammaticScroll]);
+  }, [setActiveSection]);
 
   return (
-    <main 
+    <main
       ref={contentRef}
       className="w-5/6 h-screen bg-black overflow-y-auto"
     >
       <div className="flex flex-col gap-6">
         {gptStudyData.map((recipe, index) => (
-          <Section 
-            key={recipe.id} 
-            recipe={recipe} 
+          <Section
+            key={recipe.id}
+            recipe={recipe}
             index={index}
+            scrollerRef={contentRef}   // ⬅️ 내려줌
           />
         ))}
       </div>
-      
+
       <style>{`
-        main::-webkit-scrollbar {
-          width: 8px;
-        }
-        main::-webkit-scrollbar-track {
-          background: #1a1a1a;
-        }
-        main::-webkit-scrollbar-thumb {
-          background: #444;
-          border-radius: 4px;
-        }
-        main::-webkit-scrollbar-thumb:hover {
-          background: #666;
-        }
+        main::-webkit-scrollbar { width: 8px; }
+        main::-webkit-scrollbar-track { background: #1a1a1a; }
+        main::-webkit-scrollbar-thumb { background: #444; border-radius: 4px; }
+        main::-webkit-scrollbar-thumb:hover { background: #666; }
       `}</style>
     </main>
   );
