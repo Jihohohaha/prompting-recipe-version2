@@ -15,6 +15,7 @@ export default {
         watermelon: ['116Watermelon', 'sans-serif'],
         sacramento: ['"Sacramento"', 'cursive'],
         mortend: ["Mortend", "sans-serif"],
+        cafe24: ['"Cafe24ClassicType"', "sans-serif"],
       },
       zIndex: {
         60: '60',

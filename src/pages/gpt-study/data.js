@@ -85,6 +85,8 @@ export const gptStudyData = [
     title: "ROLE Prompting",
     slug: "recipe2",
     displayTitle: "RECIPE 2.\n(FEW-SHOT)",
+    font: "Mortend",
+    fontWeight: "bold",
     description: "역할 기반 프롬프팅 기법을 학습합니다.",
     color: recipeColors[1],
     images: {
