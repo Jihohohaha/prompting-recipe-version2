@@ -12,41 +12,85 @@ import { motion } from "framer-motion";
 export default function ScrollPage() {
   const navigate = useNavigate();
   const [closing, setClosing] = useState(false);
+  const [activeIndex, setActiveIndex] = useState(0);
+  const containerRef = useRef(null);
+  const sectionsRef = useRef([]);
 
+  // 🔸 페이지 닫힘 (커튼 모션 후 이동)
   const handleStartClick = () => {
     setClosing(true);
-    // 닫히는 모션 후 페이지 이동
-    setTimeout(() => navigate("/select"), 1200);
+    setTimeout(() => navigate("/select"), 850);
   };
 
-  const sectionsRef = useRef([]);
-  const [activeIndex, setActiveIndex] = useState(0);
-
+  // 🔸 스냅 스크롤 제어
   useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const visible = entries
-          .filter((e) => e.isIntersecting)
-          .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
-        if (visible) {
-          const idx = sectionsRef.current.findIndex(
-            (el) => el === visible.target
-          );
-          if (idx !== -1) setActiveIndex(idx);
-        }
-      },
-      {
-        threshold: Array.from({ length: 10 }, (_, i) => i / 10),
-        rootMargin: "-25% 0px -25% 0px",
-      }
-    );
+    const container = containerRef.current;
+    const sections = sectionsRef.current;
+    let isScrolling = false;
+    let current = 0;
 
-    sectionsRef.current.forEach((el) => el && observer.observe(el));
-    return () => observer.disconnect();
+    const handleWheel = (e) => {
+      if (isScrolling) return;
+      e.preventDefault();
+
+      const delta = e.deltaY;
+      if (delta > 0 && current < sections.length - 1) current++;
+      else if (delta < 0 && current > 0) current--;
+
+      setActiveIndex(current);
+      sections[current].scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+
+      isScrolling = true;
+      setTimeout(() => {
+        isScrolling = false;
+      }, 400); // ← 스크롤 속도 조절 (느리게 하려면 ↑ 값 증가)
+    };
+
+    container.addEventListener("wheel", handleWheel, { passive: false });
+    return () => container.removeEventListener("wheel", handleWheel);
   }, []);
 
   return (
-    <div className="scroll-container">
+    <div ref={containerRef} className="scroll-container">
+      {/* 🔥 커튼 닫히는 애니메이션 */}
+      {closing && (
+        <>
+          <motion.div
+            className="curtain left"
+            initial={{ x: "-100%" }}
+            animate={{ x: 0 }}
+            transition={{ duration: 1.0, ease: [0.83, 0, 0.17, 1] }}
+            style={{
+              position: "fixed",
+              top: 0,
+              left: 0,
+              width: "50vw",
+              height: "100vh",
+              background: "black",
+              zIndex: 9999,
+            }}
+          />
+          <motion.div
+            className="curtain right"
+            initial={{ x: "100%" }}
+            animate={{ x: 0 }}
+            transition={{ duration: 1.0, ease: [0.83, 0, 0.17, 1] }}
+            style={{
+              position: "fixed",
+              top: 0,
+              right: 0,
+              width: "50vw",
+              height: "100vh",
+              background: "black",
+              zIndex: 9999,
+            }}
+          />
+        </>
+      )}
+
       {/* 영어 문단 1 */}
       <section
         ref={(el) => (sectionsRef.current[0] = el)}
@@ -62,7 +106,6 @@ export default function ScrollPage() {
             create a great dish."
           </p>
         </div>
-        {/* 스크롤 유도 힌트 */}
         <div className="scroll-hint">
           <p className="scroll-text"></p>
           <div className="arrow-down"></div>
@@ -72,12 +115,11 @@ export default function ScrollPage() {
 
       {/* 한국어 문단 2 */}
       <section
-        ref={(el) => (sectionsRef.current[3] = el)}
-        className={`fade-section ${activeIndex === 3 ? "active" : ""}`}
+        ref={(el) => (sectionsRef.current[1] = el)}
+        className={`fade-section ${activeIndex === 1 ? "active" : ""}`}
       >
         <img src={orange_line} alt="왼쪽 라인" className="side-line left" />
         <img src={orange_line} alt="오른쪽 라인" className="side-line right" />
-
         <div className="korean-group">
           <p>
             AI는 <span className="highlight">재료</span>이고, 사용자는{" "}
@@ -95,8 +137,8 @@ export default function ScrollPage() {
 
       {/* 책 아이콘 섹션 */}
       <section
-        ref={(el) => (sectionsRef.current[6] = el)}
-        className={`fade-section ${activeIndex === 6 ? "active" : ""}`}
+        ref={(el) => (sectionsRef.current[2] = el)}
+        className={`fade-section ${activeIndex === 2 ? "active" : ""}`}
       >
         <img src={orange_book} alt="레시피북 이미지" className="book-image" />
         <p>AI가 처음이라도 괜찮아요.</p>
@@ -105,8 +147,8 @@ export default function ScrollPage() {
 
       {/* 프롬프트 소개 문구 */}
       <section
-        ref={(el) => (sectionsRef.current[7] = el)}
-        className={`fade-section ${activeIndex === 7 ? "active" : ""}`}
+        ref={(el) => (sectionsRef.current[3] = el)}
+        className={`fade-section ${activeIndex === 3 ? "active" : ""}`}
       >
         <div className="prompt-intro">
           <p>이곳은 처음 프롬프팅을 배우는 사람들을 위한 주방입니다.</p>
@@ -119,8 +161,8 @@ export default function ScrollPage() {
 
       {/* 4단계 구성 문구 */}
       <section
-        ref={(el) => (sectionsRef.current[8] = el)}
-        className={`fade-section ${activeIndex === 8 ? "active" : ""}`}
+        ref={(el) => (sectionsRef.current[4] = el)}
+        className={`fade-section ${activeIndex === 4 ? "active" : ""}`}
       >
         <div className="step-intro">
           <p className="step-title">누구나 따라 할 수 있도록</p>
@@ -130,10 +172,11 @@ export default function ScrollPage() {
           </p>
         </div>
       </section>
+
       {/* 튜토리얼 단계 */}
       <section
-        ref={(el) => (sectionsRef.current[9] = el)}
-        className={`fade-section ${activeIndex === 9 ? "active" : ""}`}
+        ref={(el) => (sectionsRef.current[5] = el)}
+        className={`fade-section ${activeIndex === 5 ? "active" : ""}`}
       >
         <div className="step-row">
           <p>
@@ -146,8 +189,8 @@ export default function ScrollPage() {
 
       {/* 퀴즈 단계 */}
       <section
-        ref={(el) => (sectionsRef.current[10] = el)}
-        className={`fade-section ${activeIndex === 10 ? "active" : ""}`}
+        ref={(el) => (sectionsRef.current[6] = el)}
+        className={`fade-section ${activeIndex === 6 ? "active" : ""}`}
       >
         <div className="step-row">
           <p>두번째, 학습한 프롬프팅 기법을</p>
@@ -160,8 +203,8 @@ export default function ScrollPage() {
 
       {/* 테스트 단계 */}
       <section
-        ref={(el) => (sectionsRef.current[11] = el)}
-        className={`fade-section ${activeIndex === 11 ? "active" : ""}`}
+        ref={(el) => (sectionsRef.current[7] = el)}
+        className={`fade-section ${activeIndex === 7 ? "active" : ""}`}
       >
         <div className="step-row">
           <p>
@@ -174,8 +217,8 @@ export default function ScrollPage() {
 
       {/* 커뮤니티 단계 */}
       <section
-        ref={(el) => (sectionsRef.current[12] = el)}
-        className={`fade-section ${activeIndex === 12 ? "active" : ""}`}
+        ref={(el) => (sectionsRef.current[8] = el)}
+        className={`fade-section ${activeIndex === 8 ? "active" : ""}`}
       >
         <div className="step-row">
           <p>마지막, 다른 학습자들과 함께</p>
@@ -188,8 +231,8 @@ export default function ScrollPage() {
 
       {/* 마무리 문단 */}
       <section
-        ref={(el) => (sectionsRef.current[13] = el)}
-        className={`fade-section ${activeIndex === 13 ? "active" : ""}`}
+        ref={(el) => (sectionsRef.current[9] = el)}
+        className={`fade-section ${activeIndex === 9 ? "active" : ""}`}
       >
         <div className="ending-text">
           <p>AI 프롬프팅의 전 과정을 한 곳에서.</p>
@@ -201,25 +244,6 @@ export default function ScrollPage() {
           </button>
         </div>
       </section>
-      {/* 🔥 커튼 닫히는 애니메이션 */}
-      {closing && (
-        <>
-          {/* 왼쪽 커튼 */}
-          <motion.div
-            className="curtain left"
-            initial={{ x: "-100%" }}
-            animate={{ x: 0 }}
-            transition={{ duration: 1.2, ease: [0.83, 0, 0.17, 1] }}
-          />
-          {/* 오른쪽 커튼 */}
-          <motion.div
-            className="curtain right"
-            initial={{ x: "100%" }}
-            animate={{ x: 0 }}
-            transition={{ duration: 1.2, ease: [0.83, 0, 0.17, 1] }}
-          />
-        </>
-      )}
     </div>
   );
 }
