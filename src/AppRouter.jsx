@@ -4,7 +4,7 @@ import { AnimatePresence, motion } from "framer-motion";
 
 import MainPage from "./pages/main-page/MainPage";
 import GPTStudy from "./pages/gpt-study/GPTStudy";
-import Recipe1QuizMultipleResult from "./pages/gpt-study/components/content/tabs/expanded/quiz/Recipe1QuizMultipleResult";
+import Recipe1QuizMultiple from "./pages/gpt-study/components/content/tabs/expanded/quiz/Recipe1QuizMultiple";
 import Recipe1QuizEssay from "./pages/gpt-study/components/content/tabs/expanded/quiz/Recipe1QuizEssay";
 import ScrollPage from "./pages/main-page/components/TutorialScroll/TutorialScroll/ScrollPage";
 import ClosueStatueSelect from "./pages/main-page/components/closue-statue-select/ClosueStatueSelect";
@@ -27,20 +27,62 @@ const AppRouter = () => {
       <Routes>
         <Route path="/login" element={<SocialLoginPage />} />
         <Route path="/auth/callback" element={<AuthCallback />} />
-        <Route path="/" element={<PrivateRoute><MainPage /></PrivateRoute>} />
-        <Route path="/tutorial" element={<ScrollPage/>}/>
-        <Route path="/select" element={<ClosueStatueSelect/>}/>
+        <Route
+          path="/"
+          element={
+            <PrivateRoute>
+              <MainPage />
+            </PrivateRoute>
+          }
+        />
+        <Route path="/tutorial" element={<ScrollPage />} />
+        <Route path="/select" element={<ClosueStatueSelect />} />
         <Route path="/gpt-study" element={<GPTStudy />} />
         <Route path="/gpt-study/:slug" element={<GPTStudy />} />
         <Route path="/gpt-study/:slug/:tab" element={<GPTStudy />} />
         <Route path="/gpt-study/:slug/:tab/:subTab" element={<GPTStudy />} />
-        <Route path="/test" element={<Recipe1QuizMultipleResult />} />
+        <Route path="/test" element={<Recipe1QuizMultiple />} />
         <Route path="/test2" element={<Recipe1QuizEssay />} />
-        <Route path="/community" element={<PrivateRoute><Community /></PrivateRoute>} />
-        <Route path="/community/ai-articles" element={<PrivateRoute><AIArticles /></PrivateRoute>} />
-        <Route path="/community/ai-gallery" element={<PrivateRoute><AIGallery /></PrivateRoute>} />
-        <Route path="/community/information" element={<PrivateRoute><Information /></PrivateRoute>} />
-        <Route path="/community/creation" element={<PrivateRoute><Creation /></PrivateRoute>} />
+        <Route
+          path="/community"
+          element={
+            <PrivateRoute>
+              <Community />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/community/ai-articles"
+          element={
+            <PrivateRoute>
+              <AIArticles />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/community/ai-gallery"
+          element={
+            <PrivateRoute>
+              <AIGallery />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/community/information"
+          element={
+            <PrivateRoute>
+              <Information />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/community/creation"
+          element={
+            <PrivateRoute>
+              <Creation />
+            </PrivateRoute>
+          }
+        />
       </Routes>
     </AnimatePresence>
   );
