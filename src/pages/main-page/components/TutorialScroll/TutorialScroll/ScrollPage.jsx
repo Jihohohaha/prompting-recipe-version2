@@ -1,8 +1,8 @@
 import React, { useEffect, useRef, useState } from "react";
 import "./ScrollPage.css";
 import orange_line from "../../TutorialScroll/orange_line.png";
-import orange_book from "../../TutorialScroll/orange_book.png";
-import book from "../../TutorialScroll/book.png";
+import orange_book from "../../TutorialScroll/orange_book.gif";
+import book from "../../TutorialScroll/book.gif";
 import gookja from "../../TutorialScroll/gookja.png";
 import star from "../../TutorialScroll/star.png";
 import lightbulb from "../../TutorialScroll/lightbulb.png";
@@ -99,7 +99,7 @@ export default function ScrollPage() {
         className={`fade-section ${activeIndex === 0 ? "active" : ""}`}
       >
         <motion.div
-          className="intro-text"
+          className="intro-text text-center"
           initial={{ opacity: 0, y: 40 }} // 👈 처음엔 투명 + 아래쪽
           animate={{ opacity: 1, y: 0 }} // 👈 자연스럽게 올라오면서 등장
           transition={{

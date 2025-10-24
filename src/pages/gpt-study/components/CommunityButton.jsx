@@ -23,7 +23,7 @@ const CommunityButton = () => {
       transition={{ duration: 0.2 }}
     >
       <motion.span
-        className={`text-5xl mr-2 font-light transition-colors duration-300 ${
+        className={`text-6xl mr-2 font-light transition-colors duration-300 ${
           isHovered ? "text-[#FF6C43]" : "text-gray-400 opacity-50"
         }`}
         animate={{ x: [0, -4, 0] }}
@@ -31,7 +31,7 @@ const CommunityButton = () => {
       >
         〈
       </motion.span>
-      <span className="text-gray-200 text-3xl font-bold font-pretendard">
+      <span className="text-gray-400 text-xl font-bold font-pretendard">
         커뮤니티
       </span>
     </motion.div>

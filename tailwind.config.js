@@ -16,6 +16,7 @@ export default {
         sacramento: ['"Sacramento"', 'cursive'],
         mortend: ["Mortend", "sans-serif"],
         cafe24: ['"Cafe24ClassicType"', "sans-serif"],
+        neunrimbo: ['"Neunrimbo Gothic"', 'sans-serif'],
       },
       zIndex: {
         60: '60',

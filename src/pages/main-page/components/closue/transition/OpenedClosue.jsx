@@ -11,18 +11,15 @@ const OpenedClosue = ({ onComplete }) => {
   const skipToStep5 = searchParams.get("step") === "5"; // Added
   const [scrollProgress, setScrollProgress] = useState(skipToStep5 ? 1 : 0); // Modified
   const [isScrollCompleted, setIsScrollCompleted] = useState(skipToStep5 ? true : false); // Modified
-  const navigate = useNavigate(); // ✅ 페이지 이동용
-  const [closing, setClosing] = useState(false); // ✅ 커튼 모션 상태
+  const navigate = useNavigate();
+  const [closing, setClosing] = useState(false);
   const containerRef = useRef(null);
 
-  // 스크롤 텍스트들
   const scrollTexts = [
-    ["그것은 곧 프롬프트 엔지니어링,", "언어를 다루는 비밀의 조리법이었다."],
     [
       "그 때, 눈앞에 나타난 의문의 석상!",
-      "그 석상은 원래 단순한 돌조각에 불과했지만,",
-      "소문에 따르면 레시피를 완성한 석상은",
-      "비로소 사람이 될 수 있다고 했다.",
+      "그 석상은 원래 단순한 돌조각에 불과했지만, 소문에 따르면 레시피를",
+      "완성한 석상은 비로소 사람이 될 수 있다고 했다.",
     ],
     [
       "그래서 그는 요리 마스터가 되기로 결심했다.",
@@ -47,7 +44,6 @@ const OpenedClosue = ({ onComplete }) => {
       const progress = scrollTop / scrollHeight;
       setScrollProgress(progress);
 
-      // 스크롤이 거의 끝에 도달했을 때 완료 상태로 설정 (95% 이상)
       if (progress >= 0.95 && !isScrollCompleted) {
         setIsScrollCompleted(true);
       }
@@ -57,7 +53,6 @@ const OpenedClosue = ({ onComplete }) => {
     return () => container.removeEventListener("scroll", handleScroll);
   }, [isScrollCompleted]);
 
-  // 클릭 핸들러
   const handleClick = useCallback(() => {
     if (isScrollCompleted && onComplete) {
       onComplete();
@@ -69,6 +64,44 @@ const OpenedClosue = ({ onComplete }) => {
     const progressPerItem = 1 / totalItems;
     const currentItemStart = index * progressPerItem;
     const currentItemEnd = (index + 1) * progressPerItem;
+
+    // 첫 번째 텍스트는 처음부터 보이도록
+    if (index === 0 && scrollProgress < progressPerItem) {
+      const itemProgress = scrollProgress / progressPerItem;
+      const steps = 16;
+      const stepSize = 1 / steps;
+      const currentStep = Math.floor(itemProgress / stepSize);
+      const stepProgress = (itemProgress % stepSize) / stepSize;
+
+      if (currentStep < 8) {
+        return 1;
+      } else {
+        const fadeOutStep = currentStep - 8;
+        const baseOpacity = 1 - fadeOutStep * 0.125;
+        const stepDecrement = stepProgress * 0.125;
+        return Math.max(baseOpacity - stepDecrement, 0);
+      }
+    }
+
+    // 마지막 텍스트는 스크롤 끝나고도 계속 보이도록
+    if (index === totalItems - 1 && scrollProgress >= currentItemStart) {
+      const itemProgress =
+        (scrollProgress - currentItemStart) / progressPerItem;
+
+      const steps = 16;
+      const stepSize = 1 / steps;
+      const currentStep = Math.floor(itemProgress / stepSize);
+      const stepProgress = (itemProgress % stepSize) / stepSize;
+
+      if (currentStep < 8) {
+        const baseOpacity = currentStep * 0.125;
+        const stepIncrement = stepProgress * 0.125;
+        return Math.min(baseOpacity + stepIncrement, 1);
+      } else {
+        // 마지막 텍스트는 fade out 하지 않고 opacity 1 유지
+        return 1;
+      }
+    }
 
     if (
       scrollProgress >= currentItemStart &&
@@ -98,8 +131,8 @@ const OpenedClosue = ({ onComplete }) => {
   };
 
   return (
-    <div className="relative w-screen h-screen overflow-hidden bg-[#F5F5F5]">
-      <div className="relative w-screen h-screen overflow-hidden bg-[#F5F5F5]">
+    <div className="relative w-screen h-screen overflow-hidden bg-black">
+      <div className="relative w-screen h-screen overflow-hidden bg-black">
         {/* 열린 클로슈 (하단) */}
         <div className="absolute inset-0 z-10 flex items-end justify-center pb-10">
           <div
@@ -107,29 +140,10 @@ const OpenedClosue = ({ onComplete }) => {
             style={{ width: "calc(60vw * 0.8)", maxWidth: "800px" }}
           >
             <img
-              src="/images/main-page/closue_plate.png"
+              src="/images/main-page/cooking_statue.png"
               alt="closue-plate"
               className="w-full"
-              style={{ display: "block", transform: "translateY(250px)" }}
-            />
-            <motion.img
-              src="/images/main-page/closue_dom.png"
-              alt="closue-dom"
-              className="absolute bottom-0 left-0 w-full"
-              initial={{
-                rotate: -20,
-                y: -70,
-                x: 80,
-              }}
-              animate={{
-                rotate: -20,
-                y: -70,
-                x: 80,
-              }}
-              transition={{ duration: 0 }}
-              style={{
-                transformOrigin: "bottom left",
-              }}
+              style={{ display: "block", transform: "translateY(20px)" }}
             />
           </div>
         </div>
@@ -141,34 +155,36 @@ const OpenedClosue = ({ onComplete }) => {
           transition={{ duration: 1 }}
           className="absolute inset-0 z-20 flex flex-col items-center justify-center"
           style={{
-            backgroundColor: "rgba(0, 0, 0, 0.5)",
-            backdropFilter: "blur(10px)",
+            backgroundColor: "rgba(0, 0, 0, 0.4)",
+            backdropFilter: "blur(0px)",
           }}
         >
-          {/* 서비스명 - 스크롤 채우기 효과 */}
+          {/* 서비스명 - 스크롤 크로스 페이드 효과 */}
           <motion.div
             initial={{ scale: 0.8, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ delay: 0.5, duration: 0.8 }}
             className="absolute text-[80px] font-bold text-center"
           >
-            {/* 기본 텍스트 (흰색) */}
+            {/* 기본 텍스트 (흰색) - 스크롤하면서 서서히 투명해짐 */}
             <div className="relative">
-              <div className="font-stretch text-white">PRompting</div>
-              <div className="font-desira text-white">[RECIPe]</div>
-
-              {/* 오버레이 텍스트 (그라데이션) - 스크롤 진행도에 따라 위에서부터 그라데이션으로 채워짐 */}
+              <div 
+                className="grid gap-0 leading-snug transition-opacity duration-300"
+                style={{ opacity: 1 - scrollProgress }}
+              >
+                <div className="font-stretch text-white">PRompting</div>
+                <div className="font-desira text-white">[RECIPe]</div>
+              </div>
+              {/* 오버레이 텍스트 (그라데이션) - 스크롤하면서 서서히 나타남 */}
               <div
-                className="absolute top-0 left-0 overflow-hidden"
-                style={{
-                  height: `${scrollProgress * 100}%`,
-                }}
+                className="grid gap-0 leading-snug absolute top-0 left-0 transition-opacity duration-300"
+                style={{ opacity: scrollProgress }}
               >
                 <div
                   className="font-stretch"
                   style={{
                     background:
-                      "linear-gradient(to bottom, #FF6C43, #FF6C43, #ffffff)",
+                      "linear-gradient(to bottom, #FF6C43, #FF6C43, #FF6C43, #FF6C43, #ffffff)",
                     WebkitBackgroundClip: "text",
                     WebkitTextFillColor: "transparent",
                     backgroundClip: "text",
@@ -180,7 +196,7 @@ const OpenedClosue = ({ onComplete }) => {
                   className="font-desira"
                   style={{
                     background:
-                      "linear-gradient(to bottom, #FF6C43, #FF6C43, #ffffff)",
+                      "linear-gradient(to bottom, #FF6C43, #FF6C43, #FF6C43, #FF6C43, #ffffff)",
                     WebkitBackgroundClip: "text",
                     WebkitTextFillColor: "transparent",
                     backgroundClip: "text",
@@ -211,7 +227,7 @@ const OpenedClosue = ({ onComplete }) => {
               {scrollTexts.map((lines, index) => (
                 <div
                   key={index}
-                  className="absolute text-white text-[20px] font-bold font-pretendard mt-[360px] text-center px-4 leading-relaxed"
+                  className="absolute text-white text-[22px] font-medium font-pretendard mt-[360px] text-center px-4 leading-relaxed"
                   style={{
                     opacity: getOpacity(index),
                   }}
@@ -237,7 +253,7 @@ const OpenedClosue = ({ onComplete }) => {
                 onMouseLeave={() =>
                   document.body.classList.remove("hover-left")
                 }
-                onClick={() => (window.location.href = "/community")} // ✅ 클릭 시 이동
+                onClick={() => (window.location.href = "/community")}
                 style={{ cursor: "pointer" }}
               ></div>
 
@@ -249,8 +265,8 @@ const OpenedClosue = ({ onComplete }) => {
                   document.body.classList.remove("hover-right")
                 }
                 onClick={() => {
-                  setClosing(true); // 🔥 커튼 닫기
-                  setTimeout(() => navigate("/tutorial"), 1800); // 🔥 모션 후 페이지 이동
+                  setClosing(true);
+                  setTimeout(() => navigate("/tutorial"), 1800);
                 }}
                 style={{ cursor: "pointer" }}
               ></div>

@@ -22,11 +22,11 @@ const StartButton = () => {
       animate={{ filter: isHovered ? "brightness(1.3)" : "brightness(1)" }}
       transition={{ duration: 0.2 }}
     >
-      <span className="text-gray-200 text-3xl font-bold font-pretendard">
+      <span className="text-gray-400 text-xl font-bold font-pretendard">
         요리 시작
       </span>
       <motion.span
-        className={`text-5xl ml-2 font-light transition-colors duration-300 ${
+        className={`text-6xl ml-2 font-light transition-colors duration-300 ${
           isHovered ? "text-[#FF6C43]" : "text-gray-400 opacity-50"
         }`}
         animate={{ x: [0, 4, 0] }}
