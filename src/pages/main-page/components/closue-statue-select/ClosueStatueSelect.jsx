@@ -365,10 +365,10 @@ const ClosueStatueSelect = () => {
           onClick={() => setShowMask(false)}
         >
           <div className="absolute inset-0 flex flex-col items-center justify-center cursor-pointer transition-opacity duration-500">
-            <h1 className="text-6xl font-bold text-white mb-8 font-koolegant">
+            <h1 className="text-6xl font-bold text-white mb-4 font-koolegant">
               Choose Your Dish
             </h1>
-            <p className="text-xl text-white mb-12">
+            <p className="text-xl text-white">
               오늘의 메뉴를 선택하세요.
             </p>
           </div>
