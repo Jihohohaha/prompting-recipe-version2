@@ -6,13 +6,13 @@ const DishItem = React.memo(function DishItem({
   index,
   frontDishIndex,
   scale,
-  handleDishClick, // (dish, index)
+  handleDishClick,
   orbitAngle,
   tilt = 0,
   clickable = false,
-  hideText = false, // 프리-틸트 텍스트 숨김용
-  showLogo = false, // 틸트 모드 로고 표시
-  showTitle = false, // 틸트 모드 타이틀 표시(정면만)
+  hideText = false,
+  showLogo = false,
+  showTitle = false,
 }) {
   const baseAngle = index * 45;
   const rad = (baseAngle * Math.PI) / 180;
@@ -44,7 +44,7 @@ const DishItem = React.memo(function DishItem({
         style={{ backgroundImage: 'url(/images/main-page/dish.png)' }}
         onDragStart={(e) => e.preventDefault()}
       >
-        {/* ───── 틸트 모드: 로고(모두), 타이틀(정면) ───── */}
+        {/* 틸트 모드: 로고/타이틀 */}
         {showLogo && dish?.logo && (
           <img
             src={dish.logo}
@@ -61,13 +61,8 @@ const DishItem = React.memo(function DishItem({
             }}
           />
         )}
-        {showTitle && (
-          <div className="text-black text-3xl font-pretendard font-bold leading-none select-none">
-            {dish.title}
-          </div>
-        )}
 
-        {/* ───── 프리-틸트: 텍스트(제목/부제) ───── */}
+        {/* 프리-틸트: 제목/부제 */}
         {!showLogo && !hideText && (
           <div className="absolute inset-0 flex flex-col items-center justify-center p-4 text-center select-none">
             <h3 className="text-2xl font-bold text-black mb-1 font-bromawo">{dish.title}</h3>

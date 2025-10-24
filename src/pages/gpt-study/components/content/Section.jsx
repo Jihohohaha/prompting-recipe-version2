@@ -19,6 +19,7 @@ import Recipe5TutorialExplain from "./tabs/expanded/tutorial/Recipe5TutorialExpl
 import Recipe5TutorialExample from "./tabs/expanded/tutorial/Recipe5TutorialExample";
 import Recipe6TutorialExplain from "./tabs/expanded/tutorial/Recipe6TutorialExplain";
 import Recipe6TutorialExample from "./tabs/expanded/tutorial/Recipe6TutorialExample";
+import ChatUI from "./tabs/expanded/chat/Recipe1ChatExpanded";
 
 // Quiz Container import
 import Recipe1QuizContainer from "./tabs/expanded/quiz/Recipe1QuizContainer";
@@ -28,16 +29,19 @@ gsap.registerPlugin(ScrollTrigger);
 const Section = ({ recipe, index }) => {
   const { tab } = useParams();
   const { expandedContent, setProgrammaticScroll } = useGPTStudyStore();
-  
+
   const timelineRef = useRef(null);
   const tutorialRef = useRef(null);
   const quizRef = useRef(null);
   const chatRef = useRef(null);
   const containerRef = useRef(null);
 
-  const isTutorialExpanded = expandedContent?.recipeId === recipe.id && tab === "tutorial";
-  const isQuizExpanded = expandedContent?.recipeId === recipe.id && tab === "quiz";
-  const isChatExpanded = expandedContent?.recipeId === recipe.id && tab === "chat";
+  const isTutorialExpanded =
+    expandedContent?.recipeId === recipe.id && tab === "tutorial";
+  const isQuizExpanded =
+    expandedContent?.recipeId === recipe.id && tab === "quiz";
+  const isChatExpanded =
+    expandedContent?.recipeId === recipe.id && tab === "chat";
 
   // âœ… Reference íŒ¨í„´: GSAP Timelineìœ¼ë¡œ ì—´ë¦¼/ë‹«íž˜ + ìŠ¤í¬ë¡¤ ê´€ë¦¬
   useEffect(() => {
@@ -55,7 +59,7 @@ const Section = ({ recipe, index }) => {
       }
     });
 
-    const container = document.querySelector('main');
+    const container = document.querySelector("main");
 
     // Tutorial ì²˜ë¦¬
     if (tutorialRef.current && container) {
@@ -78,8 +82,10 @@ const Section = ({ recipe, index }) => {
 
         // 3. ìŠ¤í¬ë¡¤ ì• ë‹ˆë©”ì´ì…˜
         const sectionElement = containerRef.current;
-        const tabInterface = sectionElement?.querySelector(`#tab-interface-${recipe.id}`);
-        
+        const tabInterface = sectionElement?.querySelector(
+          `#tab-interface-${recipe.id}`
+        );
+
         if (tabInterface) {
           const targetScrollTop = tabInterface.offsetTop + tabInterface.offsetHeight;
           
@@ -99,8 +105,9 @@ const Section = ({ recipe, index }) => {
         }, null, 0.9); // 0.1 + 0.8 = 0.9ì´ˆ
         
       } else if (tutorialRef.current.offsetHeight > 0) {
-        const shouldCloseImmediately = container.scrollTop > tutorialRef.current.offsetTop;
-        
+        const shouldCloseImmediately =
+          container.scrollTop > tutorialRef.current.offsetTop;
+
         if (shouldCloseImmediately) {
           console.log(`ðŸ”½ Closing Tutorial immediately (scrolled past) for Recipe ${recipe.id}`);
           
@@ -147,8 +154,10 @@ const Section = ({ recipe, index }) => {
         
         // 3. ìŠ¤í¬ë¡¤ ì• ë‹ˆë©”ì´ì…˜
         const sectionElement = containerRef.current;
-        const tabInterface = sectionElement?.querySelector(`#tab-interface-${recipe.id}`);
-        
+        const tabInterface = sectionElement?.querySelector(
+          `#tab-interface-${recipe.id}`
+        );
+
         if (tabInterface) {
           const targetScrollTop = tabInterface.offsetTop + tabInterface.offsetHeight;
           
@@ -168,8 +177,9 @@ const Section = ({ recipe, index }) => {
         }, null, 0.9);
         
       } else if (quizRef.current.offsetHeight > 0) {
-        const shouldCloseImmediately = container.scrollTop > quizRef.current.offsetTop;
-        
+        const shouldCloseImmediately =
+          container.scrollTop > quizRef.current.offsetTop;
+
         if (shouldCloseImmediately) {
           console.log(`ðŸ”½ Closing Quiz immediately for Recipe ${recipe.id}`);
           
@@ -216,8 +226,10 @@ const Section = ({ recipe, index }) => {
         
         // 3. ìŠ¤í¬ë¡¤ ì• ë‹ˆë©”ì´ì…˜
         const sectionElement = containerRef.current;
-        const tabInterface = sectionElement?.querySelector(`#tab-interface-${recipe.id}`);
-        
+        const tabInterface = sectionElement?.querySelector(
+          `#tab-interface-${recipe.id}`
+        );
+
         if (tabInterface) {
           const targetScrollTop = tabInterface.offsetTop + tabInterface.offsetHeight;
           
@@ -237,8 +249,9 @@ const Section = ({ recipe, index }) => {
         }, null, 0.9);
         
       } else if (chatRef.current.offsetHeight > 0) {
-        const shouldCloseImmediately = container.scrollTop > chatRef.current.offsetTop;
-        
+        const shouldCloseImmediately =
+          container.scrollTop > chatRef.current.offsetTop;
+
         if (shouldCloseImmediately) {
           console.log(`ðŸ”½ Closing Chat immediately for Recipe ${recipe.id}`);
           
@@ -269,7 +282,14 @@ const Section = ({ recipe, index }) => {
         timelineRef.current.kill();
       }
     };
-  }, [isTutorialExpanded, isQuizExpanded, isChatExpanded, recipe.id, index, setProgrammaticScroll]);
+  }, [
+    isTutorialExpanded,
+    isQuizExpanded,
+    isChatExpanded,
+    recipe.id,
+    index,
+    setProgrammaticScroll,
+  ]);
 
   return (
     <section
@@ -278,10 +298,10 @@ const Section = ({ recipe, index }) => {
       className="flex flex-col px-12"
     >
       {/* Start Anchor */}
-      <div 
-        id={`section-start-${index}`} 
+      <div
+        id={`section-start-${index}`}
         data-section-index={index}
-        className="h-0" 
+        className="h-0"
       />
 
       {/* íƒ­ ì¸í„°íŽ˜ì´ìŠ¤ */}
@@ -293,7 +313,7 @@ const Section = ({ recipe, index }) => {
         className="bg-black"
         style={{
           height: 0,
-          overflow: "hidden"
+          overflow: "hidden",
         }}
       >
         <div className="py-4">
@@ -307,7 +327,7 @@ const Section = ({ recipe, index }) => {
         className="bg-black"
         style={{
           height: 0,
-          overflow: "hidden"
+          overflow: "hidden",
         }}
       >
         <div className="py-8">
@@ -321,7 +341,7 @@ const Section = ({ recipe, index }) => {
         className="bg-black"
         style={{
           height: 0,
-          overflow: "hidden"
+          overflow: "hidden",
         }}
       >
         <div className="py-8">
@@ -333,10 +353,10 @@ const Section = ({ recipe, index }) => {
       </div>
 
       {/* Section End Anchor */}
-      <div 
+      <div
         id={`section-end-${index}`}
         data-section-index={index}
-        className="h-0" 
+        className="h-0"
       />
     </section>
   );

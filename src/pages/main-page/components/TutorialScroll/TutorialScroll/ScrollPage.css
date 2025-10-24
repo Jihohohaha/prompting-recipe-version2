@@ -1,0 +1,245 @@
+@import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css");
+
+body {
+  background-color: #3b1a00;  /* ✅ 그라데이션 마지막 색과 동일 */
+}
+
+.intro-text p {
+  margin: 1rem 0;
+}
+
+.scroll-container {
+  height: 100vh;
+  overflow-y: hidden;
+  position: relative;
+  scroll-behavior: smooth;
+  background: black;
+}
+
+.fade-section {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  opacity: 0.4;
+  transform: scale(0.97);
+  transition: all 1s cubic-bezier(0.25, 1, 0.3, 1);
+}
+
+
+/* 중앙 들어오면 활성화 */
+.fade-section.active {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.fade-section p {
+  font-size: 2.2rem;
+  font-weight: 500;
+  line-height: 1.5;
+  max-width: 900px;
+  margin: 2rem 2rem;
+}
+
+.highlight {
+  color: #ff7d2a;
+  font-weight: 700;
+}
+
+.highlight2 {
+  color: #ff7d2a;
+  font-weight: 600;
+  font-size: 1.6rem;
+}
+
+.side-line {
+  position: absolute;
+  top: 50%;
+  width: 180px;
+  transform: translateY(-50%);
+}
+
+.side-line.left {
+  left: 0%;
+  top: 50%;
+  width: 400px;
+}
+
+.side-line.right {
+  right: 0%;
+  width: 400px;
+}
+
+.book-image {
+  width: 400px;  
+  margin-top: 3rem;
+  margin-bottom: 3rem;
+}
+
+.step-intro {
+  text-align: center;
+  color: #fff;
+  font-family: "Pretendard", sans-serif;
+  line-height: 1.8;
+  font-size: 1.8rem;
+  font-weight: 500;
+  margin-top: 3rem;
+}
+
+.step-intro .step-title {
+  font-weight: 600;
+  font-size: 2rem;
+}
+
+.step-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+  text-align: center;
+  color: #fff;
+  font-family: "Pretendard", sans-serif;
+  font-size: 1.8rem;
+  font-weight: 500;
+  line-height: 1.6;
+  flex-wrap: nowrap; /* 화면 줄바꿈 대응 */
+  max-width: none;
+  white-space: nowrap; /* ✅ 텍스트 강제 한 줄 유지 */
+  overflow: hidden;  /* ✅ 혹시 넘치면 잘림 방지 */
+}
+
+.step-icon {
+  width: 160px; /* ✅ 아이콘 크기 여기서 조절 */
+  height: auto;
+  display: inline-block;
+}
+
+@media (max-width: 768px) {
+  .step-row {
+    font-size: 1.4rem;
+  }
+
+  .step-icon {
+    width: 60px;
+  }
+}
+
+.ending-text {
+  text-align: center;
+  color: #fff;
+  font-family: "Pretendard", sans-serif;
+  line-height: 1.8;
+  font-size: 2.2rem; /* ✅ "AI가 처음이라도 괜찮아요"와 동일한 크기 */
+  font-weight: 500;
+}
+
+.ending-text p {
+  margin: 1.5rem 0;
+}
+
+.highlight-final {
+  color: #ff7d2a;
+  font-weight: 700;
+  font-size: 3.0rem;
+}
+
+/* 스크롤 힌트 전체 컨테이너 */
+.scroll-hint {
+  position: absolute;
+  bottom: 40px; /* 화면 아래쪽에 고정 */
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+}
+
+/* 텍스트 */
+.scroll-text {
+  font-family: "Pretendard", sans-serif;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 1.4rem;
+  letter-spacing: 1px;
+  margin-bottom: 8px;
+  animation: fadeBlink 2.4s infinite ease-in-out;
+}
+
+/* 아래 화살표 아이콘 (단순 CSS 화살표) */
+.arrow-down {
+  width: 10px;
+  height: 10px;
+  border-left: 2px solid rgba(255, 255, 255, 0.8);
+  border-bottom: 2px solid rgba(255, 255, 255, 0.8);
+  transform: rotate(-45deg);
+  animation: arrowBounce 1.5s infinite;
+}
+
+/* 아래쪽으로 fade-out 그라데이션 */
+.bottom-fade {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 180px;
+  background: linear-gradient(to bottom, transparent, #000);
+  pointer-events: none;
+}
+
+/* 텍스트 깜빡이는 애니메이션 */
+@keyframes fadeBlink {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 1; }
+}
+
+/* 화살표 천천히 위아래 움직이는 애니메이션 */
+@keyframes arrowBounce {
+  0%, 100% { transform: translateY(0) rotate(-45deg); }
+  50% { transform: translateY(8px) rotate(-45deg); }
+}
+
+.start-button {
+
+  margin-top: 5rem;
+  padding: 1.1rem 3.5rem;
+  font-family: "Pretendard", sans-serif;
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: #fff;
+  background: linear-gradient(135deg, #ce6428, #dc7b35);
+  border: none;
+  border-radius: 25px; /* 둥글게 */
+  cursor: pointer;
+  box-shadow: 0 6px 18px rgba(206, 100, 40, 0.4);
+  transition: all 0.3s ease;
+}
+
+.start-button:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 24px rgba(255, 125, 42, 0.6);
+}
+
+.start-button:active {
+  transform: translateY(0);
+  box-shadow: 0 4px 12px rgba(255, 125, 42, 0.4);
+}
+
+.curtain {
+  position: fixed;
+  top: 0;
+  width: 50vw;
+  height: 100vh;
+  background: #000;
+  z-index: 9999;
+}
+
+
+.curtain.left {
+  left: 0;
+}
+
+.curtain.right {
+  right: 0;
+}
