@@ -365,10 +365,10 @@ const ClosueStatueSelect = () => {
           onClick={() => setShowMask(false)}
         >
           <div className="absolute inset-0 flex flex-col items-center justify-center cursor-pointer transition-opacity duration-500">
-            <h1 className="text-6xl font-bold text-white mb-8 font-koolegant">
+            <h1 className="text-6xl font-bold text-white mb-4 font-koolegant">
               Choose Your Dish
             </h1>
-            <p className="text-xl text-white mb-12">
+            <p className="text-xl text-white">
               오늘의 메뉴를 선택하세요.
             </p>
           </div>
@@ -417,6 +417,19 @@ const ClosueStatueSelect = () => {
             {titleText}
           </h1>
         </div>
+        
+        <div
+          className="text-[320px] font-bold text-white mb-4 font-koolegant whitespace-nowrap"
+          style={{
+            color: isTilt ? "transparent" : "white",
+            transform: `scale(${titleScale})`,
+            transformOrigin: "top",
+            transition: "transform 800ms cubic-bezier(0.2, 0.8, 0.2, 1)",
+          }}>
+          <img src="/images/main-page/leftline.png" className="absolute left-0 top-[300px] h-[300px]"/>
+          <img src="/images/main-page/rightline.png" className="absolute right-0 top-[160px] h-[300px]"/>
+        </div>
+
 
         <div
           className="absolute w-[96vw] top-0 left-[2vw]"
