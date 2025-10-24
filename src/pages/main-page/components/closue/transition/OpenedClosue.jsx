@@ -4,13 +4,15 @@ import { useSearchParams } from "react-router-dom"; // Added
 import StartButton from "../../../../../pages/gpt-study/components/StartButton";
 import CommunityButton from "../../../../../pages/gpt-study/components/CommunityButton";
 import ScrollPage from "../../TutorialScroll/TutorialScroll/ScrollPage";
+import { useNavigate } from "react-router-dom";
 
 const OpenedClosue = ({ onComplete }) => {
   const [searchParams] = useSearchParams(); // Added
   const skipToStep5 = searchParams.get("step") === "5"; // Added
-
   const [scrollProgress, setScrollProgress] = useState(skipToStep5 ? 1 : 0); // Modified
   const [isScrollCompleted, setIsScrollCompleted] = useState(skipToStep5 ? true : false); // Modified
+  const navigate = useNavigate(); // ✅ 페이지 이동용
+  const [closing, setClosing] = useState(false); // ✅ 커튼 모션 상태
   const containerRef = useRef(null);
 
   // 스크롤 텍스트들
@@ -246,7 +248,10 @@ const OpenedClosue = ({ onComplete }) => {
                 onMouseLeave={() =>
                   document.body.classList.remove("hover-right")
                 }
-                onClick={() => (window.location.href = "/tutorial")} // ✅ 클릭 시 이동
+                onClick={() => {
+                  setClosing(true); // 🔥 커튼 닫기
+                  setTimeout(() => navigate("/tutorial"), 1800); // 🔥 모션 후 페이지 이동
+                }}
                 style={{ cursor: "pointer" }}
               ></div>
             </div>
@@ -258,6 +263,16 @@ const OpenedClosue = ({ onComplete }) => {
           </div>
         )}
       </div>
+      {closing && (
+        <>
+          <motion.div
+            className="fixed top-0 left-0 w-full h-full bg-black z-[9999]"
+            initial={{ x: "100%" }}
+            animate={{ x: 0 }}
+            transition={{ duration: 1.2, ease: [0.83, 0, 0.17, 1] }}
+          />
+        </>
+      )}
     </div>
   );
 };
