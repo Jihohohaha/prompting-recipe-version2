@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
-import AssetsHandLightClosue from './transition/AssetHandLightClosue';
-import OpenedClosue from './transition/OpenedClosue';
+import React, { useState } from "react";
+import AssetsHandLightClosue from "./transition/AssetHandLightClosue";
+import OpenedClosue from "./transition/OpenedClosue";
 
 const Closue = ({ onComplete }) => {
   const [isCompleted, setIsCompleted] = useState(false);
@@ -15,12 +15,9 @@ const Closue = ({ onComplete }) => {
   };
 
   return (
-    <div
-      className="relative w-screen h-screen"
-      onMouseMove={handleMouseMove}
-    >
-      <video 
-        src="/videos/Closue.mp4"
+    <div className="relative w-screen h-screen" onMouseMove={handleMouseMove}>
+      <video
+        src="/videos/closue.mp4"
         className="absolute inset-0 w-full h-full object-cover"
         autoPlay
         muted
@@ -32,8 +29,8 @@ const Closue = ({ onComplete }) => {
 
 export default Closue;
 
-
-{/* <div
+{
+  /* <div
       className="relative w-screen h-screen"
       onMouseMove={handleMouseMove}
     >
@@ -45,4 +42,5 @@ export default Closue;
       ) : (
         <OpenedClosue onComplete={onComplete} />
       )}
-    </div> */}
+    </div> */
+}
