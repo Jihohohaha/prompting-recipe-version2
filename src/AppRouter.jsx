@@ -7,6 +7,7 @@ import GPTStudy from "./pages/gpt-study/GPTStudy";
 import Recipe1QuizMultipleResult from "./pages/gpt-study/components/content/tabs/expanded/quiz/Recipe1QuizMultipleResult";
 import Recipe1QuizEssay from "./pages/gpt-study/components/content/tabs/expanded/quiz/Recipe1QuizEssay";
 import ScrollPage from "./pages/main-page/components/TutorialScroll/TutorialScroll/ScrollPage";
+import ClosueStatueSelect from "./pages/main-page/components/closue-statue-select/ClosueStatueSelect";
 
 import SocialLoginPage from "./pages/social-login/SocialLoginPage";
 import PrivateRoute from "./components/PrivateRoute";
@@ -73,12 +74,22 @@ const AppRouter = () => {
           }
         />
 
-        {/* 튜토리얼 페이지 */}
+        {/* 튜토리얼 */}
         <Route
           path="/tutorial"
           element={
             <PageTransition direction="forward">
               <ScrollPage />
+            </PageTransition>
+          }
+        />
+
+        {/* 선택 페이지 (main 새 추가) */}
+        <Route
+          path="/select"
+          element={
+            <PageTransition direction="forward">
+              <ClosueStatueSelect />
             </PageTransition>
           }
         />
