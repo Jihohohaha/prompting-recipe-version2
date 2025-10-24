@@ -7,6 +7,7 @@ const Chatbot = () => {
   // 채팅
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState([]);
+  const [typing, setTyping] = useState(false); // 봇 타이핑 상태
 
   // 위치/크기
   const [position, setPosition] = useState({ x: null, y: null }); // null이면 bottom/right 고정
@@ -138,10 +139,36 @@ const Chatbot = () => {
     };
   }, [dragging, resizing, offset, size]);
 
-  const handleSend = () => {
+  // 데모용 봇 응답 함수 (실서비스에선 교체)
+  const requestBot = async (userText) => {
+    // 여기를 실제 API 호출로 바꿔 사용하세요.
+    // 예: const res = await fetch('/api/chat', { method:'POST', body: JSON.stringify({ text:userText }) })
+    //     const data = await res.json(); return data.reply;
+    return new Promise((resolve) => {
+      setTimeout(() => resolve(`"${userText}" 에 대한 응답이에요! 😄`), 1200);
+    });
+  };
+
+  const handleSend = async () => {
     if (!input.trim()) return;
-    setMessages((prev) => [...prev, { text: input, from: "user" }]);
+
+    const text = input.trim();
+    setMessages((prev) => [...prev, { text, from: "user" }]);
     setInput("");
+
+    // 타이핑 버블 표시
+    setTyping(true);
+    try {
+      const reply = await requestBot(text);
+      setMessages((prev) => [...prev, { text: reply, from: "bot" }]);
+    } catch (e) {
+      setMessages((prev) => [
+        ...prev,
+        { text: "오류가 발생했어요. 잠시 후 다시 시도해 주세요.", from: "bot" },
+      ]);
+    } finally {
+      setTyping(false);
+    }
   };
 
   const resizeCursor =
@@ -153,6 +180,15 @@ const Chatbot = () => {
 
   return (
     <>
+      {/* 애니메이션 키프레임 (점 출렁) */}
+      <style>{`
+        @keyframes bobDot {
+          0%, 60%, 100% { transform: translateY(0); opacity: .6; }
+          30% { transform: translateY(-4px); opacity: 1; }
+        }
+        .animate-bobDot { animation: bobDot 900ms ease-in-out infinite; }
+      `}</style>
+
       {/* FAB */}
       <button
         className="absolute bottom-[100px] right-8 z-[9999] w-12 h-12 rounded-full bg-[#FE7525] shadow-lg flex items-center justify-center text-white text-[16px] hover:bg-[#FF8C42] transition-colors"
@@ -166,7 +202,7 @@ const Chatbot = () => {
       {open && (
         <div
           ref={modalRef}
-          className="fixed bg-white rounded-xl shadow-2xl flex flex-col z-[9999]"
+          className="fixed bg-white rounded-xl shadow-2xl flex flex-col z-[9999] border border-[#FE7525]"
           style={{
             left: position.x !== null ? position.x : undefined,
             top: position.y !== null ? position.y : undefined,
@@ -187,16 +223,30 @@ const Chatbot = () => {
 
           {/* 메시지 */}
           <div className="flex-1 px-4 py-2 overflow-y-auto">
-            {messages.length === 0 ? (
+            {messages.length === 0 && !typing ? (
               <div className="text-gray-400 text-sm text-center mt-8">메시지를 입력해보세요!</div>
             ) : (
-              messages.map((msg, idx) => (
-                <div key={idx} className={`my-2 flex ${msg.from === "user" ? "justify-end" : "justify-start"}`}>
-                  <span className={`inline-block px-3 py-2 rounded-lg ${msg.from === "user" ? "bg-[#FE7525] text-white" : "bg-gray-200 text-gray-800"}`}>
-                    {msg.text}
-                  </span>
-                </div>
-              ))
+              <>
+                {messages.map((msg, idx) => (
+                  <div key={idx} className={`my-2 flex ${msg.from === "user" ? "justify-end" : "justify-start"}`}>
+                    <span className={`inline-block px-3 py-2 rounded-lg ${msg.from === "user" ? "bg-[#FE7525] text-white" : "bg-gray-200 text-gray-800"}`}>
+                      {msg.text}
+                    </span>
+                  </div>
+                ))}
+
+                {/* 타이핑 버블: 점 3개가 순차적으로 출렁 */}
+                {typing && (
+                  <div className="my-2 flex justify-start" aria-live="polite" aria-label="봇이 입력 중">
+                    <div className="inline-flex items-center gap-1 h-5 px-3 py-2 rounded-lg bg-gray-200 text-gray-800">
+                      <span className="sr-only">입력 중...</span>
+                      <span className="w-2 h-2 rounded-full bg-gray-600 animate-bobDot" style={{ animationDelay: "0ms" }} />
+                      <span className="w-2 h-2 rounded-full bg-gray-600 animate-bobDot" style={{ animationDelay: "120ms" }} />
+                      <span className="w-2 h-2 rounded-full bg-gray-600 animate-bobDot" style={{ animationDelay: "240ms" }} />
+                    </div>
+                  </div>
+                )}
+              </>
             )}
           </div>
 
@@ -204,15 +254,18 @@ const Chatbot = () => {
           <div className="flex border-t p-2 bg-white rounded-b-xl">
             <input
               type="text"
-              className="flex-1 px-3 py-2 rounded-lg border bg-black/80 focus:outline-none focus:ring-2 focus:ring-[#FE7525]"
+              className="flex-1 px-3 py-2 rounded-lg border bg-black/80 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-[#FE7525]"
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && handleSend()}
               placeholder="무엇이든 물어보세요!"
+              disabled={typing && !input} // 타이핑 중에도 새 입력은 허용하려면 이 줄 제거
             />
             <button
-              className="ml-2 p-2 h-10 w-10 rounded-full bg-[#FE7525] text-white font-semibold hover:bg-[#FF8C42] transition-colors"
+              className="ml-2 p-2 h-10 w-10 rounded-full bg-[#FE7525] text-white font-semibold hover:bg-[#FF8C42] transition-colors disabled:opacity-60"
               onClick={handleSend}
+              disabled={typing && !input}
+              title="전송"
             >
               {"->"}
             </button>
