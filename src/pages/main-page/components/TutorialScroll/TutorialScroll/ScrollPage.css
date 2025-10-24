@@ -231,9 +231,10 @@ body {
   top: 0;
   width: 50vw;
   height: 100vh;
-  background: #000000;
+  background: #000;
   z-index: 9999;
 }
+
 
 .curtain.left {
   left: 0;

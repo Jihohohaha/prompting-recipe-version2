@@ -1,6 +1,7 @@
 
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useSearchParams } from 'react-router-dom'; // Added
 import { folders, letters, centerImage, vw, vh, fontUrl } from '../../start-video/assetData';
 import { centerImageRaw } from '../../start-video/assetData.js';
 import AppearanceClosue from '../animation/AppearanceClosue';
@@ -10,11 +11,19 @@ import SecondOpeningClosue from '../animation/SecondOpeningClosue';
 import HandLight from '../../../effects/HandLight';
 
 const AssetsHandLightClosue = ({ mousePos, onAnimationComplete }) => {
-  const urlParams = new URLSearchParams(window.location.search);
-  const debugStep = parseInt(urlParams.get('step')) || 0;
+  const [searchParams] = useSearchParams(); // Added
+  const debugStep = parseInt(searchParams.get('step')) || 0; // Modified
   const [step, setStep] = useState(debugStep);
   const [isPaused, setIsPaused] = useState(false);
-  const isDebugMode = urlParams.has('step');
+  const isDebugMode = searchParams.has('step');
+
+  // Effect to update step when URL search params change
+  useEffect(() => {
+    const stepFromUrl = searchParams.get('step');
+    if (stepFromUrl !== null) { // Check for null to allow step 0
+      setStep(parseInt(stepFromUrl, 10));
+    }
+  }, [searchParams]); // Dependency on searchParams
 
   useEffect(() => {
     if (!isDebugMode && !isPaused) {

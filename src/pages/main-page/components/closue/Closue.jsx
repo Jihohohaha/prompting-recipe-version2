@@ -15,12 +15,12 @@ const Closue = ({ onComplete }) => {
   };
 
   return (
-    <div 
+    <div
       className="relative w-screen h-screen"
       onMouseMove={handleMouseMove}
     >
       {!isCompleted ? (
-        <AssetsHandLightClosue 
+        <AssetsHandLightClosue
           mousePos={mousePos}
           onAnimationComplete={handleAnimationComplete}
         />

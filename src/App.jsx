@@ -1,6 +1,7 @@
 // src/App.jsx
 import { BrowserRouter as Router } from 'react-router-dom'
 import AppRouter from './AppRouter'
+import HeaderWrapper from './components/common/HeaderWrapper'; // New import
 import './styles/App.css'
 
 /* // AuthProvider 내부에서 useAuth를 사용하는 컴포넌트
@@ -25,6 +26,7 @@ const AppContent = () => {
 function App() {
   return (
     <Router>
+      <HeaderWrapper /> // New component
       <AppRouter />
     </Router>
   )

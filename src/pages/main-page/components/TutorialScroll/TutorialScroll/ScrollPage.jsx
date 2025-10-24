@@ -19,7 +19,8 @@ export default function ScrollPage() {
   // 🔸 페이지 닫힘 (커튼 모션 후 이동)
   const handleStartClick = () => {
     setClosing(true);
-    setTimeout(() => navigate("/select"), 850);
+    // 닫히는 모션 후 페이지 이동
+    setTimeout(() => navigate("/select"), 1000);
   };
 
   // 🔸 스냅 스크롤 제어
@@ -46,7 +47,7 @@ export default function ScrollPage() {
       isScrolling = true;
       setTimeout(() => {
         isScrolling = false;
-      }, 400); // ← 스크롤 속도 조절 (느리게 하려면 ↑ 값 증가)
+      }, 400); // ← 스크롤 속도 조절
     };
 
     container.addEventListener("wheel", handleWheel, { passive: false });
