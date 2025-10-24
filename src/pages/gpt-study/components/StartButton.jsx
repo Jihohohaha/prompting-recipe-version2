@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { useState, useEffect } from "react";
 
 const StartButton = () => {
+  const navigate = useNavigate();
   const [isHovered, setIsHovered] = useState(false);
 
   useEffect(() => {
@@ -16,7 +17,8 @@ const StartButton = () => {
 
   return (
     <motion.div
-      className="fixed top-1/2 right-16 transform -translate-y-1/2 z-[9999] flex items-center select-none"
+      className="fixed top-1/2 right-16 transform -translate-y-1/2 z-[9999] flex items-center select-none cursor-pointer"
+      onClick={() => navigate("/tutorial")} // ✅ 클릭 시 이동
       animate={{ filter: isHovered ? "brightness(1.3)" : "brightness(1)" }}
       transition={{ duration: 0.2 }}
     >
