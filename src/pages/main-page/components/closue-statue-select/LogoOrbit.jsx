@@ -88,7 +88,7 @@ const LogoOrbit = React.memo(function LogoOrbit({
         }}
       >
         {/* (옵션) 가이드 타원 */}
-        {showGuide && (
+        {/* {showGuide && (
           <svg
             width={a * 2}
             height={b * 2}
@@ -98,7 +98,7 @@ const LogoOrbit = React.memo(function LogoOrbit({
             <ellipse cx="0" cy="0" rx={a} ry={b} fill="none" stroke="red" strokeDasharray="6 6" />
             <line x1="0" y1={b} x2="0" y2={-b} stroke="red" strokeDasharray="4 4" />
           </svg>
-        )}
+        )} */}
 
         {/* 로고 + 6시 윈도우 제목(같은 트랜스폼/타이밍) */}
         {logos.map(({ i, dish, x, y, logoOpacity, titleOpacity }) => {

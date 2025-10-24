@@ -523,7 +523,7 @@ const ClosueStatueSelect = () => {
                   {detailDish?.description}
                 </p>
               </div>
-              <div className="relative flex flex-col items-center justify-center h-full w-[300px] rounded-r-[24px] bg-black bg-opacity-[70%]">
+              <div className="relative flex flex-col items-center justify-center h-full w-[260px] rounded-r-[24px] bg-black bg-opacity-[70%]">
                 <div className="text-[40px] font-koolegant mb-2">
                   Ingredient
                 </div>
@@ -546,7 +546,7 @@ const ClosueStatueSelect = () => {
               transition: `transform ${isTilt ? 1600 : 700}ms ${
                 isTilt
                   ? "cubic-bezier(0.2, 1, 0.5, 1)"
-                  : "cubic-bezier(0.3, 1, 0.5, 1)"
+                  : "cubic-bezier(0.3, 1, 0.8, 1)"
               }`,
             }}
           >
