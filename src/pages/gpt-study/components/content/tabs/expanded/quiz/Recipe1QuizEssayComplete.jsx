@@ -92,7 +92,7 @@ export default function MissionComplete() {
           marginTop: "20px",
         }}
       >
-        <h1 className="text-[64px] font-cafe24 text-[#FF702A] font-bold drop-shadow-[0_0_15px_rgba(255,112,42,0.6)] mb-6">
+        <h1 className="z-[9999] text-[64px] font-cafe24 text-[#FF702A] font-bold drop-shadow-[0_0_15px_rgba(255,112,42,0.6)] mb-6">
           Mission Complete
         </h1>
 

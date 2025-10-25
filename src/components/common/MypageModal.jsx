@@ -26,8 +26,8 @@ const MypageModal = ({ open, onClose, progressList }) => {
   const id = 'mypage-modal';
 
   const defaults = [
-    { label: 'FEW SHOT', percent: 100 },
     { label: 'ROLE PROMPTING', percent: 65 },
+    { label: 'FEW SHOT', percent: 100 },
     { label: 'HALLUCINATION', percent: 100 },
     { label: 'MARKDOWN', percent: 100 },
     { label: 'RAG', percent: 100 },

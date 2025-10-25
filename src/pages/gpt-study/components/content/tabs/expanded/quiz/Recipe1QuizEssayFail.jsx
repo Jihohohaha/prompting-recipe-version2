@@ -138,7 +138,7 @@ export default function MissionFailed() {
               fontFamily: "Pretendard, sans-serif",
               fontSize: "18px",
               fontWeight: 600,
-              padding: "14px 34px",
+              padding: "16px 40px",
               border: "none",
               borderRadius: "40px",
               cursor: "pointer",
@@ -175,21 +175,22 @@ export default function MissionFailed() {
         {/* 오른쪽 버튼 */}
         <button
           onClick={() => navigate("/test2")}
-          style={{
-            backgroundColor: "#FF702A",
-            color: "white",
-            fontFamily: "Pretendard, sans-serif",
-            fontSize: "18px",
-            fontWeight: 600,
-            padding: "16px 40px",
-            border: "none",
-            borderRadius: "40px",
-            cursor: "pointer",
-            transition: "background-color 0.3s, transform 0.3s",
-            boxShadow: "0 0 20px rgba(255, 112, 42, 0.3)",
-            alignSelf: "flex-end",
-            marginBottom: "30px",
-          }}
+            style={{
+              position: "absolute",
+              top: "-13px",
+              marginTop: "20px",
+              backgroundColor: "#FF702A",
+              color: "white",
+              fontFamily: "Pretendard, sans-serif",
+              fontSize: "18px",
+              fontWeight: 600,
+              padding: "16px 40px",
+              border: "none",
+              borderRadius: "40px",
+              cursor: "pointer",
+              transition: "background-color 0.3s, transform 0.3s",
+              boxShadow: "0 0 20px rgba(255, 112, 42, 0.3)",
+            }}
           onMouseOver={(e) => {
             e.currentTarget.style.backgroundColor = "#E9631F";
             e.currentTarget.style.transform = "scale(1.05)";

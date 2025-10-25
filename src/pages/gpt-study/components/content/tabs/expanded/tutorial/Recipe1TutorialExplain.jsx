@@ -4,12 +4,72 @@ import { useNavigate, useParams } from "react-router-dom";
 import { motion } from "framer-motion";
 import "./BookFlip.css";
 import Chatbot from "./chatbot";
+const Highlight = ({ children }) => {
+  return (
+    <motion.span
+      className="relative font-bold font-pretendardtext-2xl px-2 py-1 inline-block"
+      initial={{ backgroundSize: "0% 100%" }}
+      whileInView={{ backgroundSize: "100% 100%" }}
+      viewport={{ once: true }}
+      transition={{ duration: 1.3, ease: "easeInOut" }}
+      style={{
+        backgroundImage:
+          "linear-gradient(90deg, rgba(255, 145, 0, 0.6) 0%, rgba(255, 145, 0, 1) 50%, rgba(255, 140, 0, 0.7) 100%)",
+        backgroundRepeat: "no-repeat",
+        backgroundPosition: "left center",
+        backgroundSize: "0% 100%",
+        filter: "blur(0.6px) brightness(1.1)",
+        // 🎨 아래 3줄이 '삐뚤한' 효과 핵심입니다.
+        transform: "rotate(-1.5deg) skewX(-3deg)",
+        borderRadius: "6px",
+        clipPath: "polygon(0% 10%, 100% 0%, 100% 90%, 0% 100%)", // 위아래가 약간 비틀림
+      }}
+    >
+      {children}
+    </motion.span>
+  );
+};
+
+const HighlightBox = ({ children, rotate = true }) => {
+  // 랜덤하게 살짝 기울이기 (자연스러움)
+  const randomTilt = rotate ? (Math.random() * 2 - 1.2).toFixed(1) : 0;
+
+  return (
+    <motion.div
+      className="relative inline-block group"
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.8, ease: "easeOut" }}
+    >
+      {/* 형광펜 질감 배경 */}
+      <div
+        className="absolute inset-0 rounded-2xl bg-gradient-to-r from-[#FFD60A]/80 to-[#FFC300]/90 blur-[3px]"
+        style={{
+          transform: `rotate(${randomTilt}deg)`,
+          clipPath: "polygon(0% 10%, 100% 0%, 100% 90%, 0% 100%)",
+        }}
+      ></div>
+
+      {/* 실제 카드 */}
+      <div
+        className="relative px-12 py-8 bg-white rounded-2xl border-[4px] border-[#FFC300]
+                   shadow-[0_6px_20px_rgba(0,0,0,0.1)] transition-transform duration-300
+                   hover:rotate-[1deg] hover:scale-[1.02]"
+      >
+        <p className="text-black font-pretendard text-5xl font-medium leading-snug text-center">
+          {children}
+        </p>
+      </div>
+    </motion.div>
+  );
+};
 
 const Recipe1TutorialExplain = () => {
   const [leftPageIndex, setLeftPageIndex] = useState(0); // 왼쪽 페이지 인덱스
   const [rightPageIndex, setRightPageIndex] = useState(1); // 오른쪽 페이지 인덱스
   const [isFlipping, setIsFlipping] = useState(false);
-  const [flipDirection, setFlipDirection] = useState('next'); // 'next' or 'prev'
+  const [flipDirection, setFlipDirection] = useState("next"); // 'next' or 'prev'
   const [isPage3Completed, setIsPage3Completed] = useState(false); // Page3 완료 상태
   const navigate = useNavigate();
   const { slug } = useParams();
@@ -28,31 +88,31 @@ const Recipe1TutorialExplain = () => {
 
   // 전체 페이지 배열 (단일 배열)
   const pages = [
-    <CoverPage />,           // 0
-    <Page2 />,               // 1
-    <Page3 onComplete={handlePage3Complete} />,               // 2
-    <Page4 isPage3Completed={isPage3Completed} />,               // 3
-    <Page5 />,               // 4
-    <Page6 />,               // 5
-    <Page7 />,               // 6
-    <Page8 />,               // 7
-    <Page9 />,               // 8
+    <CoverPage />, // 0
+    <Page2 />, // 1
+    <Page3 onComplete={handlePage3Complete} />, // 2
+    <Page4 isPage3Completed={isPage3Completed} />, // 3
+    <Page5 />, // 4
+    <Page6 />, // 5
+    <Page7 />, // 6
+    <Page8 />, // 7
+    <Page9 />, // 8
     <FinalPage navigate={navigate} slug={slug} />, // 9
   ];
 
   const handleNextPage = () => {
     // 더 이상 넘길 페이지가 없으면 리턴
     if (isFlipping || rightPageIndex >= pages.length - 1) return;
-    
-    setFlipDirection('next');
+
+    setFlipDirection("next");
     setIsFlipping(true);
-    
+
     // ✅ 회전 완료 후 state 업데이트
     setTimeout(() => {
-      setLeftPageIndex(prev => prev + 2);
-      setRightPageIndex(prev => prev + 2);
+      setLeftPageIndex((prev) => prev + 2);
+      setRightPageIndex((prev) => prev + 2);
     }, 800);
-    
+
     // ✅ 새 페이지 렌더링 후 클래스 제거 (약간 지연)
     setTimeout(() => {
       setIsFlipping(false);
@@ -62,16 +122,16 @@ const Recipe1TutorialExplain = () => {
   const handlePrevPage = () => {
     // 더 이상 이전 페이지가 없으면 리턴
     if (isFlipping || leftPageIndex <= 0) return;
-    
-    setFlipDirection('prev');
+
+    setFlipDirection("prev");
     setIsFlipping(true);
-    
+
     // ✅ 회전 완료 후 state 업데이트
     setTimeout(() => {
-      setLeftPageIndex(prev => prev - 2);
-      setRightPageIndex(prev => prev - 2);
+      setLeftPageIndex((prev) => prev - 2);
+      setRightPageIndex((prev) => prev - 2);
     }, 800);
-    
+
     // ✅ 새 페이지 렌더링 후 클래스 제거 (약간 지연)
     setTimeout(() => {
       setIsFlipping(false);
@@ -91,24 +151,37 @@ const Recipe1TutorialExplain = () => {
         {/* 책 컨테이너 - 이미지 정가운데에 배치 */}
         <div className="absolute inset-0 flex items-center justify-center">
           <Chatbot />
-          <div className="book-wrapper" style={{ width: "1100px", height: "450px" }}>
+          <div
+            className="book-wrapper"
+            style={{ width: "1100px", height: "450px" }}
+          >
             <div className="book-container">
               {/* 왼쪽 페이지 컨테이너 */}
               <div className="page-left-container relative">
                 {/* 왼쪽 페이지 - 앞면 */}
-                <div className={`page-left-front ${isFlipping && flipDirection === 'prev' ? 'flipping-left' : ''}`}>
-                  <div className={`page-wrapper ${isFlipping && flipDirection === 'prev' ? 'fading-out' : ''}`}>
-                    <div className="page-content">
-                      {pages[leftPageIndex]}
-                    </div>
+                <div
+                  className={`page-left-front ${
+                    isFlipping && flipDirection === "prev"
+                      ? "flipping-left"
+                      : ""
+                  }`}
+                >
+                  <div
+                    className={`page-wrapper ${
+                      isFlipping && flipDirection === "prev" ? "fading-out" : ""
+                    }`}
+                  >
+                    <div className="page-content">{pages[leftPageIndex]}</div>
                   </div>
                 </div>
 
                 {/* 왼쪽 클릭 영역 - 왼쪽 20%만 */}
-                <div 
+                <div
                   onClick={handlePrevPage}
                   className="absolute left-0 top-1/3 bottom-0 w-[20%] h-[40%] cursor-pointer z-10"
-                  style={{ pointerEvents: leftPageIndex <= 0 ? 'none' : 'auto' }}
+                  style={{
+                    pointerEvents: leftPageIndex <= 0 ? "none" : "auto",
+                  }}
                 />
               </div>
 
@@ -118,26 +191,36 @@ const Recipe1TutorialExplain = () => {
               {/* 오른쪽 페이지 컨테이너 */}
               <div className="page-right-container relative">
                 {/* 오른쪽 페이지 - 앞면 */}
-                <div className={`page-right-front ${isFlipping && flipDirection === 'next' ? 'flipping-right' : ''}`}>
-                  <div className={`page-wrapper ${isFlipping && flipDirection === 'next' ? 'fading-out' : ''}`}>
-                    <div className="page-content">
-                      {pages[rightPageIndex]}
-                    </div>
+                <div
+                  className={`page-right-front ${
+                    isFlipping && flipDirection === "next"
+                      ? "flipping-right"
+                      : ""
+                  }`}
+                >
+                  <div
+                    className={`page-wrapper ${
+                      isFlipping && flipDirection === "next" ? "fading-out" : ""
+                    }`}
+                  >
+                    <div className="page-content">{pages[rightPageIndex]}</div>
                   </div>
                 </div>
 
                 {/* 오른쪽 클릭 영역 - 오른쪽 20%만 */}
-                <div 
+                <div
                   onClick={handleNextPage}
                   className="absolute right-0 top-1/3 bottom-0 w-[20%] h-[40%] cursor-pointer z-10"
-                  style={{ pointerEvents: rightPageIndex >= pages.length - 1 ? 'none' : 'auto' }}
+                  style={{
+                    pointerEvents:
+                      rightPageIndex >= pages.length - 1 ? "none" : "auto",
+                  }}
                 />
               </div>
             </div>
           </div>
         </div>
       </div>
-
     </div>
   );
 };
@@ -221,7 +304,12 @@ const CoverPage = () => {
 // Page 2
 const Page2 = () => {
   return (
-    <div className="w-full flex items-center justify-center">
+    <motion.div
+      className="w-full flex items-center justify-center"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 1.5 }}
+    >
       <div className="text-center font-pretendard text-lg pt-24 font-medium leading-none text-black">
         <p className="mb-10">
           영화 배우는{" "}
@@ -232,25 +320,24 @@ const Page2 = () => {
         </p>
         <p className="mb-10">같은 배우라도 어떤 작품에서는 냉철한 형사로, </p>
         <p className="mb-10">다른 작품에서는 따뜻한 아버지로 보이죠.</p>
-        <p className="mb-10">
-          이처럼 역할이 달라지면 말투와 행동, 표현 방식도 함께 달라집니다.
-        </p>
+        <p className="mb-10">이처럼 역할에 따라 말투와 행동, 표현 방식도</p>
+        <p>함께 달라집니다.</p>
       </div>
-    </div>
+    </motion.div>
   );
 };
 
 // Page 3
 const Page3 = ({ onComplete }) => {
-  const [chatState, setChatState] = useState('initial'); // 'initial', 'loading', 'answered'
+  const [chatState, setChatState] = useState("initial"); // 'initial', 'loading', 'answered'
 
   const handleSendMessage = () => {
     // 1. 로딩 상태로 전환
-    setChatState('loading');
-    
+    setChatState("loading");
+
     // 2. 1.5초 후 답변 표시
     setTimeout(() => {
-      setChatState('answered');
+      setChatState("answered");
       // 3. Page3 완료 알림
       if (onComplete) {
         onComplete();
@@ -261,17 +348,20 @@ const Page3 = ({ onComplete }) => {
   return (
     <div className="w-full h-full flex flex-col items-center justify-center px-12 bg-transparent relative">
       {/* 초기 상태 */}
-      {chatState === 'initial' && (
+      {chatState === "initial" && (
         <div className="flex flex-col items-center justify-center">
           {/* ThinkingStatue 이미지 */}
-          <img
+          <motion.img
             src="/images/gpt-study/ThinkingStatue.png"
             alt="Thinking Statue"
             className="w-[260px] h-[260px] object-contain"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 1.5 }}
           />
 
           {/* 설명 텍스트 */}
-          <div className="text-black text-lg font-pretendard text-center leading-tight mt-4">
+          <div className="text-black text-lg font-pretendard font-semibold text-center leading-tight mt-4">
             직접 예시를 함께 봐볼까요?
             <br />
             먼저 아무 역할도 주지 않고 이렇게 시켜보세요.
@@ -280,13 +370,13 @@ const Page3 = ({ onComplete }) => {
       )}
 
       {/* 답변 후 평가 텍스트 - absolute 고정 */}
-      {chatState === 'answered' && (
-        <div 
+      {chatState === "answered" && (
+        <div
           className="absolute w-full text-black text-lg font-pretendard text-center leading-tight"
           style={{
-            top: '50px',
-            left: '50%',
-            transform: 'translateX(-50%)'
+            top: "50px",
+            left: "50%",
+            transform: "translateX(-50%)",
           }}
         >
           흠… 계산은 잘 되어 있지만,
@@ -298,14 +388,14 @@ const Page3 = ({ onComplete }) => {
       )}
 
       {/* 채팅 말풍선 영역 - absolute 고정 */}
-      {(chatState === 'loading' || chatState === 'answered') && (
-        <div 
+      {(chatState === "loading" || chatState === "answered") && (
+        <div
           className="absolute w-full space-y-3"
           style={{
-            top: '70%',
-            left: '50%',
-            transform: 'translate(-50%, -50%)',
-            maxWidth: '500px'
+            top: "70%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            maxWidth: "500px",
           }}
         >
           {/* 사용자 메시지 - 우측 흰색 말풍선 */}
@@ -319,21 +409,34 @@ const Page3 = ({ onComplete }) => {
 
           {/* GPT 응답 - 좌측 주황색 말풍선 */}
           <div className="flex justify-start">
-            {chatState === 'loading' ? (
+            {chatState === "loading" ? (
               // 로딩 애니메이션
               <div className="bg-[#FF9E4A] text-black rounded-3xl px-12 py-4 shadow-md">
                 <div className="flex gap-1">
-                  <span className="animate-bounce" style={{ animationDelay: '0ms' }}>.</span>
-                  <span className="animate-bounce" style={{ animationDelay: '150ms' }}>.</span>
-                  <span className="animate-bounce" style={{ animationDelay: '300ms' }}>.</span>
+                  <span
+                    className="animate-bounce"
+                    style={{ animationDelay: "0ms" }}
+                  >
+                    .
+                  </span>
+                  <span
+                    className="animate-bounce"
+                    style={{ animationDelay: "150ms" }}
+                  >
+                    .
+                  </span>
+                  <span
+                    className="animate-bounce"
+                    style={{ animationDelay: "300ms" }}
+                  >
+                    .
+                  </span>
                 </div>
               </div>
             ) : (
               // 답변
               <div className="bg-[#FF9E4A] text-black rounded-3xl px-12 py-4 max-w-[70%] shadow-md">
-                <p className="font-pretendard text-sm">
-                  답: 12
-                </p>
+                <p className="font-pretendard text-sm">답: 12</p>
               </div>
             )}
           </div>
@@ -341,12 +444,12 @@ const Page3 = ({ onComplete }) => {
       )}
 
       {/* 챗봇 Input 스타일 박스 - absolute로 하단 고정 */}
-      <div 
+      <div
         className="absolute w-[500px] bg-white rounded-full border-1 border-black py-1 flex items-center justify-center shadow-md"
         style={{
-          bottom: '-50px',
-          left: '50%',
-          transform: 'translateX(-50%)'
+          bottom: "-50px",
+          left: "50%",
+          transform: "translateX(-50%)",
         }}
       >
         {/* 텍스트 - 전체 중앙 */}
@@ -365,14 +468,13 @@ const Page3 = ({ onComplete }) => {
           <img
             src="/images/gpt-study/Arrow2.png"
             alt="Send"
-            className="w-8 h-8 object-contain"
+            className="z-[9999] w-8 h-8 object-contain"
           />
         </button>
       </div>
     </div>
   );
 };
-
 
 // Page 4
 const Page4 = ({ isPage3Completed }) => {
@@ -395,13 +497,13 @@ const Page4 = ({ isPage3Completed }) => {
 
   const handleSendMessage = () => {
     setShowUserMessage(true);
-    
+
     setTimeout(() => {
       setStep(0);
       setShowUserMessage(false);
       setShowResponse(true);
       setIsLoading(true);
-      
+
       setTimeout(() => {
         setIsLoading(false);
         setTimeout(() => {
@@ -419,21 +521,26 @@ const Page4 = ({ isPage3Completed }) => {
   };
 
   return (
-    <div className="w-full h-full flex flex-col items-center justify-center px-12 bg-transparent relative">
+    <motion.div
+      className="w-full h-full flex flex-col items-center justify-center px-12 bg-transparent relative"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 1.5 }}
+    >
       {/* ===== Step 1: 초기 화면 ===== */}
       {step === 1 && (
         <>
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ duration: 1, delay: 2 }}
+            transition={{ duration: 1.5, delay: 2 }}
             className="absolute"
             style={{
-              top: '35px',
-              left: '50%',
-              transform: 'translateX(-50%)',
-              width: '100%',
-              textAlign: 'center'
+              top: "35px",
+              left: "50%",
+              transform: "translateX(-50%)",
+              width: "100%",
+              textAlign: "center",
             }}
           >
             <div className="relative inline-block">
@@ -441,20 +548,20 @@ const Page4 = ({ isPage3Completed }) => {
                 그렇다면 Role Prompting은 어떻게 다를까요?
               </div>
               <div className="relative w-full flex justify-center mt-2">
-                <div 
+                <div
                   className="h-[3px] bg-[#FE7525]"
-                  style={{ width: '400px' }}
+                  style={{ width: "400px" }}
                 />
                 <img
                   src="/images/gpt-study/role/Star2.png"
                   alt="Star"
                   className="absolute"
                   style={{
-                    left: '-10px',
-                    top: '-90px',
-                    width: '45px',
-                    height: '40px',
-                    transform: 'scaleX(-1)'
+                    left: "-10px",
+                    top: "-90px",
+                    width: "45px",
+                    height: "40px",
+                    transform: "scaleX(-1)",
                   }}
                 />
               </div>
@@ -464,13 +571,13 @@ const Page4 = ({ isPage3Completed }) => {
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ duration: 0.8, delay: 3.2 }}
+            transition={{ duration: 1, delay: 3.2 }}
             className="absolute text-black text-lg font-pretendard text-center leading-tight whitespace-nowrap"
             style={{
-              top: '100px',
-              left: '50%',
-              transform: 'translateX(-50%)',
-              width: '100%'
+              top: "100px",
+              left: "50%",
+              transform: "translateX(-50%)",
+              width: "100%",
             }}
           >
             이번에는 다음과 같이 '선생님'이라는 역할을 부여해보세요!
@@ -479,12 +586,12 @@ const Page4 = ({ isPage3Completed }) => {
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ duration: 0.8, delay: 3.2 }}
+            transition={{ duration: 1, delay: 3.2 }}
             className="absolute w-[500px] bg-white rounded-full border border-black py-1 flex items-center justify-center shadow-md"
             style={{
-              bottom: '-50px',
-              left: '50%',
-              transform: 'translateX(-50%)'
+              bottom: "50px",
+              left: "50%",
+              transform: "translateX(-50%)",
             }}
           >
             <div className="-translate-x-[30px]">
@@ -502,12 +609,12 @@ const Page4 = ({ isPage3Completed }) => {
                 e.stopPropagation();
                 handleSendMessage();
               }}
-              className="absolute right-[100px] flex-shrink-0 hover:opacity-80 transition-opacity bg-transparent border-none p-0 cursor-pointer z-10"
+              className="z-[9999] absolute right-[100px] flex-shrink-0 hover:opacity-80 transition-opacity bg-transparent border-none p-0 cursor-pointer "
             >
               <img
                 src="/images/gpt-study/Arrow2.png"
                 alt="Send"
-                className="w-8 h-8 object-contain"
+                className="w-8 h-8 object-contain z-[9999]"
               />
             </button>
           </motion.div>
@@ -522,8 +629,8 @@ const Page4 = ({ isPage3Completed }) => {
           transition={{ duration: 0.3 }}
           className="absolute"
           style={{
-            top: '150px',
-            right: '30px'
+            top: "150px",
+            right: "30px",
           }}
         >
           <div className="bg-white text-black rounded-3xl px-6 py-3 max-w-[300px] shadow-md">
@@ -548,10 +655,10 @@ const Page4 = ({ isPage3Completed }) => {
             transition={{ duration: 0.5 }}
             className="absolute"
             style={{
-              bottom: '-74%',
-              left: '-8%',
-              width: '550px',
-              height: '500px',
+              bottom: "-74%",
+              left: "-8%",
+              width: "550px",
+              height: "500px",
             }}
           >
             <img
@@ -569,16 +676,31 @@ const Page4 = ({ isPage3Completed }) => {
               transition={{ duration: 0.5, delay: 0.3 }}
               className="absolute"
               style={{
-                top: '-5px',
-                left: '50px'
+                top: "-5px",
+                left: "50px",
               }}
             >
               <div className="bg-[#FF9E4A] text-black border border-black rounded-2xl px-6 py-2 w-[400px] shadow-md">
                 {isLoading ? (
                   <div className="flex gap-1">
-                    <span className="animate-bounce" style={{ animationDelay: '0ms' }}>.</span>
-                    <span className="animate-bounce" style={{ animationDelay: '150ms' }}>.</span>
-                    <span className="animate-bounce" style={{ animationDelay: '300ms' }}>.</span>
+                    <span
+                      className="animate-bounce"
+                      style={{ animationDelay: "0ms" }}
+                    >
+                      .
+                    </span>
+                    <span
+                      className="animate-bounce"
+                      style={{ animationDelay: "150ms" }}
+                    >
+                      .
+                    </span>
+                    <span
+                      className="animate-bounce"
+                      style={{ animationDelay: "300ms" }}
+                    >
+                      .
+                    </span>
                   </div>
                 ) : (
                   <p className="font-pretendard text-center text-lg font-medium leading-relaxed">
@@ -598,11 +720,11 @@ const Page4 = ({ isPage3Completed }) => {
             <motion.div
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5 }}
+              transition={{ duration: 1.5 }}
               className="absolute"
               style={{
-                top: '20px',
-                left: '22px'
+                top: "20px",
+                left: "22px",
               }}
             >
               <div className="bg-transparent text-black w-[500px] text-lg">
@@ -612,12 +734,12 @@ const Page4 = ({ isPage3Completed }) => {
                   같은 문제지만, 이번에는{" "}
                   <span className="bg-[#FE7525] px-2 py-1 font-extrabold text-xl text-white">
                     교사의 말투
-                  </span>
-                  {" "}와{" "}
+                  </span>{" "}
+                  와{" "}
                   <span className="bg-[#FE7525] px-2 py-1 font-extrabold text-xl text-white">
                     관점
-                  </span>
-                  {" "}으로 바뀌었죠.
+                  </span>{" "}
+                  으로 바뀌었죠.
                   <br />
                   이게 바로 Role Prompting의 힘이에요.
                 </p>
@@ -635,8 +757,8 @@ const Page4 = ({ isPage3Completed }) => {
           transition={{ duration: 0.5 }}
           className="absolute"
           style={{
-            top: '70px',
-            right: '50px'
+            top: "70px",
+            right: "50px",
           }}
         >
           <div className="text-black text-lg font-bold font-pretendard mb-2">
@@ -651,42 +773,37 @@ const Page4 = ({ isPage3Completed }) => {
           />
         </motion.div>
       )}
-    </div>
+    </motion.div>
   );
 };
 
 // Page 5
 const Page5 = () => {
   return (
-    <div className="bg-transparent text-black w-[500px] text-2xl"
-    style={{
-      transform: 'translateX(-20px)'
-    }}>
+    <motion.div
+      className="bg-transparent text-black w-[500px] text-2xl"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 2.0 }}
+      style={{
+        transform: "translateX(-20px)",
+      }}
+    >
       <p className="font-pretendard text-center leading-11 pt-24 gap-12">
         <span className="bg-[#FE7525] px-2 py-0 font-extrabold text-3xl text-white">
           Role Prompting
-        </span>
-        {" "}이 좋은 이유는
+        </span>{" "}
+        이 좋은 이유는
         <br />
         모델이 단순히 문맥에 맞게 대답하는 데서
-        <br/>
-        그치지 않고{" "}
-        <span className="bg-[#FE7525] px-2 py-0 font-extrabold text-3xl text-white">
-          정확하면서도
-        </span>
         <br />
-        <span className="bg-[#FE7525] px-2 py-0 font-extrabold text-3xl text-white">
-          맥락에 맞는 사고
-        </span>
-        {" "}와
+        그치지 않고 <Highlight>정확하면서도</Highlight>
         <br />
-        <span className="bg-[#FE7525] px-2 py-0 font-extrabold text-3xl text-white">
-          표현을 유도
-        </span>
-
-        {" "}하기 때문이에요.
+        <Highlight>맥락에 맞는 사고</Highlight> 와
+        <br />
+        <Highlight>표현을 유도</Highlight> 하기 때문이에요.
       </p>
-    </div>
+    </motion.div>
   );
 };
 
@@ -700,41 +817,44 @@ const Page6 = () => {
         alt="Star 1"
         className="absolute"
         style={{
-          left: '50px',
-          top: '30px',
-          width: '45px',
-          height: '65px',
+          left: "50px",
+          top: "30px",
+          width: "45px",
+          height: "65px",
         }}
         animate={{ rotateY: [0, -360] }}
         transition={{
-          duration: 1,
+          duration: 1.5,
           repeat: Infinity,
           ease: "linear",
         }}
       />
 
       {/* 텍스트 영역 */}
-      <div className="flex flex-col items-center justify-center gap-12">
+      <motion.div
+        className="flex flex-col items-center justify-center gap-12"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 1.5 }}
+      >
         {/* 첫 번째 줄 - relative container */}
         <div className="relative flex items-center justify-center">
           <div className="text-black text-3xl font-pretendard text-center relative z-10">
             그래서{" "}
-            <span className="text-4xl font-extrabold">
-              정답률이 높고,
-            </span>
+            <span className="text-4xl font-extrabold">정답률이 높고,</span>
           </div>
           {/* 첫 번째 밑줄 - absolute로 텍스트와 겹침 */}
           <img
             src="/images/gpt-study/role/orange_line.png"
             alt="Underline 1"
             className="absolute"
-            style={{ 
-              width: "800px", 
+            style={{
+              width: "800px",
               height: "auto",
-              top: '50%',
-              left: '50%',
-              transform: 'translate(-50%, -20%)',
-              objectFit: 'fill'
+              top: "50%",
+              left: "50%",
+              transform: "translate(-50%, -20%)",
+              objectFit: "fill",
             }}
           />
         </div>
@@ -742,26 +862,24 @@ const Page6 = () => {
         {/* 두 번째 줄 - relative container */}
         <div className="relative flex items-center justify-center">
           <div className="text-black text-3xl font-pretendard text-center relative z-10">
-            <span className="text-4xl font-extrabold">
-              결과의 일관성
-            </span>
-            이 유지돼요.
+            <span className="text-4xl font-extrabold">결과의 일관성</span>이
+            유지돼요.
           </div>
           {/* 두 번째 밑줄 - absolute로 텍스트와 겹침 */}
           <img
             src="/images/gpt-study/role/orange_line.png"
             alt="Underline 2"
             className="absolute"
-            style={{ 
-              width: "600px", 
+            style={{
+              width: "600px",
               height: "25px",
-              top: '50%',
-              left: '50%',
-              transform: 'translate(-50%, -20%)'
+              top: "50%",
+              left: "50%",
+              transform: "translate(-50%, -20%)",
             }}
           />
         </div>
-      </div>
+      </motion.div>
 
       {/* Vector 2 - 하단 별 */}
       <motion.img
@@ -769,14 +887,14 @@ const Page6 = () => {
         alt="Star 2"
         className="absolute"
         style={{
-          right: '50px',
-          bottom: '30px',
-          width: '45px',
-          height: '65px',
+          right: "50px",
+          bottom: "30px",
+          width: "45px",
+          height: "65px",
         }}
         animate={{ rotateY: [0, -360] }}
         transition={{
-          duration: 1,
+          duration: 1.5,
           repeat: Infinity,
           ease: "linear",
         }}
@@ -789,25 +907,55 @@ const Page6 = () => {
 const Page7 = () => {
   return (
     <div className="w-[700px] h-full flex flex-col items-center justify-center bg-transparent">
-      <div className="flex flex-col items-center text-center font-pretendard
+      <div
+        className="flex flex-col items-center text-center font-pretendard
        text-xl leading-10 text-black"
-      style={{
-          width: '700px',
-          height: 'auto',
-          left: '10px',
-          transform: 'translateX(-120px)'
+        style={{
+          width: "700px",
+          height: "auto",
+          left: "10px",
+          transform: "translateX(-120px)",
         }}
       >
-        <div className="mb-6">
-          정리하자면! <span className="font-semibold text-2xl">Role Prompting</span> 은
-        </div>
-        <div className="leading-11">
-          <span className="bg-[#FE7525] px-2 py-1 font-semibold text-white text-2xl">모델이 특정 인격이나 역할을 맡아 답변하도록</span><br/>
-          <span className="bg-[#FE7525] px-2 py-1 font-semibold text-white text-2xl">지시하는 방법</span> 이에요. 이 방식을 사용하면 답변의<br/>
-          <span className="bg-[#FE7525] px-2 py-1 font-semibold text-white text-2xl">스타일과 관점을 원하는 방향으로 조정</span> 할 수 있지만,<br/>
-          반대로 <span className="bg-[#FE7525] px-2 py-1 font-semibold text-white text-2xl">역할을 너무 과하게 지정하면</span><br/>
-          <span className="bg-[#FE7525] px-2 py-1 font-semibold text-white text-2xl">어색한 말투로 굳어질 수도</span> 있습니다.
-        </div>
+        <motion.div
+          className="mb-6"
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 1.5 }}
+        >
+          정리하자면!{" "}
+          <span className="font-semibold text-2xl">Role Prompting</span> 은
+        </motion.div>
+        <motion.div
+          className="leading-11"
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 1.5, delay: 0.2 }}
+        >
+          <span className="bg-[#FE7525] px-2 py-1 font-semibold text-white text-2xl">
+            모델이 특정 인격이나 역할을 맡아 답변하도록
+          </span>
+          <br />
+          <span className="bg-[#FE7525] px-2 py-1 font-semibold text-white text-2xl">
+            지시하는 방법
+          </span>{" "}
+          이에요. 이 방식을 사용하면 답변의
+          <br />
+          <span className="bg-[#FE7525] px-2 py-1 font-semibold text-white text-2xl">
+            스타일과 관점을 원하는 방향으로 조정
+          </span>{" "}
+          할 수 있지만,
+          <br />
+          반대로{" "}
+          <span className="bg-[#FE7525] px-2 py-1 font-semibold text-white text-2xl">
+            역할을 너무 과하게 지정하면
+          </span>
+          <br />
+          <span className="bg-[#FE7525] px-2 py-1 font-semibold text-white text-2xl">
+            어색한 말투로 굳어질 수도
+          </span>{" "}
+          있습니다.
+        </motion.div>
       </div>
     </div>
   );
@@ -817,32 +965,53 @@ const Page7 = () => {
 const Page8 = () => {
   return (
     <div className="w-full h-full flex flex-col justify-center px-12 bg-transparent">
-      <div className="w-[700px] text-base font-pretendard text-black mb-6 text-center leading-8"
-      style={{
-        transform: 'translateX(-140px) translateY(100px)'
-      }}>
-        또한{" "}
-        <span className="px-2 py-1 text-[#FE7525] font-semibold text-xl">30년 경력의 베테랑 디자이너</span>
-        처럼 구체적인 역할을 지정하면
-        <br/> 더 {" "}
-        <span className="px-2 py-1 text-[#FE7525] font-semibold text-xl">깊이 있고 퀄리티 높은 답변</span>
-        {" "}을 얻을 수 있어요.
-      </div>
-      {/* 이미지 div: 독립적으로 배치하고 크기 조절 */}
-      <div className="w-[550px] flex justify-center items-center mt-12"
-      style={{
-        transform: 'translateX(-20px) translateY(26px)'}}> {/* 이미지를 중앙에 배치하기 위한 컨테이너 */}
-        <img 
-          src="/images/gpt-study/role/Page8Picture.png" 
-          alt="구체적인 역할 지정 예시 이미지" 
-          className="w-[550px] h-[300px] object-contain rounded-xl" // 👈 변경된 부분
-          style={{ 
-            width: '900px', // 필요에 따라 최대 너비 지정
-            height: '350px', // 필요에 따라 최대 높이 지정
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.5, delay: 0.3 }}
+      >
+        <div
+          className="w-[700px] text-base font-pretendard text-black mb-6 text-center leading-8"
+          style={{
+            transform: "translateX(-140px) translateY(100px)",
           }}
-        />
-      </div>
+        >
+          또한{" "}
+          <span className="px-2 py-1 text-[#FE7525] font-semibold text-xl">
+            30년 경력의 베테랑 디자이너
+          </span>
+          처럼 구체적인 역할을 지정하면
+          <br /> 더{" "}
+          <span className="px-2 py-1 text-[#FE7525] font-semibold text-xl">
+            깊이 있고 퀄리티 높은 답변
+          </span>{" "}
+          을 얻을 수 있어요.
+        </div>
+      </motion.div>
 
+      {/* 이미지 div: 독립적으로 배치하고 크기 조절 */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.5 }}
+      >
+        <div
+          className="w-[550px] flex justify-center items-center mt-12"
+          style={{
+            transform: "translateX(-20px) translateY(26px)",
+          }}
+        >
+          <img
+            src="/images/gpt-study/role/Page8Picture.png"
+            alt="구체적인 역할 지정 예시 이미지"
+            className="w-[550px] h-[300px] object-contain rounded-xl"
+            style={{
+              width: "900px",
+              height: "350px",
+            }}
+          />
+        </div>
+      </motion.div>
     </div>
   );
 };
@@ -857,7 +1026,12 @@ const Page9 = () => {
   };
 
   return (
-    <div className="text-black font-pretendard w-full flex flex-col items-center justify-center pt-32 relative font-semibold">
+    <motion.div
+      className="text-black font-pretendard w-full flex flex-col items-center justify-center pt-32 relative font-semibold"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 1.5 }}
+    >
       {/* SecondLine2 */}
       <img
         src="/images/gpt-study/role/SecondLine2.png"
@@ -868,7 +1042,7 @@ const Page9 = () => {
           top: "200px",
           width: "150px",
           height: "100px",
-          transform: 'rotate(7deg) translateX(35px) translateY(-100px)'
+          transform: "rotate(7deg) translateX(35px) translateY(-100px)",
         }}
       />
 
@@ -923,7 +1097,7 @@ const Page9 = () => {
           퀴즈 풀러 가기
         </button>
       </div>
-    </div>
+    </motion.div>
   );
 };
 
@@ -932,11 +1106,16 @@ const FinalPage = () => {
   const navigate = useNavigate();
 
   const handleGoToRecipe1 = () => {
-    navigate('/gpt-study/recipe1');
+    navigate("/gpt-study/recipe1");
   };
 
   return (
-    <div className="w-full h-full flex flex-col items-center justify-center bg-transparent pt-6">
+    <motion.div
+      className="w-full h-full flex flex-col items-center justify-center bg-transparent pt-6"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 1.5 }}
+    >
       {/* 그림들 영역 */}
       <div className="w-full h-full flex items-center justify-center relative">
         {/* FE7525 원 (작은) */}
@@ -989,21 +1168,21 @@ const FinalPage = () => {
       </div>
 
       {/* 버튼 영역 */}
-      <div className="w-full flex items-center justify-center pt-12 pb-8"
-      style={{
-            transform: "translateY(35px)"
-          }}>
+      <div
+        className="w-full flex items-center justify-center pt-12 pb-8"
+        style={{
+          transform: "translateY(35px)",
+        }}
+      >
         <button
           onClick={handleGoToRecipe1}
           className="bg-[#FE7525] border-2 border-black rounded-full px-8 py-2 text-xl font-medium font-pretendard text-white hover:bg-[#D46100] transition-colors"
-
         >
           다른 레시피 더 알아보기
         </button>
       </div>
-    </div>
+    </motion.div>
   );
 };
-
 
 export default Recipe1TutorialExplain;

@@ -4,6 +4,7 @@ import AppRouter from './AppRouter'
 import HeaderWrapper from './components/common/HeaderWrapper'; // New import
 import './styles/App.css'
 import CustomCursorFork from './components/common/CustomCursorFork';
+import GlobalBgm from "./components/GlobalBgm";
 
 /* // AuthProvider 내부에서 useAuth를 사용하는 컴포넌트
 const AppContent = () => {
@@ -28,10 +29,12 @@ function App() {
   return (
     <Router>
       <CustomCursorFork />
+      {/* 🎵 전역 배경음 - 페이지 이동해도 끊기지 않음 */}
+      <GlobalBgm />
       <HeaderWrapper />
       <AppRouter />
     </Router>
-  )
+  );
 }
 
-export default App
+export default App;
