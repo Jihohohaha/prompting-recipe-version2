@@ -104,7 +104,7 @@ const TabInterface = ({ recipe }) => {
           <div className="h-[2px] bg-white" style={{ width: 'calc(100% - 4rem)' }} />
         </div>
 
-        <div className="text-white font-bold text-8xl font-pretendard whitespace-pre-line text-left mt-16">
+        <div className="text-white font-bold mt-48 text-8xl font-mortend whitespace-pre-line text-left mt-16">
           {recipe.displayTitle}
         </div>
 

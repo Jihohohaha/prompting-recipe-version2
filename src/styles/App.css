@@ -7,6 +7,10 @@
   overflow-x: hidden;
 }
 
+body, html, #root {
+  cursor: url('/images/cursor-fork.png'), auto;
+}
+
 .logo {
   height: 6em;
   padding: 1.5em;

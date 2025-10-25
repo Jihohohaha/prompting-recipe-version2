@@ -84,6 +84,13 @@
   font-style: normal;
   font-display: swap;
 }
+@font-face {
+  font-family: "Pretendard-Light";
+  src: url("/fonts/Pretendard-Light.otf") format("otf");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
 
 @font-face {
   font-family: "Michroma";

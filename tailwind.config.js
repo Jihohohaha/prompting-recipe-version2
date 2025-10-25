@@ -3,6 +3,11 @@ export default {
   content: ["./index.html", "./src/**/*.{js,jsx,ts,tsx}"],
   theme: {
     extend: {
+      lineHeight: {
+        '11': '2.75rem',     // leading-11 (11 * 0.25rem = 2.75rem, 약 44px)
+        '12': '4rem',        // leading-12 (12 * 0.25rem = 3rem, 48px)
+        'huge': '5rem',      // leading-huge (사용자 정의 이름 및 값)
+      },
       fontFamily: {
         sans: ['"Pretendard"', 'ui-sans-serif', 'system-ui', '-apple-system', 'Segoe UI', 'Noto Sans KR', 'Roboto', 'Helvetica Neue', 'Arial'],
         stretch: ['"StretchPro"', "sans-serif"],
@@ -17,6 +22,7 @@ export default {
         mortend: ["Mortend", "sans-serif"],
         cafe24: ['"Cafe24ClassicType"', "sans-serif"],
         neunrimbo: ['"Neunrimbo Gothic"', 'sans-serif'],
+        pretendardLight: ['"Pretendard-Light"', "sans-serif"],
       },
       zIndex: {
         60: '60',

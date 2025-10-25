@@ -315,9 +315,8 @@ const Page2 = () => {
         </p>
         <p className="mb-10">같은 배우라도 어떤 작품에서는 냉철한 형사로, </p>
         <p className="mb-10">다른 작품에서는 따뜻한 아버지로 보이죠.</p>
-        <p className="mb-10">
-          이처럼 역할에 따라 말투와 행동, 표현 방식도 함께 달라집니다.
-        </p>
+        <p className="mb-10">이처럼 역할에 따라 말투와 행동, 표현 방식도</p>
+        <p>함께 달라집니다.</p>
       </div>
     </div>
   );
@@ -461,7 +460,7 @@ const Page3 = ({ onComplete }) => {
           <img
             src="/images/gpt-study/Arrow2.png"
             alt="Send"
-            className="z-9999 w-8 h-8 object-contain"
+            className="z-[9999] w-8 h-8 object-contain"
           />
         </button>
       </div>
@@ -577,7 +576,7 @@ const Page4 = ({ isPage3Completed }) => {
             transition={{ duration: 0.8, delay: 3.2 }}
             className="absolute w-[500px] bg-white rounded-full border border-black py-1 flex items-center justify-center shadow-md"
             style={{
-              bottom: "-50px",
+              bottom: "50px",
               left: "50%",
               transform: "translateX(-50%)",
             }}
@@ -597,12 +596,12 @@ const Page4 = ({ isPage3Completed }) => {
                 e.stopPropagation();
                 handleSendMessage();
               }}
-              className="absolute right-[100px] flex-shrink-0 hover:opacity-80 transition-opacity bg-transparent border-none p-0 cursor-pointer z-10"
+              className="z-[9999] absolute right-[100px] flex-shrink-0 hover:opacity-80 transition-opacity bg-transparent border-none p-0 cursor-pointer "
             >
               <img
                 src="/images/gpt-study/Arrow2.png"
                 alt="Send"
-                className="w-8 h-8 object-contain"
+                className="w-8 h-8 object-contain z-[9999]"
               />
             </button>
           </motion.div>
@@ -898,27 +897,27 @@ const Page7 = () => {
           정리하자면!{" "}
           <span className="font-semibold text-2xl">Role Prompting</span> 은
         </div>
-        <div>
-          <span className="bg-white px-2 py-1 font-semibold text-2xl">
+        <div className="leading-11">
+          <span className="bg-[#FE7525] px-2 py-1 font-semibold text-white text-2xl">
             모델이 특정 인격이나 역할을 맡아 답변하도록
           </span>
           <br />
-          <span className="bg-white px-2 py-1 font-semibold text-2xl">
+          <span className="bg-[#FE7525] px-2 py-1 font-semibold text-white text-2xl">
             지시하는 방법
           </span>{" "}
           이에요. 이 방식을 사용하면 답변의
           <br />
-          <span className="bg-white px-2 py-1 font-semibold text-2xl">
+          <span className="bg-[#FE7525] px-2 py-1 font-semibold text-white text-2xl">
             스타일과 관점을 원하는 방향으로 조정
           </span>{" "}
           할 수 있지만,
           <br />
           반대로{" "}
-          <span className="bg-white px-2 py-1 font-semibold text-2xl">
+          <span className="bg-[#FE7525] px-2 py-1 font-semibold text-white text-2xl">
             역할을 너무 과하게 지정하면
           </span>
           <br />
-          <span className="bg-white px-2 py-1 font-semibold text-2xl">
+          <span className="bg-[#FE7525] px-2 py-1 font-semibold text-white text-2xl">
             어색한 말투로 굳어질 수도
           </span>{" "}
           있습니다.
@@ -933,9 +932,9 @@ const Page8 = () => {
   return (
     <div className="w-full h-full flex flex-col justify-center px-12 bg-transparent">
       <div
-        className="w-[700px] text-base font-pretendard text-black mb-6 text-center leading-10"
+        className="w-[700px] text-base font-pretendard text-black mb-6 text-center leading-8"
         style={{
-          transform: "translateX(-140px) translateY(60px)",
+          transform: "translateX(-140px) translateY(100px)",
         }}
       >
         또한{" "}
@@ -953,7 +952,7 @@ const Page8 = () => {
       <div
         className="w-[550px] flex justify-center items-center mt-12"
         style={{
-          transform: "translateX(-20px) translateY(18px)",
+          transform: "translateX(-20px) translateY(26px)",
         }}
       >
         {" "}
