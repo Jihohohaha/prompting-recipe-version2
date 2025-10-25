@@ -133,7 +133,7 @@ const Section = ({ recipe, index, scrollerRef }) => {
 
       {/* Quiz */}
       <div ref={quizRef} className="bg-black" style={{ height: 0, overflow: "hidden" }}>
-        <div className="py-8">{recipe.id === 1 && <Recipe1QuizContainer />}</div>
+        <div className="py-8">{recipe.id === 1 && <Recipe1QuizContainer scrollerRef={scrollerRef} recipeId={recipe.id} />}</div>
       </div>
 
       {/* Chat */}

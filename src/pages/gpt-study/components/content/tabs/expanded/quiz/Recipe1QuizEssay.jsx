@@ -554,6 +554,7 @@ const MissionFailed = ({ onClose, onRetry }) => {
               cursor: "pointer",
               transition: "background-color 0.3s, transform 0.3s",
               boxShadow: "0 0 20px rgba(255, 112, 42, 0.3)",
+              zIndex: 20,
             }}
             onMouseOver={(e) => {
               e.currentTarget.style.backgroundColor = "#E9631F";
@@ -599,6 +600,7 @@ const MissionFailed = ({ onClose, onRetry }) => {
             boxShadow: "0 0 20px rgba(255, 112, 42, 0.3)",
             alignSelf: "flex-end",
             marginBottom: "30px",
+            zIndex: 20,
           }}
           onMouseOver={(e) => {
             e.currentTarget.style.backgroundColor = "#E9631F";
