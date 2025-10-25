@@ -1,22 +1,49 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { useSearchParams } from "react-router-dom";
 import StartButton from "../../../../../pages/gpt-study/components/StartButton";
 import CommunityButton from "../../../../../pages/gpt-study/components/CommunityButton";
 import ScrollPage from "../../TutorialScroll/TutorialScroll/ScrollPage";
 import { useNavigate } from "react-router-dom";
 
+// ==================== 위치 조정 변수 ====================
+const LAYOUT_CONFIG = {
+  // 이미지 설정
+  imageWidth: "calc(60vw * 1.2)",        // 이미지 가로 크기
+  imageMaxWidth: "1000px",                // 이미지 최대 크기
+  
+  // 전체 컨테이너 위치 조정
+  containerVerticalOffset: "0px",         // 전체를 위/아래로 이동 (음수면 위로, 양수면 아래로)
+  
+  // 글자 위치 설정 (기본 위치)
+  textTopPosition: "25%",                // 이미지 기준 세로 위치 (100% = 이미지 바로 아래)
+  textLeftPosition: "12%",                // 이미지 기준 가로 위치 (50% = 중앙)
+  textMarginTop: "60px",                  // 이미지와 글자 사이 간격
+  
+  // 글자 위치 미세 조정
+  textTranslateX: "-50%",                 // 가로 미세 조정 (-50% = 중앙 정렬 보정)
+  textTranslateY: "0px",                  // 세로 미세 조정
+  
+  // 글자 크기
+  titleFontSize: "80px",                  // PROMPTING [RECIPE] 크기
+  descFontSize: "22px",                   // 설명 텍스트 크기
+};
+// =======================================================
+
 const OpenedClosue = ({ onComplete }) => {
   const [searchParams] = useSearchParams();
-  const skipToStep5 = searchParams.get("step") === "5";
-  const [scrollProgress, setScrollProgress] = useState(skipToStep5 ? 1 : 0);
-  const [isScrollCompleted, setIsScrollCompleted] = useState(
-    skipToStep5 ? true : false
-  );
+  const skipIntro = searchParams.get("skipIntro") === "true";
+  
+  const [firstSectionComplete, setFirstSectionComplete] = useState(skipIntro);
+  const [scrollProgress, setScrollProgress] = useState(skipIntro ? 1 : 0);
+  const [isScrollCompleted, setIsScrollCompleted] = useState(skipIntro);
+  
   const navigate = useNavigate();
   const [closing, setClosing] = useState(false);
+  const firstContainerRef = useRef(null);
   const containerRef = useRef(null);
-  const videoRef = useRef(null); // 비디오 참조 추가
+  const videoRef = useRef(null);
+  // 비디오 참조 추가
   const audioRef = useRef(null);
 
   const scrollTexts = [
@@ -38,44 +65,44 @@ const OpenedClosue = ({ onComplete }) => {
     ],
   ];
 
-  // 🎵 오디오 자동 재생 및 정지
+  // 첫 번째 섹션 스크롤 감지
   useEffect(() => {
-    const audio = audioRef.current;
-    if (!audio) return;
+    if (firstSectionComplete) return;
+    
+    const container = firstContainerRef.current;
+    if (!container) return;
 
-    audio.loop = true; // 반복 재생
-    audio.volume = 0.6;
-
-    // 자동 재생 시 브라우저 정책 대비
-    const playPromise = audio.play();
-    if (playPromise !== undefined) {
-      playPromise.catch((err) => {
-        console.warn("음악 자동 재생이 차단됨:", err);
-      });
-    }
-
-    // 컴포넌트 unmount 시 정지
-    return () => {
-      audio.pause();
-      audio.currentTime = 0;
+    const handleScroll = () => {
+      const scrollTop = container.scrollTop;
+      
+      if (scrollTop > 50) {
+        setFirstSectionComplete(true);
+      }
     };
-  }, []);
 
-  // 비디오 시간 동기화 (스크롤과 연동)
+    container.addEventListener("scroll", handleScroll);
+    return () => container.removeEventListener("scroll", handleScroll);
+  }, [firstSectionComplete]);
+
+  // 비디오 시간 동기화
   useEffect(() => {
+    if (!firstSectionComplete) return;
+    
     const video = videoRef.current;
     if (!video) return;
 
-    const videoDuration = 4; // 4초
+    const videoDuration = 4;
     const targetTime = scrollProgress * videoDuration;
 
-    // 비디오 currentTime을 스크롤 진행도에 맞춰 업데이트
     if (Math.abs(video.currentTime - targetTime) > 0.1) {
       video.currentTime = targetTime;
     }
-  }, [scrollProgress]);
+  }, [scrollProgress, firstSectionComplete]);
 
+  // 두 번째 섹션 스크롤 감지
   useEffect(() => {
+    if (!firstSectionComplete) return;
+    
     const container = containerRef.current;
     if (!container) return;
 
@@ -92,7 +119,7 @@ const OpenedClosue = ({ onComplete }) => {
 
     container.addEventListener("scroll", handleScroll);
     return () => container.removeEventListener("scroll", handleScroll);
-  }, [isScrollCompleted]);
+  }, [isScrollCompleted, firstSectionComplete]);
 
   const handleClick = useCallback(() => {
     if (isScrollCompleted && onComplete) {
@@ -173,7 +200,89 @@ const OpenedClosue = ({ onComplete }) => {
       {/* ✅ 오디오 삽입 (OpenedClosue 안 전용 배경음) */}
       <audio ref={audioRef} src="/sounds/closure-theme.mp3" preload="auto" />
 
-      <div className="relative w-screen h-screen overflow-hidden bg-black">
+      {/* 첫 번째 섹션 - 이미지 + 글자 */}
+      <AnimatePresence>
+        {!firstSectionComplete && (
+          <motion.div
+            exit={{ y: "-100%", transition: { duration: 0.5, ease: "easeOut" } }}
+            className="fixed inset-0 z-50 bg-black"
+          >
+            {/* 스크롤 감지용 투명 레이어 */}
+            <div
+              ref={firstContainerRef}
+              className="absolute inset-0 z-10 overflow-y-scroll"
+              style={{
+                scrollbarWidth: "none",
+                msOverflowStyle: "none",
+              }}
+            >
+              <div style={{ height: "200vh" }} />
+              <style jsx>{`
+                div::-webkit-scrollbar {
+                  display: none;
+                }
+              `}</style>
+            </div>
+
+            {/* 고정된 컨텐츠 */}
+            <div 
+              className="absolute inset-0 z-20 flex items-center justify-center pointer-events-none"
+              style={{ transform: `translateY(${LAYOUT_CONFIG.containerVerticalOffset})` }}
+            >
+              <div className="relative">
+                {/* 이미지 */}
+                <motion.img
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 1 }}
+                  src="/images/main-page/Closue_opened.png"
+                  alt="Closue Opened"
+                  className="w-auto"
+                  style={{ 
+                    width: LAYOUT_CONFIG.imageWidth, 
+                    maxWidth: LAYOUT_CONFIG.imageMaxWidth 
+                  }}
+                />
+                
+                {/* 글자 - 이미지 아래에서 올라오는 애니메이션 */}
+                <motion.div
+                  initial={{ scale: 0, y: 200 }}
+                  animate={{ scale: 1, y: 0 }}
+                  transition={{ duration: 1.5, ease: "easeOut", delay: 0.3 }}
+                  className="absolute text-center"
+                  style={{ 
+                    top: LAYOUT_CONFIG.textTopPosition,
+                    left: LAYOUT_CONFIG.textLeftPosition,
+                    marginTop: LAYOUT_CONFIG.textMarginTop,
+                    transform: `translateX(${LAYOUT_CONFIG.textTranslateX}) translateY(${LAYOUT_CONFIG.textTranslateY})`
+                  }}
+                >
+                  {/* PROMPTING [RECIPE] */}
+                  <div 
+                    className="font-bold leading-snug mb-4"
+                    style={{ fontSize: LAYOUT_CONFIG.titleFontSize }}
+                  >
+                    <div className="font-stretch text-white">PROMPTING</div>
+                    <div className="font-desira text-white">[RECIPE]</div>
+                  </div>
+                  
+                  {/* 설명 텍스트 */}
+                  <div 
+                    className="text-white font-pretendard leading-relaxed"
+                    style={{ fontSize: LAYOUT_CONFIG.descFontSize }}
+                  >
+                    그것은 곧 프롬프트 엔지니어링,<br />
+                    언어를 다루는 비밀의 조리법이었다.
+                  </div>
+                </motion.div>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* 두 번째 섹션 - 비디오 + scrollTexts */}
+      {firstSectionComplete && (
         <div className="relative w-screen h-screen overflow-hidden bg-black">
           {/* 비디오 (하단) */}
           <div className="absolute inset-0 z-10 flex items-end justify-center pb-10">
@@ -211,16 +320,14 @@ const OpenedClosue = ({ onComplete }) => {
               transition={{ delay: 0.5, duration: 0.8 }}
               className="absolute text-[80px] font-bold text-center"
             >
-              {/* 기본 텍스트 (흰색) - 스크롤하면서 서서히 투명해짐 */}
               <div className="relative">
-                <div
+                <div 
                   className="grid gap-0 leading-snug transition-opacity duration-300"
                   style={{ opacity: 1 - scrollProgress }}
                 >
                   <div className="font-stretch text-white">PRompting</div>
                   <div className="font-desira text-white">[RECIPe]</div>
                 </div>
-                {/* 오버레이 텍스트 (그라데이션) - 스크롤하면서 서서히 나타남 */}
                 <div
                   className="grid gap-0 leading-snug absolute top-0 left-0 transition-opacity duration-300"
                   style={{ opacity: scrollProgress }}
@@ -255,7 +362,6 @@ const OpenedClosue = ({ onComplete }) => {
 
             {/* FadeScroll 컨테이너 */}
             <div className="relative w-full h-full">
-              {/* 스크롤 가능한 투명 컨테이너 */}
               <div
                 ref={containerRef}
                 className="absolute inset-0 overflow-y-scroll"
@@ -267,7 +373,6 @@ const OpenedClosue = ({ onComplete }) => {
                 <div style={{ height: `${scrollTexts.length * 100}vh` }} />
               </div>
 
-              {/* 고정 위치에 배치된 텍스트들 */}
               <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                 {scrollTexts.map((lines, index) => (
                   <div
@@ -291,7 +396,6 @@ const OpenedClosue = ({ onComplete }) => {
               <StartButton />
               <CommunityButton />
               <div className="absolute inset-0 flex z-[9000] pointer-events-none">
-                {/* 왼쪽 반 - 커뮤니티 (hover 효과만 트리거) */}
                 <div
                   className="absolute top-0 left-0 h-full w-[25%] pointer-events-auto"
                   onMouseEnter={() => document.body.classList.add("hover-left")}
@@ -302,12 +406,9 @@ const OpenedClosue = ({ onComplete }) => {
                   style={{ cursor: "pointer" }}
                 ></div>
 
-                {/* 오른쪽 반 - 요리 시작 (hover 효과만 트리거) */}
                 <div
                   className="absolute top-0 right-0 h-full w-[25%] pointer-events-auto"
-                  onMouseEnter={() =>
-                    document.body.classList.add("hover-right")
-                  }
+                  onMouseEnter={() => document.body.classList.add("hover-right")}
                   onMouseLeave={() =>
                     document.body.classList.remove("hover-right")
                   }
@@ -326,17 +427,16 @@ const OpenedClosue = ({ onComplete }) => {
             </div>
           )}
         </div>
-        {closing && (
-          <>
-            <motion.div
-              className="fixed top-0 left-0 w-full h-full bg-black z-[9999]"
-              initial={{ x: "100%" }}
-              animate={{ x: 0 }}
-              transition={{ duration: 1.2, ease: [0.83, 0, 0.17, 1] }}
-            />
-          </>
-        )}
-      </div>
+      )}
+      
+      {closing && (
+        <motion.div
+          className="fixed top-0 left-0 w-full h-full bg-black z-[9999]"
+          initial={{ x: "100%" }}
+          animate={{ x: 0 }}
+          transition={{ duration: 1.2, ease: [0.83, 0, 0.17, 1] }}
+        />
+      )}
     </div>
   );
 };

@@ -5,12 +5,14 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import Recipe1QuizMultiple from './Recipe1QuizMultiple';
 import Recipe1QuizMultipleResult from './Recipe1QuizMultipleResult';
 import Recipe1QuizEssay from './Recipe1QuizEssay';
+import useGPTStudyStore from '../../../../../store';
 
 gsap.registerPlugin(ScrollTrigger);
 
-const Recipe1QuizContainer = () => {
+const Recipe1QuizContainer = ({ scrollerRef, recipeId }) => {
   const [step, setStep] = useState('multiple'); // 'multiple' | 'result' | 'essay'
   const [score, setScore] = useState(0);
+  const { setProgrammaticScroll } = useGPTStudyStore();
   
   const timelineRef = useRef(null);
   const multipleRef = useRef(null);
@@ -82,12 +84,34 @@ const Recipe1QuizContainer = () => {
       if (step === 'result') {
         console.log(`📊 Opening Result (score: ${score})`);
         
+        // 1) Result 열기
         timelineRef.current.to(resultRef.current, {
           height: "auto",
           overflow: "unset",
           ease: "circ.in",
           duration: 0
         }, 0);
+        
+        // 2) 스크롤 조정 (Tutorial 패턴 적용 - getBoundingClientRect 사용)
+        if (scrollerRef?.current) {
+          // Result가 열린 후 정확한 위치 계산을 위해 약간의 지연
+          timelineRef.current.call(() => {
+            const resultRect = resultRef.current.getBoundingClientRect();
+            const containerRect = scrollerRef.current.getBoundingClientRect();
+            const targetScrollTop = scrollerRef.current.scrollTop + (resultRect.top - containerRect.top);
+            
+            setProgrammaticScroll(true);
+            gsap.to(scrollerRef.current, {
+              scrollTop: targetScrollTop,
+              duration: 0.8,
+              ease: "power2.inOut",
+              onComplete: () => {
+                setProgrammaticScroll(false);
+                console.log('✅ Result 스크롤 완료');
+              }
+            });
+          }, null, 0.05);
+        }
         
       } else if (resultRef.current.offsetHeight > 0) {
         const shouldCloseImmediately = container.scrollTop > resultRef.current.offsetTop;
