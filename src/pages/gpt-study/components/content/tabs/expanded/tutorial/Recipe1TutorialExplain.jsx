@@ -1,7 +1,8 @@
 // src/pages/gpt-study/components/content/tabs/expanded/tutorial/Recipe1TutorialExplain.jsx
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
+
 import "./BookFlip.css";
 import Chatbot from "./chatbot";
 const Highlight = ({ children }) => {
@@ -330,6 +331,19 @@ const Page2 = () => {
 // Page 3
 const Page3 = ({ onComplete }) => {
   const [chatState, setChatState] = useState("initial"); // 'initial', 'loading', 'answered'
+  const [showHint, setShowHint] = useState(false);
+  useEffect(() => {
+    if (chatState === "answered") {
+      const timer = setTimeout(() => setShowHint(true), 1300);
+      const hideTimer = setTimeout(() => setShowHint(false), 6000);
+      return () => {
+        clearTimeout(timer);
+        clearTimeout(hideTimer);
+      };
+    } else {
+      setShowHint(false); // 다른 상태일 때는 숨김
+    }
+  }, [chatState]);
 
   const handleSendMessage = () => {
     // 1. 로딩 상태로 전환
@@ -370,22 +384,29 @@ const Page3 = ({ onComplete }) => {
       )}
 
       {/* 답변 후 평가 텍스트 - absolute 고정 */}
-      {chatState === "answered" && (
-        <div
-          className="absolute w-full text-black text-lg font-pretendard text-center leading-tight"
-          style={{
-            top: "50px",
-            left: "50%",
-            transform: "translateX(-50%)",
-          }}
-        >
-          흠… 계산은 잘 되어 있지만,
-          <br />
-          삼각형 공식을 처음 배우는 초등학생에게는
-          <br />
-          설명이 조금 부족해 보이네요.
-        </div>
-      )}
+      <AnimatePresence>
+        {chatState === "answered" && showHint && (
+          <motion.div
+            key="hint"
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 1 }}
+            className="absolute w-full text-black font-semibold text-lg font-pretendard text-center leading-tight"
+            style={{
+              top: "50px",
+              left: "0px",
+              transform: "translateX(-50%)",
+            }}
+          >
+            흠… 계산은 잘 되어 있지만,
+            <br />
+            삼각형 공식을 처음 배우는 초등학생에게는
+            <br />
+            설명이 조금 부족해 보이네요.
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* 채팅 말풍선 영역 - absolute 고정 */}
       {(chatState === "loading" || chatState === "answered") && (
@@ -400,7 +421,7 @@ const Page3 = ({ onComplete }) => {
         >
           {/* 사용자 메시지 - 우측 흰색 말풍선 */}
           <div className="flex justify-end">
-            <div className="bg-white text-black rounded-3xl px-12 py-4 max-w-[70%] shadow-md">
+            <div className="bg-white text-black rounded-3xl px-12 py-4 max-w-[70%] shadow-md font-semibold">
               <p className="font-pretendard text-sm">
                 밑변 6, 높이 4인 삼각형의 넓이를 구해줘.
               </p>
@@ -435,8 +456,8 @@ const Page3 = ({ onComplete }) => {
               </div>
             ) : (
               // 답변
-              <div className="bg-[#FF9E4A] text-black rounded-3xl px-12 py-4 max-w-[70%] shadow-md">
-                <p className="font-pretendard text-sm">답: 12</p>
+              <div className="bg-[#FF9E4A] text-black rounded-3xl px-12 py-4 max-w-[70%] font-semibold shadow-md">
+                <p className="font-pretendard text-sm">답: 답은 12입니다.</p>
               </div>
             )}
           </div>
@@ -463,7 +484,7 @@ const Page3 = ({ onComplete }) => {
             e.stopPropagation(); // 페이지 넘김 방지
             handleSendMessage();
           }}
-          className="absolute right-2 flex-shrink-0 hover:opacity-80 transition-opacity bg-transparent border-none p-0 cursor-pointer"
+          className="absolute right-2 flex-shrink-0 hover:bg-[#DDDDDD] transition-opacity bg-transparent border-none p-0 cursor-pointer"
         >
           <img
             src="/images/gpt-study/Arrow2.png"
@@ -496,21 +517,22 @@ const Page4 = ({ isPage3Completed }) => {
   }, [isPage3Completed]);
 
   const handleSendMessage = () => {
-    setShowUserMessage(true);
+    setShowUserMessage(true); // 사용자 말풍선 등장
 
+    // 🕐 1.5초 동안 화면에 유지
     setTimeout(() => {
-      setStep(0);
-      setShowUserMessage(false);
-      setShowResponse(true);
+      setShowUserMessage(false); // 사용자 말풍선 사라짐
+      setShowResponse(true); // GPT 응답 표시
       setIsLoading(true);
 
+      // 1.5초 후 로딩 끝 + click!! 등장
       setTimeout(() => {
         setIsLoading(false);
         setTimeout(() => {
           setShowClickPrompt(true);
         }, 1000);
       }, 1500);
-    }, 500);
+    }, 2000); // ✅ 여기 2000ms 대기 (사용자 말풍선 유지 시간)
   };
 
   const handleClickPrompt = () => {
@@ -528,98 +550,100 @@ const Page4 = ({ isPage3Completed }) => {
       transition={{ duration: 1.5 }}
     >
       {/* ===== Step 1: 초기 화면 ===== */}
-      {step === 1 && (
-        <>
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 1.5, delay: 2 }}
-            className="absolute"
-            style={{
-              top: "35px",
-              left: "50%",
-              transform: "translateX(-50%)",
-              width: "100%",
-              textAlign: "center",
-            }}
-          >
-            <div className="relative inline-block">
-              <div className="text-black text-xl font-semibold font-pretendard text-center leading-tight mt-2 mb-2">
-                그렇다면 Role Prompting은 어떻게 다를까요?
-              </div>
-              <div className="relative w-full flex justify-center mt-2">
-                <div
-                  className="h-[3px] bg-[#FE7525]"
-                  style={{ width: "400px" }}
-                />
-                <img
-                  src="/images/gpt-study/role/Star2.png"
-                  alt="Star"
-                  className="absolute"
-                  style={{
-                    left: "-10px",
-                    top: "-90px",
-                    width: "45px",
-                    height: "40px",
-                    transform: "scaleX(-1)",
-                  }}
-                />
-              </div>
-            </div>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 1, delay: 3.2 }}
-            className="absolute text-black text-lg font-pretendard text-center leading-tight whitespace-nowrap"
-            style={{
-              top: "100px",
-              left: "50%",
-              transform: "translateX(-50%)",
-              width: "100%",
-            }}
-          >
-            이번에는 다음과 같이 '선생님'이라는 역할을 부여해보세요!
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 1, delay: 3.2 }}
-            className="absolute w-[500px] bg-white rounded-full border border-black py-1 flex items-center justify-center shadow-md"
-            style={{
-              bottom: "50px",
-              left: "50%",
-              transform: "translateX(-50%)",
-            }}
-          >
-            <div className="-translate-x-[30px]">
-              <span className="text-gray-600 text-center font-pretendard text-base w-full pr-10 leading-snug">
-                너는 초등학교 수학 선생님이야.
-                <br />
-                학생의 질문에는 반드시 초등학생이
-                <br />
-                이해할 수 있는 수준으로 풀이 과정을 설명해.
-              </span>
-            </div>
-
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                handleSendMessage();
+      {step === 1 &&
+        !showDifference && ( // ← ✅ showDifference가 true면 사라짐
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 1.5, delay: 2 }}
+              className="absolute"
+              style={{
+                top: "35px",
+                left: "50%",
+                transform: "translateX(-50%)",
+                width: "100%",
+                textAlign: "center",
               }}
-              className="z-[9999] absolute right-[100px] flex-shrink-0 hover:opacity-80 transition-opacity bg-transparent border-none p-0 cursor-pointer "
             >
-              <img
-                src="/images/gpt-study/Arrow2.png"
-                alt="Send"
-                className="w-8 h-8 object-contain z-[9999]"
-              />
-            </button>
-          </motion.div>
-        </>
-      )}
+              <div className="relative inline-block">
+                <div className="text-black text-xl font-semibold font-pretendard text-center leading-tight mt-2 mb-2">
+                  그렇다면 Role Prompting은 어떻게 다를까요?
+                </div>
+                <div className="relative w-full flex justify-center mt-2">
+                  <div
+                    className="h-[3px] bg-[#FE7525]"
+                    style={{ width: "400px" }}
+                  />
+                  <img
+                    src="/images/gpt-study/role/Star2.png"
+                    alt="Star"
+                    className="absolute"
+                    style={{
+                      left: "-10px",
+                      top: "-90px",
+                      width: "45px",
+                      height: "40px",
+                      transform: "scaleX(-1)",
+                    }}
+                  />
+                </div>
+              </div>
+            </motion.div>
+
+            {/* “이번에는 다음과 같이…” 문장 */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 1, delay: 3.2 }}
+              className="absolute font-semibold text-black text-lg font-pretendard text-center leading-tight whitespace-nowrap"
+              style={{
+                top: "100px",
+                left: "50%",
+                transform: "translateX(-50%)",
+                width: "100%",
+              }}
+            >
+              이번에는 다음과 같이 '선생님'이라는 역할을 부여해보세요!
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 1, delay: 3.2 }}
+              className="absolute w-[450px] bg-white rounded-full py-1 flex items-center justify-center shadow-md"
+              style={{
+                bottom: "50px",
+                left: "50%",
+                transform: "translateX(-50%)",
+              }}
+            >
+              <div className="-translate-x-[30px]">
+                <span className="text-gray-600 text-center font-pretendard text-base w-full pr-10 leading-snug">
+                  너는 초등학교 수학 선생님이야.
+                  <br />
+                  학생의 질문에는 반드시 초등학생이
+                  <br />
+                  이해할 수 있는 수준으로 풀이 과정을 설명해.
+                </span>
+              </div>
+
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleSendMessage();
+                }}
+                className="z-[9999] absolute right-[70px] flex-shrink-0 hover:bg-[#DDDDDD] transition-opacity bg-transparent border-none p-0 cursor-pointer "
+              >
+                <img
+                  src="/images/gpt-study/Arrow2.png"
+                  alt="Send"
+                  className="w-8 h-8 object-contain z-[9999]"
+                />
+              </button>
+            </motion.div>
+          </>
+        )}
 
       {/* ===== 사용자 메시지 말풍선 (버튼 클릭 후) ===== */}
       {showUserMessage && (
@@ -680,7 +704,7 @@ const Page4 = ({ isPage3Completed }) => {
                 left: "50px",
               }}
             >
-              <div className="bg-[#FF9E4A] text-black border border-black rounded-2xl px-6 py-2 w-[400px] shadow-md">
+              <div className="bg-[#FF9E4A] text-black rounded-2xl px-6 py-2 w-[400px] shadow-md">
                 {isLoading ? (
                   <div className="flex gap-1">
                     <span
@@ -727,8 +751,8 @@ const Page4 = ({ isPage3Completed }) => {
                 left: "22px",
               }}
             >
-              <div className="bg-transparent text-black w-[500px] text-lg">
-                <p className="font-pretendard text-center text-base leading-8">
+              <div className="bg-transparent text-black w-[500px] font-semibold">
+                <p className="font-pretendard text-center text-base leading-8 text-lg">
                   어떤 차이가 느껴지나요?
                   <br />
                   같은 문제지만, 이번에는{" "}
@@ -761,16 +785,18 @@ const Page4 = ({ isPage3Completed }) => {
             right: "50px",
           }}
         >
-          <div className="text-black text-lg font-bold font-pretendard mb-2">
-            click!!
-          </div>
           <button
             onClick={(e) => {
               e.stopPropagation();
               handleClickPrompt();
             }}
-            className="w-1 h-2 bg-[#FF9E4A] rounded-full hover:bg-[#FF8C4A] transition-colors cursor-pointer border-none"
-          />
+            className="absolute bg-[#FE7525] text-white font-pretendard font-bold text-base
+             rounded-full shadow-[0_4px_0_#C85400] border border-[#D46100]
+             hover:bg-[#FF8C42] active:translate-y-[3px] active:shadow-[0_1px_0_#C85400]
+             transition-all duration-200 ease-in-out ml-[-70px] mt-[-30px]"
+          >
+            click!
+          </button>
         </motion.div>
       )}
     </motion.div>
@@ -789,7 +815,7 @@ const Page5 = () => {
         transform: "translateX(-20px)",
       }}
     >
-      <p className="font-pretendard text-center leading-11 pt-24 gap-12">
+      <p className="font-pretendard text-center leading-11 pt-24 gap-12 font-semibold">
         <span className="bg-[#FE7525] px-2 py-0 font-extrabold text-3xl text-white">
           Role Prompting
         </span>{" "}
@@ -839,45 +865,20 @@ const Page6 = () => {
       >
         {/* 첫 번째 줄 - relative container */}
         <div className="relative flex items-center justify-center">
-          <div className="text-black text-3xl font-pretendard text-center relative z-10">
+          <div className="text-black text-3xl font-pretendard text-center relative z-10 font-bold">
             그래서{" "}
             <span className="text-4xl font-extrabold">정답률이 높고,</span>
           </div>
           {/* 첫 번째 밑줄 - absolute로 텍스트와 겹침 */}
-          <img
-            src="/images/gpt-study/role/orange_line.png"
-            alt="Underline 1"
-            className="absolute"
-            style={{
-              width: "800px",
-              height: "auto",
-              top: "50%",
-              left: "50%",
-              transform: "translate(-50%, -20%)",
-              objectFit: "fill",
-            }}
-          />
         </div>
 
         {/* 두 번째 줄 - relative container */}
         <div className="relative flex items-center justify-center">
-          <div className="text-black text-3xl font-pretendard text-center relative z-10">
+          <div className="text-black text-3xl font-pretendard text-center relative z-10 font-bold">
             <span className="text-4xl font-extrabold">결과의 일관성</span>이
             유지돼요.
           </div>
           {/* 두 번째 밑줄 - absolute로 텍스트와 겹침 */}
-          <img
-            src="/images/gpt-study/role/orange_line.png"
-            alt="Underline 2"
-            className="absolute"
-            style={{
-              width: "600px",
-              height: "25px",
-              top: "50%",
-              left: "50%",
-              transform: "translate(-50%, -20%)",
-            }}
-          />
         </div>
       </motion.div>
 
@@ -909,7 +910,7 @@ const Page7 = () => {
     <div className="w-[700px] h-full flex flex-col items-center justify-center bg-transparent">
       <div
         className="flex flex-col items-center text-center font-pretendard
-       text-xl leading-10 text-black"
+       text-xl leading-10 text-black font-semibold"
         style={{
           width: "700px",
           height: "auto",
@@ -971,7 +972,7 @@ const Page8 = () => {
         transition={{ duration: 0.5, delay: 0.3 }}
       >
         <div
-          className="w-[700px] text-base font-pretendard text-black mb-6 text-center leading-8"
+          className="w-[700px] text-base font-pretendard font-semibold text-lg text-black mb-6 text-center leading-8"
           style={{
             transform: "translateX(-140px) translateY(100px)",
           }}
@@ -1073,7 +1074,7 @@ const Page9 = () => {
       />
 
       {/* 텍스트 */}
-      <div className="w-full text-lg font-pretendard font-normal leading-[2.5] text-center z-10">
+      <div className="w-full text-lg font-pretendard font-semibold leading-[2.5] text-center z-10">
         <p className="md-20">
           어때요? <span className="font-bold text-2xl">Role Prompting</span> 에
           대해 이제 감이 오죠?
@@ -1092,7 +1093,9 @@ const Page9 = () => {
       <div className="w-full flex items-center justify-center gap-4 mt-12 z-10">
         <button
           onClick={handleGoToQuiz}
-          className="bg-[#FE7525] border-2 border-black rounded-full px-8 py-2 text-xl font-medium font-pretendard text-white hover:bg-[#D46100] transition-colors"
+          className="relative bg-[#FE7525] text-white text-xl font-medium font-pretendard px-10 py-3 rounded-full
+               shadow-[0_6px_0_#D46100] active:shadow-[0_2px_0_#D46100]
+               active:translate-y-[4px] transition-all duration-200"
         >
           퀴즈 풀러 가기
         </button>
@@ -1174,12 +1177,16 @@ const FinalPage = () => {
           transform: "translateY(35px)",
         }}
       >
-        <button
-          onClick={handleGoToRecipe1}
-          className="bg-[#FE7525] border-2 border-black rounded-full px-8 py-2 text-xl font-medium font-pretendard text-white hover:bg-[#D46100] transition-colors"
-        >
-          다른 레시피 더 알아보기
-        </button>
+        <div className="w-full flex items-center justify-center gap-4 mt-12 z-10">
+          <button
+            onClick={handleGoToRecipe1}
+            className="relative bg-[#FE7525] text-white text-xl font-medium font-pretendard px-10 py-3 rounded-full
+               shadow-[0_6px_0_#D46100] active:shadow-[0_2px_0_#D46100]
+               active:translate-y-[4px] transition-all duration-200"
+          >
+            다른 레시피 더 알아보기
+          </button>
+        </div>
       </div>
     </motion.div>
   );
