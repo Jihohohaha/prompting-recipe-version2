@@ -50,10 +50,10 @@ const TabInterface = ({ recipe }) => {
           }}
         >
           <div className='relative w-full h-full border border-black rounded-2xl'>
-            <div className='absolute left-10 top-10 text-black text-[36px] leading-none'>
+            <div className='absolute left-10 top-10 text-black font-neunrimbo text-[36px] leading-none'>
               TUTORIAL<br />FOR
             </div>
-            <div className='absolute left-10 bottom-10 text-black text-[80px] leading-none'>CHAT<br />GPT</div>
+            <div className='absolute left-10 bottom-10 text-black font-bold font-neunrimbo text-[80px] leading-none'>CHAT<br />GPT</div>
             <img src='/images/gpt-study/TitlePic.png' className='absolute right-10 bottom-10 h-3/4' />
           </div>
         </div>
