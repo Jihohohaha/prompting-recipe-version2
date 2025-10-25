@@ -10,11 +10,14 @@ const OpenedClosue = ({ onComplete }) => {
   const [searchParams] = useSearchParams();
   const skipToStep5 = searchParams.get("step") === "5";
   const [scrollProgress, setScrollProgress] = useState(skipToStep5 ? 1 : 0);
-  const [isScrollCompleted, setIsScrollCompleted] = useState(skipToStep5 ? true : false);
+  const [isScrollCompleted, setIsScrollCompleted] = useState(
+    skipToStep5 ? true : false
+  );
   const navigate = useNavigate();
   const [closing, setClosing] = useState(false);
   const containerRef = useRef(null);
   const videoRef = useRef(null); // 비디오 참조 추가
+  const audioRef = useRef(null);
 
   const scrollTexts = [
     [
@@ -34,6 +37,29 @@ const OpenedClosue = ({ onComplete }) => {
       "그리고 이제, 당신이 그 길을 함께할 차례이다.",
     ],
   ];
+
+  // 🎵 오디오 자동 재생 및 정지
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (!audio) return;
+
+    audio.loop = true; // 반복 재생
+    audio.volume = 0.6;
+
+    // 자동 재생 시 브라우저 정책 대비
+    const playPromise = audio.play();
+    if (playPromise !== undefined) {
+      playPromise.catch((err) => {
+        console.warn("음악 자동 재생이 차단됨:", err);
+      });
+    }
+
+    // 컴포넌트 unmount 시 정지
+    return () => {
+      audio.pause();
+      audio.currentTime = 0;
+    };
+  }, []);
 
   // 비디오 시간 동기화 (스크롤과 연동)
   useEffect(() => {
@@ -144,166 +170,173 @@ const OpenedClosue = ({ onComplete }) => {
 
   return (
     <div className="relative w-screen h-screen overflow-hidden bg-black">
-      <div className="relative w-screen h-screen overflow-hidden bg-black">
-        {/* 비디오 (하단) */}
-        <div className="absolute inset-0 z-10 flex items-end justify-center pb-10">
-          <div
-            className="relative"
-            style={{ width: "calc(60vw * 1.2)", maxWidth: "1000px" }}
-          >
-            <video
-              ref={videoRef}
-              src="/videos/bg-new.mp4"
-              muted
-              playsInline
-              preload="auto"
-              className="w-full"
-              style={{ display: "block", transform: "translateY(20px)" }}
-            />
-          </div>
-        </div>
+      {/* ✅ 오디오 삽입 (OpenedClosue 안 전용 배경음) */}
+      <audio ref={audioRef} src="/sounds/closure-theme.mp3" preload="auto" />
 
-        {/* 오버레이 + 서비스명 (상단) */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 1 }}
-          className="absolute inset-0 z-20 flex flex-col items-center justify-center"
-          style={{
-            backgroundColor: "rgba(0, 0, 0, 0.4)",
-            backdropFilter: "blur(0px)",
-          }}
-        >
-          {/* 서비스명 - 스크롤 크로스 페이드 효과 */}
+      <div className="relative w-screen h-screen overflow-hidden bg-black">
+        <div className="relative w-screen h-screen overflow-hidden bg-black">
+          {/* 비디오 (하단) */}
+          <div className="absolute inset-0 z-10 flex items-end justify-center pb-10">
+            <div
+              className="relative"
+              style={{ width: "calc(60vw * 1.2)", maxWidth: "1000px" }}
+            >
+              <video
+                ref={videoRef}
+                src="/videos/bg-new.mp4"
+                muted
+                playsInline
+                preload="auto"
+                className="w-full"
+                style={{ display: "block", transform: "translateY(20px)" }}
+              />
+            </div>
+          </div>
+
+          {/* 오버레이 + 서비스명 (상단) */}
           <motion.div
-            initial={{ scale: 0.8, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ delay: 0.5, duration: 0.8 }}
-            className="absolute text-[80px] font-bold text-center"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 1 }}
+            className="absolute inset-0 z-20 flex flex-col items-center justify-center"
+            style={{
+              backgroundColor: "rgba(0, 0, 0, 0.4)",
+              backdropFilter: "blur(0px)",
+            }}
           >
-            {/* 기본 텍스트 (흰색) - 스크롤하면서 서서히 투명해짐 */}
-            <div className="relative">
-              <div 
-                className="grid gap-0 leading-snug transition-opacity duration-300"
-                style={{ opacity: 1 - scrollProgress }}
-              >
-                <div className="font-stretch text-white">PRompting</div>
-                <div className="font-desira text-white">[RECIPe]</div>
+            {/* 서비스명 - 스크롤 크로스 페이드 효과 */}
+            <motion.div
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ delay: 0.5, duration: 0.8 }}
+              className="absolute text-[80px] font-bold text-center"
+            >
+              {/* 기본 텍스트 (흰색) - 스크롤하면서 서서히 투명해짐 */}
+              <div className="relative">
+                <div
+                  className="grid gap-0 leading-snug transition-opacity duration-300"
+                  style={{ opacity: 1 - scrollProgress }}
+                >
+                  <div className="font-stretch text-white">PRompting</div>
+                  <div className="font-desira text-white">[RECIPe]</div>
+                </div>
+                {/* 오버레이 텍스트 (그라데이션) - 스크롤하면서 서서히 나타남 */}
+                <div
+                  className="grid gap-0 leading-snug absolute top-0 left-0 transition-opacity duration-300"
+                  style={{ opacity: scrollProgress }}
+                >
+                  <div
+                    className="font-stretch"
+                    style={{
+                      background:
+                        "linear-gradient(to bottom, #FF6C43, #FF6C43, #FF6C43, #FF6C43, #ffffff)",
+                      WebkitBackgroundClip: "text",
+                      WebkitTextFillColor: "transparent",
+                      backgroundClip: "text",
+                    }}
+                  >
+                    PRompting
+                  </div>
+                  <div
+                    className="font-desira"
+                    style={{
+                      background:
+                        "linear-gradient(to bottom, #FF6C43, #FF6C43, #FF6C43, #FF6C43, #ffffff)",
+                      WebkitBackgroundClip: "text",
+                      WebkitTextFillColor: "transparent",
+                      backgroundClip: "text",
+                    }}
+                  >
+                    [RECIPe]
+                  </div>
+                </div>
               </div>
-              {/* 오버레이 텍스트 (그라데이션) - 스크롤하면서 서서히 나타남 */}
+            </motion.div>
+
+            {/* FadeScroll 컨테이너 */}
+            <div className="relative w-full h-full">
+              {/* 스크롤 가능한 투명 컨테이너 */}
               <div
-                className="grid gap-0 leading-snug absolute top-0 left-0 transition-opacity duration-300"
-                style={{ opacity: scrollProgress }}
+                ref={containerRef}
+                className="absolute inset-0 overflow-y-scroll"
+                style={{
+                  scrollbarWidth: "none",
+                  msOverflowStyle: "none",
+                }}
               >
-                <div
-                  className="font-stretch"
-                  style={{
-                    background:
-                      "linear-gradient(to bottom, #FF6C43, #FF6C43, #FF6C43, #FF6C43, #ffffff)",
-                    WebkitBackgroundClip: "text",
-                    WebkitTextFillColor: "transparent",
-                    backgroundClip: "text",
-                  }}
-                >
-                  PRompting
-                </div>
-                <div
-                  className="font-desira"
-                  style={{
-                    background:
-                      "linear-gradient(to bottom, #FF6C43, #FF6C43, #FF6C43, #FF6C43, #ffffff)",
-                    WebkitBackgroundClip: "text",
-                    WebkitTextFillColor: "transparent",
-                    backgroundClip: "text",
-                  }}
-                >
-                  [RECIPe]
-                </div>
+                <div style={{ height: `${scrollTexts.length * 100}vh` }} />
+              </div>
+
+              {/* 고정 위치에 배치된 텍스트들 */}
+              <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                {scrollTexts.map((lines, index) => (
+                  <div
+                    key={index}
+                    className="absolute text-white text-[22px] font-medium font-pretendard mt-[360px] text-center px-4 leading-relaxed"
+                    style={{
+                      opacity: getOpacity(index),
+                    }}
+                  >
+                    {lines.map((line, lineIndex) => (
+                      <div key={lineIndex}>{line}</div>
+                    ))}
+                  </div>
+                ))}
               </div>
             </div>
           </motion.div>
 
-          {/* FadeScroll 컨테이너 */}
-          <div className="relative w-full h-full">
-            {/* 스크롤 가능한 투명 컨테이너 */}
-            <div
-              ref={containerRef}
-              className="absolute inset-0 overflow-y-scroll"
-              style={{
-                scrollbarWidth: "none",
-                msOverflowStyle: "none",
-              }}
-            >
-              <div style={{ height: `${scrollTexts.length * 100}vh` }} />
-            </div>
-
-            {/* 고정 위치에 배치된 텍스트들 */}
-            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-              {scrollTexts.map((lines, index) => (
+          {isScrollCompleted && (
+            <>
+              <StartButton />
+              <CommunityButton />
+              <div className="absolute inset-0 flex z-[9000] pointer-events-none">
+                {/* 왼쪽 반 - 커뮤니티 (hover 효과만 트리거) */}
                 <div
-                  key={index}
-                  className="absolute text-white text-[22px] font-medium font-pretendard mt-[360px] text-center px-4 leading-relaxed"
-                  style={{
-                    opacity: getOpacity(index),
+                  className="absolute top-0 left-0 h-full w-[25%] pointer-events-auto"
+                  onMouseEnter={() => document.body.classList.add("hover-left")}
+                  onMouseLeave={() =>
+                    document.body.classList.remove("hover-left")
+                  }
+                  onClick={() => (window.location.href = "/community")}
+                  style={{ cursor: "pointer" }}
+                ></div>
+
+                {/* 오른쪽 반 - 요리 시작 (hover 효과만 트리거) */}
+                <div
+                  className="absolute top-0 right-0 h-full w-[25%] pointer-events-auto"
+                  onMouseEnter={() =>
+                    document.body.classList.add("hover-right")
+                  }
+                  onMouseLeave={() =>
+                    document.body.classList.remove("hover-right")
+                  }
+                  onClick={() => {
+                    setClosing(true);
+                    setTimeout(() => navigate("/tutorial"), 1800);
                   }}
-                >
-                  {lines.map((line, lineIndex) => (
-                    <div key={lineIndex}>{line}</div>
-                  ))}
-                </div>
-              ))}
+                  style={{ cursor: "pointer" }}
+                ></div>
+              </div>
+            </>
+          )}
+          {isScrollCompleted && (
+            <div style={{ display: "none" }}>
+              <ScrollPage />
             </div>
-          </div>
-        </motion.div>
-
-        {isScrollCompleted && (
+          )}
+        </div>
+        {closing && (
           <>
-            <StartButton />
-            <CommunityButton />
-            <div className="absolute inset-0 flex z-[9000] pointer-events-none">
-              {/* 왼쪽 반 - 커뮤니티 (hover 효과만 트리거) */}
-              <div
-                className="absolute top-0 left-0 h-full w-[25%] pointer-events-auto"
-                onMouseEnter={() => document.body.classList.add("hover-left")}
-                onMouseLeave={() =>
-                  document.body.classList.remove("hover-left")
-                }
-                onClick={() => (window.location.href = "/community")}
-                style={{ cursor: "pointer" }}
-              ></div>
-
-              {/* 오른쪽 반 - 요리 시작 (hover 효과만 트리거) */}
-              <div
-                className="absolute top-0 right-0 h-full w-[25%] pointer-events-auto"
-                onMouseEnter={() => document.body.classList.add("hover-right")}
-                onMouseLeave={() =>
-                  document.body.classList.remove("hover-right")
-                }
-                onClick={() => {
-                  setClosing(true);
-                  setTimeout(() => navigate("/tutorial"), 1800);
-                }}
-                style={{ cursor: "pointer" }}
-              ></div>
-            </div>
+            <motion.div
+              className="fixed top-0 left-0 w-full h-full bg-black z-[9999]"
+              initial={{ x: "100%" }}
+              animate={{ x: 0 }}
+              transition={{ duration: 1.2, ease: [0.83, 0, 0.17, 1] }}
+            />
           </>
         )}
-        {isScrollCompleted && (
-          <div style={{ display: "none" }}>
-            <ScrollPage />
-          </div>
-        )}
       </div>
-      {closing && (
-        <>
-          <motion.div
-            className="fixed top-0 left-0 w-full h-full bg-black z-[9999]"
-            initial={{ x: "100%" }}
-            animate={{ x: 0 }}
-            transition={{ duration: 1.2, ease: [0.83, 0, 0.17, 1] }}
-          />
-        </>
-      )}
     </div>
   );
 };
