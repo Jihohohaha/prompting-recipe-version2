@@ -43,6 +43,8 @@ const OpenedClosue = ({ onComplete }) => {
   const firstContainerRef = useRef(null);
   const containerRef = useRef(null);
   const videoRef = useRef(null);
+  // 비디오 참조 추가
+  const audioRef = useRef(null);
 
   const scrollTexts = [
     [
@@ -195,6 +197,9 @@ const OpenedClosue = ({ onComplete }) => {
 
   return (
     <div className="relative w-screen h-screen overflow-hidden bg-black">
+      {/* ✅ 오디오 삽입 (OpenedClosue 안 전용 배경음) */}
+      <audio ref={audioRef} src="/sounds/closure-theme.mp3" preload="auto" />
+
       {/* 첫 번째 섹션 - 이미지 + 글자 */}
       <AnimatePresence>
         {!firstSectionComplete && (

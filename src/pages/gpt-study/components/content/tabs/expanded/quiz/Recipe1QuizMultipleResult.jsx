@@ -258,7 +258,7 @@ const FailResult = ({ onRetry }) => {
         muted
         playsInline
         loop
-        className="absolute left-1/2 bottom-[60px] -translate-x-1/2 w-[960px] h-auto"
+        className="absolute left-1/2 bottom-[120px] -translate-x-1/2 w-[600px] h-auto"
       />
 
       <img 
