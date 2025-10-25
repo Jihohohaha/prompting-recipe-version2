@@ -77,7 +77,7 @@ const SuccessScreen = ({ onNext }) => {
         }}
       />
 
-      <div className="absolute font-pretendard text-[16px] text-white text-center tracking-widest left-1/2 -translate-x-1/2 bottom-6">
+      <div className="absolute font-semibold font-pretendard text-[20px] text-white text-center tracking-widest left-1/2 -translate-x-1/2 bottom-6">
         요리 마스터가 되기 위한 비밀 레시피북을 손에 넣었습니다!
         <br />
         이제 이 책을 펼쳐, 본격적으로 요리를 시작해볼까요?
@@ -153,7 +153,7 @@ const EssayIntroScreen = ({ onNext }) => {
 
         <p
           className="flex items-center justify-center text-center
-         text-2xl text-white mb-8 tracking-wider leading-loose"
+         text-2xl text-white mb-8 tracking-wider leading-loose font-pretendard font-bold"
         >
           이번 요리는 석상이가 '진짜 사람'이 되기 위한 테스트예요.
           <br />
