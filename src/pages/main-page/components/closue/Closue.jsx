@@ -64,7 +64,7 @@ const Closue = ({ onComplete }) => {
               whileHover={{ opacity: 1, scale: 1.05 }}
               transition={{ duration: 0.3 }}
               onClick={handleSkip}
-              className="absolute top-8 right-8 z-50 px-4 py-2 bg-white/20 backdrop-blur-sm text-white text-sm font-pretendard rounded-lg hover:bg-white/30 transition-colors"
+              className="absolute bottom-8 right-8 z-50 px-4 py-2 bg-white/20 backdrop-blur-sm text-white text-sm font-pretendard rounded-lg hover:bg-white/30 transition-colors"
             >
               건너뛰기
             </motion.button>

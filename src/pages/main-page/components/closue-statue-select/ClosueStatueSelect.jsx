@@ -530,7 +530,7 @@ const ClosueStatueSelect = () => {
           {/* 하단 틸트 UI */}
           {isTilt && (
             <div className="fixed left-1/2 -translate-x-1/2 bottom-[20px] h-[160px] rounded-[25px] z-[20] shadow-lg flex items-center">
-              <div className="relative h-full w-[1000px] rounded-l-[24px] bg-white bg-opacity-[40%]"></div>
+              <div className="relative h-full w-[1200px] rounded-l-[24px] bg-white bg-opacity-[40%]"></div>
               <div className="absolute inset-0 flex items-center justify-center">
                 <p className="text-black text-[18px] text-center leading-[1.7] font-pretendard font-medium whitespace-pre-line">
                   {detailDish?.description}
@@ -631,10 +631,13 @@ const ClosueStatueSelect = () => {
           </div>
 
           {/* 뒤로가기 */}
+          <div>
+            <p className="fixed left-3 bottom-[90px] text-center font-bold text-black">분야 선택으로!</p>
+          </div>
           <button
             onClick={() => canGoBack && popHistory()}
             disabled={!canGoBack}
-            className={`fixed top-6 left-6 z-[80] px-4 py-2 rounded-xl ${
+            className={`fixed bottom-5 left-6 z-[80] h-16 w-16 px-4 py-2 rounded-xl ${
               canGoBack
                 ? "bg-black/70 hover:bg-black/80 cursor-pointer text-white"
                 : "bg-transparent cursor-not-allowed text-transparent pointer-events-none"
