@@ -2,6 +2,13 @@
 import React, { useMemo } from 'react';
 import { motion } from 'framer-motion';
 
+/* ───────── 완료 저장 키/유틸 (최소 수정) ───────── */
+const ROLE_KEY = 'rolePromptingCompleted';
+const isRoleDone = () => {
+  try { return localStorage.getItem(ROLE_KEY) === 'true'; }
+  catch { return false; }
+};
+
 /* ───────── 유틸 ───────── */
 const hexToRgb = (hex) => {
   const h = hex?.replace('#', '');
@@ -30,11 +37,19 @@ const getContrastText = (hex) => {
 const titleCase = (s = '') => s.toLowerCase().replace(/\b([a-z])/g, (m) => m.toUpperCase());
 
 const isRolePrompting = (recipe) => /role\s*prompting/i.test(recipe?.title || '');
+
+/* ───────── 진행률 계산 (여기만 의미 변화) ───────── */
 const getProgressPercent = (recipe) => {
-  // Role Prompting만 100% 예외(기본 60%), 나머지는 100%
-  if (isRolePrompting(recipe)) return recipe?.progress ?? 60;
-  return 100;
+  // ROLE PROMPTING: 저장값이 true면 100, 아니면 recipe.progress(없으면 60)
+  if (isRolePrompting(recipe)) {
+    return isRoleDone()
+      ? 100
+      : (Number.isFinite(recipe?.progress) ? recipe.progress : 60);
+  }
+  // 그 외: recipe.progress가 있으면 그 값, 없으면 100
+  return Number.isFinite(recipe?.progress) ? recipe.progress : 100;
 };
+
 const getProgressColors = (recipe) => {
   const textColor = getContrastText(recipe?.color || '#777');
   return {
@@ -111,7 +126,7 @@ const DivSwitcher = React.memo(function DivSwitcher({
   const BAR_H = 10;
 
   // 진행률/색
-  const percent = getProgressPercent(recipe);
+  const percent = Math.max(0, Math.min(100, getProgressPercent(recipe)));
   const { track, fill } = getProgressColors(recipe);
 
   return (
@@ -173,17 +188,17 @@ const DivSwitcher = React.memo(function DivSwitcher({
                 className="h-full"
                 style={{ background: fill }}
                 initial={{ width: '0%' }}
-                animate={{ width: `${Math.max(0, Math.min(100, percent))}%` }}
+                animate={{ width: `${percent}%` }}
                 transition={{ duration: 0.35, ease: [0.2, 0.8, 0.2, 1] }}
               />
             </motion.div>
           </>
         )}
 
-        {/* 4) 활성인데 이미지가 없으면 카드 유지 (프로그레스바 미표시) */}
+        {/* 4) 활성인데 이미지가 없으면 카드 유지 (프로그레스바 미표시/원래대로) */}
         {isActive && !hasActiveImage && <DesignedCard recipe={recipe} index={index} />}
 
-        {/* 5) 비활성 hover 살짝 확대 */}
+        {/* 5) 비활성 hover 살짝 확대 (원래대로) */}
         {!isActive && (
           <motion.div
             className="absolute inset-0"

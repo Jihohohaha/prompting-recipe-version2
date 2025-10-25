@@ -1,7 +1,8 @@
 // src/components/common/MypageModal.jsx
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useMemo } from 'react';
 
 const ORANGE = '#FF6C43';
+const STORAGE_KEY = 'rolePromptingCompleted';
 
 function ProgressPill({ label, percent = 0 }) {
   const p = Math.max(0, Math.min(100, percent));
@@ -26,14 +27,36 @@ const MypageModal = ({ open, onClose, progressList }) => {
   const id = 'mypage-modal';
 
   const defaults = [
-    { label: 'ROLE PROMPTING', percent: 65 },
-    { label: 'FEW SHOT', percent: 100 },
-    { label: 'HALLUCINATION', percent: 100 },
-    { label: 'MARKDOWN', percent: 100 },
-    { label: 'RAG', percent: 100 },
-    { label: 'REFLECTION', percent: 100 },
+    { label: 'ROLE PROMPTING', percent: 100 },
+    { label: 'FEW SHOT',       percent: 100 },
+    { label: 'HALLUCINATION',  percent: 100 },
+    { label: 'MARKDOWN',       percent: 100 },
+    { label: 'RAG',            percent: 100 },
+    { label: 'REFLECTION',     percent: 100 },
   ];
-  const items = Array.isArray(progressList) && progressList.length ? progressList : defaults;
+
+  // ✅ defaults + progressList 병합 + localStorage(완료시)로 ROLE PROMPTING=100 덮어쓰기
+  const items = useMemo(() => {
+    const map = new Map(defaults.map(d => [d.label, d.percent]));
+
+    if (Array.isArray(progressList) && progressList.length) {
+      for (const { label, percent } of progressList) {
+        if (typeof label === 'string' && Number.isFinite(+percent)) {
+          map.set(label, +percent);
+        }
+      }
+    }
+
+    // localStorage가 true면 ROLE PROMPTING을 100으로 고정
+    try {
+      const done = localStorage.getItem(STORAGE_KEY) === 'true';
+      if (done) map.set('ROLE PROMPTING', 100);
+    } catch {
+      /* storage 접근 불가시 무시 */
+    }
+
+    return Array.from(map, ([label, percent]) => ({ label, percent }));
+  }, [progressList, open]);
 
   useEffect(() => {
     if (!open) return;
@@ -79,32 +102,35 @@ const MypageModal = ({ open, onClose, progressList }) => {
         </div>
 
         {/* 👉 그리드: 상단 정렬 + 동일한 바깥 패딩만 유지 */}
-        <div className="grid grid-cols-[1fr_1fr_2fr] items-start gap-6 p-6">
+        <div className="grid grid-cols-[1fr_1fr_1fr_1fr] items-start gap-6 p-6">
           {/* 좌측 큰 카드 */}
-          <div className="h-[390px] rounded-xl bg-[#ffffff20] p-6" />
+          <div className="flex flex-col justify-center items-center h-[390px] rounded-xl bg-[#ffffff20] p-6">
+            <p className='mb-4 text-[28px] font-desira font-bold'>[RANK]</p>
+            <img src="/images/badge.png"/>
+          </div>
 
-          {/* 가운데 정보 카드 (바깥 래퍼의 p-6 제거, 카드 자체에 패딩) */}
+          {/* 가운데 정보 카드 */}
           <div className="flex justify-center">
             <div className="grid grid-cols-1 gap-6">
               <section className="border rounded-xl p-4 w-[300px]">
-                <h3 className="font-medium mb-3 text-white/90">이름</h3>
-                <p className="text-sm text-white">나지완</p>
+                <h3 className="text-[20px] font-bold mb-3 text-white/90">이름</h3>
+                <p className="text-sm text-white">송승윤</p>
               </section>
               <section className="border rounded-xl p-4 w-[300px]">
-                <h3 className="font-medium mb-3 text-white/90">가입 메일</h3>
-                <p className="text-sm text-white">najiwan03@khu.ac.kr</p>
+                <h3 className="text-[20px] font-bold mb-3 text-white/90">가입 메일</h3>
+                <p className="text-sm text-white">singsong9984@khu.ac.kr</p>
               </section>
               <section className="border rounded-xl p-4 w-[300px]">
-                <h3 className="font-medium mb-3 text-white/90">학습 시간</h3>
-                <p className="text-sm text-white">24H</p>
+                <h3 className="text-[20px] font-bold mb-3 text-white/90">학습 시간</h3>
+                <p className="text-sm text-white">23h 23m</p>
               </section>
             </div>
           </div>
 
-          {/* 오른쪽 진행도 카드 (바깥 래퍼의 p-6 제거, 카드 자체에 패딩) */}
+          {/* 오른쪽 진행도 카드 */}
           <div className="border rounded-xl p-4">
-            <section className="w-[320px] p-2">
-              <h3 className="w-[200px] font-normal mb-3 text-center text-white/90">진행도</h3>
+            <section className="w-[320px] p-2 flex flex-col justify-center items-center">
+              <h3 className="w-[240px] text-[20px] font-bold mb-3 text-center text-white/90">진행도</h3>
               <div className="flex flex-col gap-2">
                 {items.map(({ label, percent }) => (
                   <ProgressPill key={label} label={label} percent={percent} />
