@@ -80,9 +80,15 @@ const TabInterface = ({ recipe }) => {
               key={tab.id}
               onClick={() => handleTabClick(tab.id)}
               className={`
+<<<<<<< HEAD
+                flex-1 h-14 font-bold text-lg font-mortend justify-left 
+                rounded-t-lg transition-all duration-300
+                ${!isActive && 'hover:opacity-95'}
+=======
                 flex-1 h-full font-bold text-lg font-pretendard
                 rounded-t-2xl rounded-b-none transition-all duration-300
                 ${!isActive ? 'hover:opacity-95' : ''}
+>>>>>>> 2be5bc86dcab0c165ce9482e1ad9c9e2afffba14
               `}
               style={{
                 backgroundColor: isActive ? primaryColor : tabBg,
@@ -104,8 +110,18 @@ const TabInterface = ({ recipe }) => {
           <div className="h-[2px] bg-white" style={{ width: 'calc(100% - 4rem)' }} />
         </div>
 
-        <div className="text-white font-bold mt-48 text-8xl font-mortend whitespace-pre-line text-left mt-16">
-          {recipe.displayTitle}
+
+        <div className="text-white font-bold text-8xl whitespace-pre-line text-left mt-48">
+          {(() => {
+            const [prefix, suffix] = recipe.displayTitle.split('.');
+            return (
+              <>
+                <span className="font-koolegant text-7xl">{prefix}.</span>
+                <span className="font-mortend">{suffix}</span>
+              </>
+            );
+          })()}
+
         </div>
 
         <div className="flex justify-center">
@@ -114,12 +130,22 @@ const TabInterface = ({ recipe }) => {
       </div>
 
       <div
-        className="w-full rounded-full h-8 flex items-center text-mortend justify-left px-6 mb-3"
+        className="w-full rounded-full h-8 flex items-center justify-start px-6 mb-3"
         style={{ backgroundColor: tabBg }}
       >
-        <div className="text-white font-bold text-sm">
-          {`section ${recipe.id}. ${recipe.displayTitle}`}
-        </div>
+        {(() => {
+          const [prefix, suffix] = recipe.displayTitle.split('.');
+          return (
+            <>
+              <span className="text-white/80 font-bold font-koolegant text-sm">
+                section {recipe.id}.
+              </span>
+              <span className="text-white font-bold font-mortend text-sm ml-2">
+                {suffix?.trim()}
+              </span>
+            </>
+          );
+        })()}
       </div>
     </div>
   );
