@@ -92,20 +92,25 @@ const Recipe1QuizContainer = ({ scrollerRef, recipeId }) => {
           duration: 0
         }, 0);
         
-        // 2) 스크롤 조정 (Tutorial 패턴 적용)
+        // 2) 스크롤 조정 (Tutorial 패턴 적용 - getBoundingClientRect 사용)
         if (scrollerRef?.current) {
-          const targetScrollTop = resultRef.current.offsetTop;
-          
-          setProgrammaticScroll(true);
-          gsap.to(scrollerRef.current, {
-            scrollTop: targetScrollTop,
-            duration: 0.8,
-            ease: "power2.inOut",
-            onComplete: () => {
-              setProgrammaticScroll(false);
-              console.log('✅ Result 스크롤 완료');
-            }
-          });
+          // Result가 열린 후 정확한 위치 계산을 위해 약간의 지연
+          timelineRef.current.call(() => {
+            const resultRect = resultRef.current.getBoundingClientRect();
+            const containerRect = scrollerRef.current.getBoundingClientRect();
+            const targetScrollTop = scrollerRef.current.scrollTop + (resultRect.top - containerRect.top);
+            
+            setProgrammaticScroll(true);
+            gsap.to(scrollerRef.current, {
+              scrollTop: targetScrollTop,
+              duration: 0.8,
+              ease: "power2.inOut",
+              onComplete: () => {
+                setProgrammaticScroll(false);
+                console.log('✅ Result 스크롤 완료');
+              }
+            });
+          }, null, 0.05);
         }
         
       } else if (resultRef.current.offsetHeight > 0) {
