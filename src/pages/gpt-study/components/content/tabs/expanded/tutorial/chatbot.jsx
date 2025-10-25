@@ -1,5 +1,7 @@
 // src/components/Chatbot.jsx
 import React, { useState, useRef, useEffect } from "react";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 const API_BASE_URL = "https://artsw-ai.onrender.com";
 const Chatbot = () => {
   const [open, setOpen] = useState(false);
@@ -301,7 +303,30 @@ const Chatbot = () => {
                           : "bg-gray-200 text-gray-800"
                       }`}
                     >
-                      {msg.text}
+                      <ReactMarkdown
+                        remarkPlugins={[remarkGfm]}
+                        components={{
+                          strong: ({ node, ...props }) => (
+                            <strong
+                              className="font-bold text-[#FE7525]"
+                              {...props}
+                            />
+                          ),
+                          em: ({ node, ...props }) => (
+                            <em className="italic text-gray-700" {...props} />
+                          ),
+                          a: ({ node, ...props }) => (
+                            <a
+                              {...props}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-blue-600 underline hover:text-blue-800"
+                            />
+                          ),
+                        }}
+                      >
+                        {msg.text}
+                      </ReactMarkdown>
                     </span>
                   </div>
                 ))}
