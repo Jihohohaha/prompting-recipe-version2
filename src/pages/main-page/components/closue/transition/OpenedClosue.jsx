@@ -1,19 +1,20 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { motion } from "framer-motion";
-import { useSearchParams } from "react-router-dom"; // Added
+import { useSearchParams } from "react-router-dom";
 import StartButton from "../../../../../pages/gpt-study/components/StartButton";
 import CommunityButton from "../../../../../pages/gpt-study/components/CommunityButton";
 import ScrollPage from "../../TutorialScroll/TutorialScroll/ScrollPage";
 import { useNavigate } from "react-router-dom";
 
 const OpenedClosue = ({ onComplete }) => {
-  const [searchParams] = useSearchParams(); // Added
-  const skipToStep5 = searchParams.get("step") === "5"; // Added
-  const [scrollProgress, setScrollProgress] = useState(skipToStep5 ? 1 : 0); // Modified
-  const [isScrollCompleted, setIsScrollCompleted] = useState(skipToStep5 ? true : false); // Modified
+  const [searchParams] = useSearchParams();
+  const skipToStep5 = searchParams.get("step") === "5";
+  const [scrollProgress, setScrollProgress] = useState(skipToStep5 ? 1 : 0);
+  const [isScrollCompleted, setIsScrollCompleted] = useState(skipToStep5 ? true : false);
   const navigate = useNavigate();
   const [closing, setClosing] = useState(false);
   const containerRef = useRef(null);
+  const videoRef = useRef(null); // 비디오 참조 추가
 
   const scrollTexts = [
     [
@@ -33,6 +34,20 @@ const OpenedClosue = ({ onComplete }) => {
       "그리고 이제, 당신이 그 길을 함께할 차례이다.",
     ],
   ];
+
+  // 비디오 시간 동기화 (스크롤과 연동)
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    const videoDuration = 4; // 4초
+    const targetTime = scrollProgress * videoDuration;
+
+    // 비디오 currentTime을 스크롤 진행도에 맞춰 업데이트
+    if (Math.abs(video.currentTime - targetTime) > 0.1) {
+      video.currentTime = targetTime;
+    }
+  }, [scrollProgress]);
 
   useEffect(() => {
     const container = containerRef.current;
@@ -65,7 +80,6 @@ const OpenedClosue = ({ onComplete }) => {
     const currentItemStart = index * progressPerItem;
     const currentItemEnd = (index + 1) * progressPerItem;
 
-    // 첫 번째 텍스트는 처음부터 보이도록
     if (index === 0 && scrollProgress < progressPerItem) {
       const itemProgress = scrollProgress / progressPerItem;
       const steps = 16;
@@ -83,7 +97,6 @@ const OpenedClosue = ({ onComplete }) => {
       }
     }
 
-    // 마지막 텍스트는 스크롤 끝나고도 계속 보이도록
     if (index === totalItems - 1 && scrollProgress >= currentItemStart) {
       const itemProgress =
         (scrollProgress - currentItemStart) / progressPerItem;
@@ -98,7 +111,6 @@ const OpenedClosue = ({ onComplete }) => {
         const stepIncrement = stepProgress * 0.125;
         return Math.min(baseOpacity + stepIncrement, 1);
       } else {
-        // 마지막 텍스트는 fade out 하지 않고 opacity 1 유지
         return 1;
       }
     }
@@ -133,15 +145,18 @@ const OpenedClosue = ({ onComplete }) => {
   return (
     <div className="relative w-screen h-screen overflow-hidden bg-black">
       <div className="relative w-screen h-screen overflow-hidden bg-black">
-        {/* 열린 클로슈 (하단) */}
+        {/* 비디오 (하단) */}
         <div className="absolute inset-0 z-10 flex items-end justify-center pb-10">
           <div
             className="relative"
-            style={{ width: "calc(60vw * 0.8)", maxWidth: "800px" }}
+            style={{ width: "calc(60vw * 1.2)", maxWidth: "1000px" }}
           >
-            <img
-              src="/images/main-page/cooking_statue.png"
-              alt="closue-plate"
+            <video
+              ref={videoRef}
+              src="/videos/bg-new.mp4"
+              muted
+              playsInline
+              preload="auto"
               className="w-full"
               style={{ display: "block", transform: "translateY(20px)" }}
             />
