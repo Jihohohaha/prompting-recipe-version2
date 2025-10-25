@@ -3,6 +3,7 @@ import { BrowserRouter as Router } from 'react-router-dom'
 import AppRouter from './AppRouter'
 import HeaderWrapper from './components/common/HeaderWrapper'; // New import
 import './styles/App.css'
+import CustomCursorFork from './components/common/CustomCursorFork';
 
 /* // AuthProvider 내부에서 useAuth를 사용하는 컴포넌트
 const AppContent = () => {
@@ -26,6 +27,7 @@ const AppContent = () => {
 function App() {
   return (
     <Router>
+      <CustomCursorFork />
       <HeaderWrapper />
       <AppRouter />
     </Router>
