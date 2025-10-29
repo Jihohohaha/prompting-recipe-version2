@@ -4,7 +4,6 @@ import useGPTStudyStore from '../../store';
 
 const TABS = Object.freeze([
   { id: 'tutorial', title: 'TUTORIAL' },
-  { id: 'chat',     title: 'CHAT' },
   { id: 'quiz',     title: 'QUIZ' },
 ]);
 
@@ -80,15 +79,9 @@ const TabInterface = ({ recipe }) => {
               key={tab.id}
               onClick={() => handleTabClick(tab.id)}
               className={`
-<<<<<<< HEAD
-                flex-1 h-14 font-bold text-lg font-mortend justify-left 
-                rounded-t-lg transition-all duration-300
-                ${!isActive && 'hover:opacity-95'}
-=======
                 flex-1 h-full font-bold text-lg font-pretendard
                 rounded-t-2xl rounded-b-none transition-all duration-300
                 ${!isActive ? 'hover:opacity-95' : ''}
->>>>>>> 2be5bc86dcab0c165ce9482e1ad9c9e2afffba14
               `}
               style={{
                 backgroundColor: isActive ? primaryColor : tabBg,

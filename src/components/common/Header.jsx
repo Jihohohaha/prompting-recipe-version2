@@ -15,13 +15,14 @@ const Header = () => {
         </Link>
 
         {/* 마이페이지 모달 트리거 */}
-        <button
+        <img
+          src="/images/mypagebutton.png"
           type="button"
           onClick={() => setOpen(true)}
           aria-haspopup="dialog"
           aria-expanded={open}
           aria-controls="mypage-modal"
-          className="fixed h-10 w-10 rounded-full bg-white top-[20px] right-[20px] z-[100] shadow-md hover:shadow-lg transition-shadow"
+          className="fixed h-12 w-12 rounded-full bg-white top-[20px] right-[20px] z-[100] shadow-md hover:shadow-lg transition-shadow"
           title="마이페이지"
         />
       </header>

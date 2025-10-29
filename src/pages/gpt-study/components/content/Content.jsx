@@ -88,8 +88,8 @@ const Content = () => {
             exit={{ opacity: 0 }}
             transition={{ duration: 0.7 }}
             onClick={handleOverlayClick}
-            className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center cursor-pointer"
-            style={{ left: '16.666667%', width: '83.333333%' }}
+            className="fixed inset-0 z-50 flex items-center justify-center cursor-pointer w-[84vw]"
+            style={{ left: '16%' }}
           >
             <div className="relative w-full h-full flex items-center justify-center">
               <img 
@@ -104,7 +104,7 @@ const Content = () => {
                   repeat: Infinity,
                   ease: "easeInOut"
                 }}
-                className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-gray-300 text-2xl font-bold"
+                className="absolute bottom-[32px] left-1/2 transform -translate-x-4 -translate-y-1/2 text-gray-300 text-2xl font-bold"
               >
                 클릭하세요!
               </motion.div>
