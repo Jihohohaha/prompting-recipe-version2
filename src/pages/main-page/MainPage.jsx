@@ -3,7 +3,7 @@ import { useSearchParams } from "react-router-dom"; // Added
 import Prologue from "./components/prologue/Prologue";
 import Closue from "./components/closue/Closue";
 import ClosueStatueSelect from "./components/closue-statue-select/ClosueStatueSelect";
-
+//파일명 바꿈
 const MainPage = () => {
   const [searchParams] = useSearchParams(); // Added
   const skipToClosue = searchParams.get("step") === "5"; // Added
