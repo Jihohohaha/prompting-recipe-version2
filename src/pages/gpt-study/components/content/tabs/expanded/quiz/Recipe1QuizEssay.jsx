@@ -263,7 +263,7 @@ const Section5 = ({ setResult }) => {
                      font-pretendard font-semibold py-4 px-20 rounded-[10px]
                      border-none border-[#642D05] shadow-md transition-transform duration-300 hover:scale-105 disabled:opacity-60"
         >
-          {loading ? "서버로 전송 중..." : "레시피 제출하기"}
+          {loading ? "검사 중..." : "레시피 제출하기"}
         </button>
       </div>
     </div>
@@ -272,10 +272,22 @@ const Section5 = ({ setResult }) => {
 
 // ========== 성공 화면 ==========
 const MissionComplete = ({ onClose }) => {
+  const [showBadgeOverlay, setShowBadgeOverlay] = useState(false);
+
+  const handleNextRecipe = () => {
+    // 배지 오버레이 표시
+    setShowBadgeOverlay(true);
+
+    // 1.5초 후 자동으로 onClose 실행
+    setTimeout(() => {
+      onClose();
+    }, 1500);
+  };
+
   return (
     <div
       style={{
-        backgroundColor: "#000",
+        background: "linear-gradient(to bottom, #000, #2c2c2c)",
         color: "white",
         textAlign: "center",
         height: "100%",
@@ -291,17 +303,6 @@ const MissionComplete = ({ onClose }) => {
         borderRadius: "24px",
       }}
     >
-      {/* 🎥 동영상 */}
-      <video
-        src="/videos/shining.mp4"
-        autoPlay
-        loop
-        muted
-        playsInline
-        className="absolute top-0 left-0 w-full h-full object-cover"
-        style={{ borderRadius: "24px" }}
-      />
-
       {/* ✨ ROLE PROMPTING 배경 텍스트 */}
       <h1
         className="font-cafe24"
@@ -311,7 +312,7 @@ const MissionComplete = ({ onClose }) => {
           left: "50%",
           transform: "translateX(-50%)",
           fontSize: "12vw",
-          color: "rgba(199, 106, 45, 0.12)",
+          color: "rgba(255,255,255,0.06)",
           zIndex: 1,
           whiteSpace: "nowrap",
           userSelect: "none",
@@ -339,7 +340,7 @@ const MissionComplete = ({ onClose }) => {
         }}
       >
         <h1 className="text-[64px] font-cafe24 text-[#FF702A] font-bold drop-shadow-[0_0_15px_rgba(255,112,42,0.6)] mb-6">
-          Mission Complete
+          Mission Complete!
         </h1>
 
         <div
@@ -347,7 +348,7 @@ const MissionComplete = ({ onClose }) => {
             maxWidth: "850px",
             lineHeight: 1.8,
             fontSize: "18px",
-            color: "#fff",
+            color: "#DDD",
             textShadow: "0 0 10px rgba(0,0,0,0.3)",
           }}
         >
@@ -402,7 +403,7 @@ const MissionComplete = ({ onClose }) => {
 
         {/* 버튼 */}
         <button
-          onClick={onClose}
+          onClick={handleNextRecipe}
           style={{
             position: "absolute",
             bottom: "8%",
@@ -431,6 +432,41 @@ const MissionComplete = ({ onClose }) => {
           다른 레시피 학습하기
         </button>
       </motion.div>
+
+      {/* 배지 오버레이 */}
+      <AnimatePresence>
+        {showBadgeOverlay && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 5.5 }}
+            style={{
+              position: "absolute",
+              inset: 0,
+              backgroundColor: "rgba(0, 0, 0, 0.8)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              zIndex: 50,
+              borderRadius: "24px",
+            }}
+          >
+            <motion.img
+              src="/images/gpt-study/badge.png"
+              alt="Achievement Badge"
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 5.5, ease: "easeOut" }}
+              style={{
+                maxWidth: "400px",
+                maxHeight: "400px",
+                objectFit: "contain",
+              }}
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };
